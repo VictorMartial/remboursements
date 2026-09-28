@@ -1,0 +1,38 @@
+# This file is the entry point to configure your own services.
+
+parameters:
+    uploads_directory: '%kernel.project_dir%/public/uploads/rib'
+    realtime_hub_url: '%env(REALTIME_HUB_URL)%'
+    realtime_hub_secret: '%env(REALTIME_HUB_SECRET)%'
+
+    # CLIENT (refund@evisamada-mg.com)
+    app_email_from: '%env(APP_EMAIL_FROM)%'
+    app_email_reply_to: '%env(APP_EMAIL_REPLY_TO)%'
+    client_email_from: '%env(CLIENT_EMAIL_FROM)%'
+    client_email_reply_to: '%env(CLIENT_EMAIL_REPLY_TO)%'
+
+    # BANQUE (remboursement@madaozi.mg)
+    bank_email: '%env(BANK_EMAIL)%'
+    bank_email_from: '%env(BANK_EMAIL_FROM)%'
+    bank_email_reply_to: '%env(BANK_EMAIL_REPLY_TO)%'
+
+    interlocuteur_email: '%env(INTERLOCUTEUR_EMAIL)%'
+
+    # IMAP banque
+    imap_host: '%env(IMAP_HOST)%'
+    imap_port: '%env(int:IMAP_PORT)%'
+    imap_encryption: '%env(IMAP_ENCRYPTION)%'
+    imap_username: '%env(IMAP_USERNAME)%'
+    imap_password: '%env(IMAP_PASSWORD)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'

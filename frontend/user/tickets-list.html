@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="nav.tickets">Mes tickets | adminHMD</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        :root {
+            --glass-bg: rgba(226,232,240,0.78);
+            --glass-border: rgba(71,85,105,0.35);
+            --glass-shadow: 0 8px 32px rgba(31,41,55,0.14);
+            --radius-md: 12px;
+            --radius-pill: 999px;
+        }
+        [data-bs-theme="dark"] {
+            --glass-bg: rgba(32,36,46,0.55);
+            --glass-border: rgba(255,255,255,0.08);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.35);
+        }
+
+        .table-wrap, .table-responsive {
+            display: block; width: 100%; max-width: 100%;
+            overflow-x: auto !important; -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(71,85,105,0.2);
+            box-shadow: 0 2px 12px rgba(15,23,42,0.08);
+        }
+        #ticketsTable {
+            width: max-content !important; min-width: 900px !important;
+            table-layout: auto !important; margin-bottom: 0;
+        }
+        #ticketsTable th, #ticketsTable td {
+            white-space: nowrap !important; vertical-align: middle; padding: 12px 14px;
+        }
+        #ticketsTable thead.table-dark { background: rgba(71,85,105,0.14) !important; }
+        #ticketsTable thead.table-dark th {
+            background: transparent; color: #334155 !important; font-weight: 700;
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+            border-color: rgba(71,85,105,0.22);
+        }
+        [data-bs-theme="dark"] #ticketsTable thead.table-dark th { color: #94a3b8 !important; }
+        #ticketsTable tbody tr { transition: background-color 0.15s ease; }
+        #ticketsTable tbody tr:hover { background: rgba(99,102,241,0.08) !important; }
+        #ticketsTable td, #ticketsTable th { border-color: rgba(71,85,105,0.16); }
+        #ticketsTable tbody td { color: #1e293b; }
+        [data-bs-theme="dark"] #ticketsTable tbody td { color: #e6e8ec; }
+
+        #ticketsTable .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px 5px 8px; border-radius: var(--radius-pill);
+            font-size: 0.74rem; font-weight: 600; border: 1px solid transparent;
+        }
+        #ticketsTable .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        #ticketsTable .badge.bg-warning { background: #fde8b8 !important; color: #7c2d12; border-color: #f5c563; }
+        #ticketsTable .badge.bg-warning::before { background: #d97706; }
+        #ticketsTable .badge.bg-success { background: #bbf7d0 !important; color: #14532d; border-color: #86efac; }
+        #ticketsTable .badge.bg-success::before { background: #16a34a; }
+        #ticketsTable .badge.bg-danger { background: #fecdd3 !important; color: #881337; border-color: #fda4af; }
+        #ticketsTable .badge.bg-danger::before { background: #e11d48; }
+        #ticketsTable .badge.bg-primary { background: #c7d2fe !important; color: #312e81; border-color: #a5b4fc; }
+        #ticketsTable .badge.bg-primary::before { background: #4f46e5; }
+        #ticketsTable .badge.bg-info { background: #bfdbfe !important; color: #1e3a8a; border-color: #93c5fd; }
+        #ticketsTable .badge.bg-info::before { background: #2563eb; }
+        #ticketsTable .badge.bg-secondary { background: #e2e8f0 !important; color: #334155; border-color: #cbd5e1; }
+        #ticketsTable .badge.bg-secondary::before { background: #64748b; }
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-warning { background: rgba(245,158,11,0.16) !important; color: #fbbf24; border-color: rgba(245,158,11,0.3); }
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-success { background: rgba(34,197,94,0.16) !important; color: #86efac; border-color: rgba(34,197,94,0.3); }
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-danger { background: rgba(244,63,94,0.16) !important; color: #fda4af; border-color: rgba(244,63,94,0.3); }
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-primary { background: rgba(99,102,241,0.16) !important; color: #c7d2fe; border-color: rgba(99,102,241,0.3); }
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-info { background: rgba(59,130,246,0.16) !important; color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-secondary { background: rgba(148,163,184,0.16) !important; color: #cbd5e1; border-color: rgba(148,163,184,0.3); }
+
+        .btn-action {
+            width: 34px; height: 34px; padding: 0; border-radius: 10px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid #e2e8f0; background: #fff; color: #64748b;
+            transition: all 0.15s ease; text-decoration: none; cursor: pointer;
+        }
+        .btn-action:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,23,42,0.08); }
+        .btn-action.btn-view:hover { background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; }
+        .btn-action.btn-rib { background: #ecfdf5; color: #094834; border-color: #0d613a; }
+        .btn-action.btn-rib:hover { background: #d1fae5; color: #047857; border-color: #3ca87d; }
+        .btn-action.btn-rib i { animation: wiz-blink 1.4s ease-in-out infinite; }
+        @keyframes wiz-blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+        .btn-action.btn-follow { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+        .btn-action.btn-follow:hover { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
+        .btn-action.btn-follow i { animation: wiz-hourglass-spin 2.4s linear infinite; }
+        @keyframes wiz-hourglass-spin { to { transform: rotate(360deg); } }
+        .btn-action.btn-delete:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+        [data-bs-theme="dark"] .btn-action { background: rgba(30,41,59,0.8); border-color: rgba(148,163,184,0.2); color: #94a3b8; }
+        [data-bs-theme="dark"] .btn-action.btn-view:hover { background: rgba(99,102,241,0.2); color: #c7d2fe; }
+        [data-bs-theme="dark"] .btn-action.btn-rib { background: rgba(16,185,129,0.16); color: #6ee7b7; border-color: rgba(16,185,129,0.3); }
+        [data-bs-theme="dark"] .btn-action.btn-follow { background: rgba(245,158,11,0.16); color: #fcd34d; border-color: rgba(245,158,11,0.3); }
+        [data-bs-theme="dark"] .btn-action.btn-delete:hover { background: rgba(239,68,68,0.2); color: #fca5a5; }
+
+        .actions-cell { display: inline-flex; flex-wrap: nowrap; gap: 6px; align-items: center; }
+        .date-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.3rem 0.65rem; border-radius: 8px; font-size: 0.8rem; font-weight: 500;
+            color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; white-space: nowrap;
+        }
+        .date-pill i { font-size: 0.85rem; opacity: 0.7; }
+        [data-bs-theme="dark"] .date-pill { background: rgba(148,163,184,0.12); color: #cbd5e1; border-color: rgba(148,163,184,0.2); }
+        .amount-cell { font-weight: 600; font-variant-numeric: tabular-nums; }
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 6px;
+            border-radius: var(--radius-pill) !important;
+            background: linear-gradient(135deg, rgba(79,70,229,0.88), rgba(67,56,202,0.88));
+            border-color: rgba(67,56,202,0.5); font-weight: 500;
+        }
+        .btn-danger { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill) !important; }
+
+        /* Modale + Toast */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15,18,25,.45); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 16px; padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,.15); width: 90%; max-width: 420px;
+        }
+        [data-bs-theme="dark"] .modal-box { background: #1b2029; color: #e6e8ec; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+        .toast-item {
+            padding: 14px 18px; border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.14);
+            display: flex; align-items: flex-start; gap: 10px;
+            animation: toastIn .3s ease; font-size: .9rem; font-weight: 500;
+        }
+        .toast-item.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .toast-item.danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .toast-item.info    { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .toast-item .toast-close {
+            margin-left: auto; border: none; background: transparent;
+            cursor: pointer; opacity: .55; font-size: 1.15rem; line-height: 1;
+        }
+        .toast-item .toast-close:hover { opacity: 1; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(36px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        [data-bs-theme="dark"] .toast-item.success { background: rgba(16,185,129,.18); color: #6ee7b7; border-color: rgba(16,185,129,.3); }
+        [data-bs-theme="dark"] .toast-item.danger  { background: rgba(239,68,68,.18); color: #fca5a5; border-color: rgba(239,68,68,.3); }
+
+        @media (min-width: 1400px) {
+            .container-fluid { max-width: 1600px; margin-inline: auto; }
+            .table-wrap, .table-responsive { max-height: 640px; }
+            #ticketsTable { width: 100% !important; min-width: 100% !important; }
+            #ticketsTable th, #ticketsTable td { padding: 16px 22px; font-size: 0.95rem; }
+            .btn-action { width: 38px; height: 38px; }
+        }
+    </style>
+    <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('adminHMD.colorTheme') || localStorage.getItem('theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', t);
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+    </script>
+</head>
+<body>
+<div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <a class="brand-mark" href="/user/dashboard-user.html">
+                <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+                <span class="brand-copy">
+                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
+                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace Personnel</span>
+                </span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
+            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
+            <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
+        </nav>
+        <div class="sidebar-user">
+            <strong id="sidebarUserName">Utilisateur</strong>
+            <small data-i18n="brand.subtitle">Espace personnel</small>
+        </div>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <nav class="navbar admin-navbar navbar-expand bg-white">
+            <div class="container-fluid px-3 px-lg-4">
+                <button class="sidebar-toggle" type="button" data-sidebar-toggle>
+                    <span></span><span></span><span></span>
+                </button>
+                <form class="d-none d-md-flex ms-3 flex-grow-1" role="search" onsubmit="return false;">
+                    <input class="form-control search-input" data-table-search="ticketsTable" type="search" placeholder="Rechercher..." data-i18n-placeholder="search.placeholder">
+                </form>
+                <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageButton">🇫🇷</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                        </ul>
+                    </div>
+                    <button class="icon-button theme-toggle" type="button" data-theme-toggle>
+                        <i class="bi bi-moon-stars" data-theme-icon></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="container-fluid px-3 px-lg-4 py-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h2 class="mb-0"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></h2>
+                    <div class="d-flex align-items-center gap-2">
+                        <button id="deleteSelectedBtn" class="btn btn-danger btn-sm d-none" type="button" title="Supprimer la sélection">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <a href="/ticket/ticket-create-step1.html" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-lg"></i>
+                            Nouveau ticket
+                        </a>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="table-responsive table-wrap" style="max-height:420px; overflow-y:auto;">
+                        <table id="ticketsTable" class="table table-striped align-middle mb-0" data-searchable-table>
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width:40px"><input type="checkbox" id="selectAllTickets" aria-label="Tout sélectionner"></th>
+                                    <th data-i18n="table.id">ID</th>
+                                    <th data-i18n="table.reference">Référence</th>
+                                    <th data-i18n="table.amount">Montant</th>
+                                    <th data-i18n="table.status">Statut</th>
+                                    <th data-i18n="table.date">Date</th>
+                                    <th data-i18n="table.actions" class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticketsBody">
+                                <tr><td colspan="7" class="text-center" data-i18n="ticket.detail.loading">Chargement...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="admin-footer"></footer>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:10px;max-width:380px;"></div>
+
+<!-- Modale confirmation -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <h3 id="confirmTitle"><i class="bi bi-question-circle"></i> <span data-i18n="confirm.title">Confirmation</span></h3>
+        <p id="confirmMessage" class="mb-0 mt-2"></p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="confirmCancelBtn" data-i18n="button.cancel">Annuler</button>
+            <button type="button" class="btn btn-danger" id="confirmOkBtn" data-i18n="button.confirm">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/i18n.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
+    const token = localStorage.getItem('jwt_token');
+    if (!token) { window.location.href = '/auth/login.html'; return; }
+
+    /* ===== Toast ===== */
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast-item ${type}`;
+        toast.innerHTML = `<span>${message}</span><button class="toast-close" aria-label="Fermer">&times;</button>`;
+        container.appendChild(toast);
+        const close = () => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(36px)';
+            toast.style.transition = '.25s ease';
+            setTimeout(() => toast.remove(), 250);
+        };
+        toast.querySelector('.toast-close').addEventListener('click', close);
+        setTimeout(close, 4500);
+    }
+
+    /* ===== Confirmation popup ===== */
+    function showConfirm(message, title = 'Confirmation') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirmModal');
+            const titleEl = document.getElementById('confirmTitle');
+            const msgEl = document.getElementById('confirmMessage');
+            const okBtn = document.getElementById('confirmOkBtn');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+
+            titleEl.innerHTML = `<i class="bi bi-exclamation-triangle text-danger"></i> ${title}`;
+            msgEl.textContent = message;
+            modal.classList.add('open');
+
+            function cleanup(result) {
+                modal.classList.remove('open');
+                okBtn.removeEventListener('click', onOk);
+                cancelBtn.removeEventListener('click', onCancel);
+                modal.removeEventListener('click', onOutside);
+                resolve(result);
+            }
+            function onOk() { cleanup(true); }
+            function onCancel() { cleanup(false); }
+            function onOutside(e) { if (e.target === modal) cleanup(false); }
+
+            okBtn.addEventListener('click', onOk);
+            cancelBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onOutside);
+        });
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+        });
+    }
+
+    function parseJwt(t) {
+        try {
+            const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(atob(base64).split('').map(c =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            ).join(''));
+            return JSON.parse(json);
+        } catch (e) { return null; }
+    }
+
+    const jwtPayload = parseJwt(token);
+    const currentUserEmail = jwtPayload?.email || jwtPayload?.username || jwtPayload?.sub || 'Utilisateur';
+    document.getElementById('sidebarUserName').textContent = currentUserEmail;
+    document.getElementById('navbarUserName').textContent = currentUserEmail;
+
+    function fetchWithAuth(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            headers: {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }).then(async res => {
+            if (res.status === 401) {
+                localStorage.removeItem('jwt_token');
+                window.location.href = '/auth/login.html';
+                return Promise.reject('Non authentifié');
+            }
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        });
+    }
+
+    function currencySymbol(code) {
+        return ({ 'EUR': '€', 'USD': '$', 'GBP': '£', 'MGA': 'Ar' }[code] || code);
+    }
+    function formatCurrency(amount, code) {
+        return (parseFloat(amount) || 0).toFixed(2) + ' ' + currencySymbol(code || 'EUR');
+    }
+    function formatDate(raw) {
+        if (!raw) return '—';
+        const d = new Date(String(raw).replace(' ', 'T'));
+        if (isNaN(d.getTime())) return raw;
+        return String(d.getDate()).padStart(2,'0') + '/' +
+               String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+    }
+
+    const STATUS_I18N_KEYS = {
+        'Validé': 'ticket.status.validated',
+        'Refusé': 'ticket.status.refused',
+        'En attente RIB': 'ticket.status.pending_rib',
+        'RIB reçu': 'ticket.status.rib_received',
+        'En attente réponse banque': 'ticket.status.pending_bank',
+        'En attente confirmation': 'ticket.status.pending_confirmation'
+    };
+    function translateStatus(statut) {
+        if (!statut) return '-';
+        const key = STATUS_I18N_KEYS[statut];
+        if (!key) return statut;
+        const translated = (typeof t === 'function') ? t(key) : null;
+        if (translated && translated !== key) return translated;
+        return statut;
+    }
+
+    function loadTickets() {
+        return fetchWithAuth(`${API_BASE}/api/user/tickets`)
+            .then(tickets => {
+                const tbody = document.getElementById('ticketsBody');
+                if (!tickets.length) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center">${typeof t === 'function' ? t('tickets.empty') : 'Aucun ticket'}</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = tickets.map(ticket => {
+                    let badgeClass = 'warning';
+                    if (ticket.statut === 'Validé') badgeClass = 'success';
+                    else if (ticket.statut === 'Refusé') badgeClass = 'danger';
+                    else if (ticket.statut === 'En attente RIB') badgeClass = 'primary';
+                    else if (ticket.statut === 'RIB reçu') badgeClass = 'info';
+                    else if (ticket.statut === 'En attente réponse banque') badgeClass = 'secondary';
+
+                    let actions = `
+                        <a class="btn-action btn-view" href="/ticket/ticket-show.html?id=${ticket.id}" title="${typeof t === 'function' ? t('action.view') : 'Voir'}">
+                            <i class="bi bi-eye"></i>
+                        </a>`;
+                    if (ticket.statut === 'En attente RIB') {
+                        actions += `
+                        <a class="btn-action btn-rib" href="/ticket/ticket-step3.html?id=${ticket.id}" title="${typeof t === 'function' ? t('action.send_rib') : 'Envoyer RIB'}">
+                            <i class="bi bi-paperclip"></i>
+                        </a>`;
+                    }
+                    if (ticket.statut === 'En attente confirmation') {
+                        actions += `
+                        <a class="btn-action btn-follow" href="/ticket/ticket-awaiting.html?id=${ticket.id}" title="${typeof t === 'function' ? t('action.follow') : 'Suivre'}">
+                            <i class="bi bi-hourglass-split"></i>
+                        </a>`;
+                    }
+                    actions += `
+                        <button type="button" class="btn-action btn-delete" onclick="deleteTicket(${ticket.id})" title="${typeof t === 'function' ? t('action.delete') : 'Supprimer'}">
+                            <i class="bi bi-trash"></i>
+                        </button>`;
+
+                    return `
+                        <tr>
+                            <td><input type="checkbox" class="ticket-checkbox" data-id="${ticket.id}"></td>
+                            <td>#${ticket.id}</td>
+                            <td>${ticket.reference || '—'}</td>
+                            <td class="amount-cell">${formatCurrency(ticket.montant, ticket.devise)}</td>
+                            <td><span class="badge bg-${badgeClass}">${translateStatus(ticket.statut)}</span></td>
+                            <td><span class="date-pill"><i class="bi bi-calendar3"></i>${formatDate(ticket.date || ticket.createdAt)}</span></td>
+                            <td class="text-end"><div class="actions-cell">${actions}</div></td>
+                        </tr>`;
+                }).join('');
+
+                document.getElementById('selectAllTickets').onclick = function() {
+                    document.querySelectorAll('.ticket-checkbox').forEach(cb => cb.checked = this.checked);
+                    updateDeleteButtonVisibility();
+                };
+                document.querySelectorAll('.ticket-checkbox').forEach(cb => cb.onchange = updateDeleteButtonVisibility);
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('ticketsBody').innerHTML =
+                    `<tr><td colspan="7" class="text-danger">${typeof t === 'function' ? t('tickets.load_error') : 'Erreur de chargement'}</td></tr>`;
+            });
+    }
+
+    window.deleteTicket = async function(id) {
+        const ok = await showConfirm(typeof t === 'function' ? t('confirm.delete_one') : 'Confirmer la suppression de ce ticket ?', typeof t === 'function' ? t('confirm.delete_title') : 'Suppression');
+        if (!ok) return;
+
+        fetchWithAuth(`${API_BASE}/api/user/ticket/${id}/delete`, { method: 'POST' })
+            .then(data => {
+                if (data.success) {
+                    showToast(typeof t === 'function' ? t('toast.ticket_deleted') : 'Ticket supprimé avec succès', 'success');
+                    loadTickets();
+                } else {
+                    showToast(typeof t === 'function' ? t('toast.delete_error') : 'Erreur de suppression', 'danger');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast(typeof t === 'function' ? t('toast.delete_error') : 'Erreur de suppression', 'danger');
+            });
+    };
+
+    function updateDeleteButtonVisibility() {
+        const any = document.querySelectorAll('.ticket-checkbox:checked').length > 0;
+        const btn = document.getElementById('deleteSelectedBtn');
+        if (btn) btn.classList.toggle('d-none', !any);
+    }
+
+    async function deleteSelected() {
+        const ids = Array.from(document.querySelectorAll('.ticket-checkbox:checked')).map(cb => cb.dataset.id);
+        if (!ids.length) {
+            showToast(typeof t === 'function' ? t('toast.none_selected') : 'Aucun ticket sélectionné', 'info');
+            return;
+        }
+
+        const ok = await showConfirm((typeof t === 'function' ? t('confirm.delete_many') : 'Supprimer {n} ticket(s) ?').replace('{n}', ids.length), typeof t === 'function' ? t('confirm.delete_many_title') : 'Suppression multiple');
+        if (!ok) return;
+
+        const btn = document.getElementById('deleteSelectedBtn');
+        if (btn) btn.disabled = true;
+
+        try {
+            const results = await Promise.allSettled(
+                ids.map(id => fetchWithAuth(`${API_BASE}/api/user/ticket/${id}/delete`, { method: 'POST' }))
+            );
+            const failed = results.filter(r =>
+                r.status === 'rejected' || (r.status === 'fulfilled' && !(r.value && r.value.success))
+            );
+            if (failed.length === 0) {
+                showToast(typeof t === 'function' ? t('toast.delete_success') : 'Suppression réussie', 'success');
+            } else {
+                showToast(`${failed.length} échec(s) lors de la suppression`, 'danger');
+            }
+            loadTickets();
+        } catch (e) {
+            console.error(e);
+            showToast(typeof t === 'function' ? t('toast.delete_error') : 'Erreur de suppression', 'danger');
+        } finally {
+            if (btn) btn.disabled = false;
+            updateDeleteButtonVisibility();
+        }
+    }
+
+    document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
+    loadTickets();
+
+    /* ===== WebSocket temps réel + fallback polling ===== */
+    const WS_URL = window.WS_URL || ((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.hostname + ':8081/ws');
+    let ticketsWs = null;
+    let ticketsWsTimer = null;
+    let ticketsWsOk = false;
+    let ticketsPollTimer = null;
+    const TICKETS_POLL_MS = 35000;
+
+    function ticketsWsConnect() {
+        if (ticketsWs && (ticketsWs.readyState === WebSocket.OPEN || ticketsWs.readyState === WebSocket.CONNECTING)) return;
+        try {
+            ticketsWs = new WebSocket(WS_URL);
+        } catch (e) {
+            console.warn('[ws] connect failed', e);
+            scheduleTicketsWs();
+            return;
+        }
+        ticketsWs.addEventListener('open', function () {
+            console.log('[ws] connected', WS_URL);
+            ticketsWsOk = true;
+            stopTicketsPolling();
+            loadTickets();
+        });
+        ticketsWs.addEventListener('message', function (ev) {
+            let msg;
+            try { msg = JSON.parse(ev.data); } catch (_) { return; }
+            if (!msg) return;
+
+            // Le hub peut envoyer soit {event, ticketId, ...}, soit {type: 'ping'|'connected'}
+            const eventName = msg.event || msg.type || '';
+            if (eventName === 'pong' || eventName === 'connected') return;
+
+            // On ne réagit qu'aux événements ticket.*
+            if (eventName.indexOf('ticket.') === 0) {
+                console.log('[ws] event', eventName);
+                loadTickets();
+            }
+        });
+        ticketsWs.addEventListener('close', function () {
+            console.warn('[ws] closed — fallback polling');
+            ticketsWsOk = false;
+            scheduleTicketsWs();
+            if (!document.hidden) startTicketsPolling();
+        });
+        ticketsWs.addEventListener('error', function () {
+            try { ticketsWs.close(); } catch (_) {}
+        });
+    }
+    function scheduleTicketsWs() {
+        if (ticketsWsTimer) return;
+        ticketsWsTimer = setTimeout(function () {
+            ticketsWsTimer = null;
+            ticketsWsConnect();
+        }, 4000);
+    }
+    function startTicketsPolling() {
+        stopTicketsPolling();
+        if (document.hidden || ticketsWsOk) return;
+        ticketsPollTimer = setInterval(function () {
+            if (!document.hidden && !ticketsWsOk) loadTickets();
+        }, TICKETS_POLL_MS);
+    }
+    function stopTicketsPolling() {
+        if (ticketsPollTimer) { clearInterval(ticketsPollTimer); ticketsPollTimer = null; }
+    }
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stopTicketsPolling();
+        else {
+            loadTickets();
+            if (!ticketsWsOk) { startTicketsPolling(); ticketsWsConnect(); }
+        }
+    });
+    ticketsWsConnect();
+    startTicketsPolling();
+
+    document.addEventListener('languageChanged', function() {
+        loadTickets();
+    });
+});
+</script>
+</body>
+</html>

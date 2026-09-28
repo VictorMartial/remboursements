@@ -1,0 +1,68 @@
+security:
+    # Hachage des mots de passe
+    password_hashers:
+        App\Entity\User: 'auto'
+
+    # Providers : charger les utilisateurs via Doctrine
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    # Hiérarchie des rôles
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_INTERLOCUTEUR, ROLE_USER]
+        ROLE_INTERLOCUTEUR: ROLE_USER
+        # ROLE_USER est le rôle de base
+
+    firewalls:
+        # Firewall pour l'API de login (stateless)
+        login:
+            pattern: ^/api/login
+            stateless: true
+            # Pas d'authentification, on utilise notre contrôleur personnalisé
+
+        # Firewall pour l'API sécurisée (JWT)
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
+        # Firewall principal pour les pages HTML (avec session)
+        main:
+            lazy: true
+            provider: app_user_provider
+            # Optionnel : si vous voulez un formulaire de login classique
+            # form_login:
+            #     login_path: login
+            #     check_path: login
+            # logout:
+            #     path: logout
+
+        # Firewall pour les outils de dev
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+    # Contrôle d'accès
+    access_control:
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/forgot-password, roles: PUBLIC_ACCESS }
+        - { path: ^/api/verify-reset-code, roles: PUBLIC_ACCESS }
+        - { path: ^/api/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/api/admin, roles: ROLE_ADMIN }
+        - { path: ^/api/interlocuteur, roles: ROLE_INTERLOCUTEUR }
+        - { path: ^/api, roles: ROLE_USER }
+        # Protéger les pages HTML si nécessaire
+        # - { path: ^/dashboard, roles: ROLE_USER }
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

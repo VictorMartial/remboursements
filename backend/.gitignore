@@ -1,0 +1,29 @@
+﻿# Backend Symfony
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/config/jwt/*.pem
+/public/bundles/
+/var/
+/vendor/
+
+# Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+
+# Historique et Ã©diteur
+.history/
+.backups/
+.vscode/
+.idea/
+/.groupedtimelineinclude
+
+# Divers
+*.key
+*.bak
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini

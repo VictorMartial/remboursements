@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="profile.title">Profil | adminHMD</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .profile-hero { text-align: center; padding: 1.5rem 1rem 0.5rem; }
+        .user-avatar-xl {
+            width: 88px; height: 88px; border-radius: 20px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 2rem;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff; margin-bottom: 1rem;
+            box-shadow: 0 8px 24px rgba(79,70,229,0.3);
+        }
+        .info-list > div {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(148,163,184,0.2);
+            gap: 1rem;
+        }
+        .info-list > div:last-child { border-bottom: none; }
+        .info-list span { color: #64748b; font-size: 0.9rem; }
+        .info-list strong { font-weight: 600; text-align: right; word-break: break-all; }
+        .date-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.3rem 0.65rem; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 500; color: #475569;
+            background: #f1f5f9; border: 1px solid #e2e8f0; white-space: nowrap;
+        }
+        .date-pill i { font-size: 0.85rem; opacity: 0.7; }
+        [data-bs-theme="dark"] .date-pill {
+            background: rgba(148,163,184,0.12); color: #cbd5e1;
+            border-color: rgba(148,163,184,0.2);
+        }
+        .role-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.35rem 0.75rem; border-radius: 999px;
+            font-size: 0.75rem; font-weight: 600;
+            border: 1px solid transparent;
+        }
+        .role-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .role-user { background: rgba(59,130,246,0.12); color: #1d4ed8; border-color: rgba(59,130,246,0.25); }
+        .role-user::before { background: #3b82f6; }
+        .role-interlocuteur { background: rgba(245,158,11,0.14); color: #b45309; border-color: rgba(245,158,11,0.3); }
+        .role-interlocuteur::before { background: #f59e0b; }
+        .role-admin { background: rgba(239,68,68,0.12); color: #b91c1c; border-color: rgba(239,68,68,0.28); }
+        .role-admin::before { background: #ef4444; }
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.3rem 0.7rem; border-radius: 999px;
+            font-size: 0.72rem; font-weight: 600;
+            background: rgba(34,197,94,0.14); color: #15803d;
+            border: 1px solid rgba(34,197,94,0.28);
+        }
+        .status-badge::before {
+            content: ""; width: 6px; height: 6px; border-radius: 50%;
+            background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+        }
+        .status-badge.off {
+            background: rgba(148,163,184,0.14); color: #475569;
+            border-color: rgba(148,163,184,0.28);
+        }
+        .status-badge.off::before { background: #94a3b8; box-shadow: none; }
+    </style>
+    <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('adminHMD.colorTheme')
+          || localStorage.getItem('theme')
+          || localStorage.getItem('bs-theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', t);
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+    </script>
+</head>
+<body>
+<div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <a class="brand-mark" href="/user/dashboard-user.html">
+                <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+                <span class="brand-copy">
+                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
+                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace User</span>
+                </span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-link" href="/user/dashboard-user.html">
+                <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
+                <span class="nav-text" data-i18n="nav.dashboard">Dashboard</span>
+            </a>
+            <a class="nav-link" href="/user/tickets-list.html">
+                <span class="nav-icon"><i class="bi bi-list-ul"></i></span>
+                <span class="nav-text" data-i18n="nav.tickets">Mes tickets</span>
+            </a>
+            <a class="nav-link" href="/ticket/ticket-create.html">
+                <span class="nav-icon"><i class="bi bi-plus-circle"></i></span>
+                <span class="nav-text" data-i18n="nav.new_ticket">Nouveau ticket</span>
+            </a>
+            <a class="nav-link active" href="/user/profile.html" aria-current="page">
+                <span class="nav-icon"><i class="bi bi-person"></i></span>
+                <span class="nav-text" data-i18n="profile">Profil</span>
+            </a>
+        </nav>
+        <div class="sidebar-user">
+            <strong id="sidebarUserName">Utilisateur</strong>
+            <small data-i18n="brand.subtitle">Espace personnel</small>
+        </div>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <nav class="navbar admin-navbar navbar-expand bg-white">
+            <div class="container-fluid px-3 px-lg-4">
+                <button class="sidebar-toggle" type="button" data-sidebar-toggle>
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageButton">🇫🇷</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                        </ul>
+                    </div>
+                    <button class="icon-button theme-toggle" type="button" data-theme-toggle>
+                        <i class="bi bi-moon-stars" data-theme-icon></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="container-fluid px-3 px-lg-4 py-4">
+                <div class="page-heading">
+                    <div class="page-heading-copy">
+                        <span class="page-icon"><i class="bi bi-person"></i></span>
+                        <div>
+                            <p class="eyebrow mb-1" data-i18n="profile.eyebrow">Profil</p>
+                            <h1 class="h3 mb-1" data-i18n="profile.title">Mon profil</h1>
+                            <p class="text-muted mb-0" data-i18n="profile.subtitle">Vos informations personnelles.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="row g-3 mt-1">
+                    <div class="col-12 col-xl-4">
+                        <div class="panel h-100">
+                            <div class="profile-hero">
+                                <div class="user-avatar-xl" id="profileAvatar">?</div>
+                                <h2 class="h5 mb-1" id="profileEmailTitle">—</h2>
+                                <div class="mt-2" id="profileRoleBadges"></div>
+                                <div class="mt-2" id="profileVerifiedBadge"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-xl-8">
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div>
+                                    <h2 class="h5 mb-1 section-title">
+                                        <i class="bi bi-info-circle"></i>
+                                        <span>Détails du compte</span>
+                                    </h2>
+                                </div>
+                            </div>
+                            <div class="info-list px-1">
+                                <div>
+                                    <span data-i18n="label.email">Email</span>
+                                    <strong id="profileEmail">—</strong>
+                                </div>
+                                <div>
+                                    <span>Rôle</span>
+                                    <strong id="profileRoles">—</strong>
+                                </div>
+                                <div>
+                                    <span>Compte vérifié</span>
+                                    <strong id="profileVerified">—</strong>
+                                </div>
+                                <div>
+                                    <span data-i18n="label.registered">Inscrit le</span>
+                                    <strong><span class="date-pill" id="profileCreatedAt"><i class="bi bi-calendar3"></i> —</span></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <footer class="admin-footer"></footer>
+    </div>
+</div>
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/i18n.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE = 'http://localhost:8000';
+    const token = localStorage.getItem('jwt_token');
+    if (!token) { window.location.href = '/auth/login.html'; return; }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+        });
+    }
+
+    function formatDate(raw) {
+        if (!raw) return '—';
+        var s = String(raw).trim();
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) {
+            return s.split(' ')[0];
+        }
+        var d = new Date(s.replace(' ', 'T'));
+        if (isNaN(d.getTime())) return s;
+        var jj = String(d.getDate()).padStart(2, '0');
+        var mm = String(d.getMonth() + 1).padStart(2, '0');
+        var aaaa = d.getFullYear();
+        return jj + '/' + mm + '/' + aaaa;
+    }
+
+    function roleLabel(role) {
+        var map = { 'ROLE_USER': 'User', 'ROLE_INTERLOCUTEUR': 'Interlocuteur', 'ROLE_ADMIN': 'Admin' };
+        return map[role] || role || '—';
+    }
+    function roleClass(role) {
+        var r = (role || '').toUpperCase();
+        if (r.indexOf('ADMIN') !== -1) return 'role-admin';
+        if (r.indexOf('INTERLOCUTEUR') !== -1) return 'role-interlocuteur';
+        return 'role-user';
+    }
+
+    function fetchWithAuth(url, options) {
+        options = options || {};
+        return fetch(url, {
+            method: options.method || 'GET',
+            headers: Object.assign({
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }, options.headers || {}),
+            body: options.body
+        }).then(function(res) {
+            if (res.status === 401) {
+                localStorage.removeItem('jwt_token');
+                window.location.href = '/auth/login.html';
+                return Promise.reject('Non authentifié');
+            }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        });
+    }
+
+    fetchWithAuth(API_BASE + '/api/user/profile')
+        .then(function(data) {
+            var user = (data && data.user) ? data.user : (data || {});
+            var email = user.email || user.username || '—';
+            var created = user.createdAt || user.created_at || user.dateCreation || null;
+
+            function setText(id, val) {
+                var el = document.getElementById(id);
+                if (el) el.textContent = val;
+            }
+
+            setText('profileEmail', email);
+            setText('profileEmailTitle', email);
+            setText('sidebarUserName', email);
+            setText('navbarUserName', email);
+
+            var avatar = document.getElementById('profileAvatar');
+            if (avatar) avatar.textContent = (email && email !== '—') ? email.charAt(0).toUpperCase() : '?';
+
+            var elDate = document.getElementById('profileCreatedAt');
+            if (elDate) {
+                elDate.innerHTML = '<i class="bi bi-calendar3"></i> ' + formatDate(created);
+            }
+
+            var roles = [];
+            if (Array.isArray(user.roles)) roles = user.roles;
+            else if (user.role) roles = [user.role];
+            setText('profileRoles', roles.length ? roles.map(roleLabel).join(', ') : '—');
+
+            var badgesEl = document.getElementById('profileRoleBadges');
+            if (badgesEl) {
+                badgesEl.innerHTML = roles.map(function(r) {
+                    return '<span class="role-badge ' + roleClass(r) + '">' + roleLabel(r) + '</span>';
+                }).join(' ');
+            }
+
+            var verified = !!user.verified;
+            var elVerified = document.getElementById('profileVerified');
+            if (elVerified) {
+                elVerified.innerHTML = verified
+                    ? '<span class="status-badge">Oui</span>'
+                    : '<span class="status-badge off">Non</span>';
+            }
+            var elVerifiedBadge = document.getElementById('profileVerifiedBadge');
+            if (elVerifiedBadge) {
+                elVerifiedBadge.innerHTML = verified
+                    ? '<span class="status-badge">Compte vérifié</span>'
+                    : '<span class="status-badge off">Non vérifié</span>';
+            }
+        })
+        .catch(function(err) { console.error(err); });
+});
+</script>
+</body>
+</html>

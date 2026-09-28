@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Remboursement" />
+  <title>Charts</title>
+
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../assets/vendors/bootstrap-icons/bootstrap-icons.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+/* Thème AVANT paint — clé = adminHMD.colorTheme (main.js) */
+(function () {
+  try {
+    var t = localStorage.getItem('adminHMD.colorTheme')
+      || localStorage.getItem('theme')
+      || localStorage.getItem('bs-theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-bs-theme', t);
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+
+<body>
+  <div class="admin-shell">
+    <!-- Sidebar (identique) -->
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand-mark" href="index.html" aria-label="adminHMD dashboard">
+          <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+          <span class="brand-copy">
+            <span class="brand-title">Mada Ozi</span>
+            <span class="brand-subtitle">admin</span>
+          </span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+        <a class="nav-link" href="users.html">
+          <span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+          <span class="nav-text">Users</span>
+        </a>
+        <a class="nav-link" href="add-user.html">
+          <span class="nav-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></span>
+          <span class="nav-text">Add User</span>
+        </a>
+        <a class="nav-link" href="profile.html">
+          <span class="nav-icon"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+          <span class="nav-text">Profile</span>
+        </a>
+        <a class="nav-link active" href="charts.html" aria-current="page">
+          <span class="nav-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
+          <span class="nav-text">Charts</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+      <strong id="sidebarUserName"></strong>
+      <small>Active Workspace</small>
+    </div>
+
+      <div class="sidebar-footer">
+        <span class="status-dot"></span>
+        <span class="sidebar-footer-text">System running smoothly</span>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <!-- Navbar (identique) -->
+      <nav class="navbar admin-navbar navbar-expand bg-white">
+        <div class="container-fluid px-3 px-lg-4">
+          <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true" aria-label="Toggle sidebar">
+            <span></span><span></span><span></span>
+          </button>
+          <form class="d-none d-md-flex ms-3 flex-grow-1" role="search">
+            <input class="form-control search-input" type="search" placeholder="Search..." aria-label="Search" />
+          </form>
+          <div class="navbar-actions ms-auto">
+    <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+        <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+    </button>
+    <div class="dropdown">
+        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            
+            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/user/profile.html">Profil</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/auth/login.html">Déconnexion</a></li>
+        </ul>
+    </div>
+</div>
+        </div>
+      </nav>
+
+      <!-- Contenu principal -->
+      <main class="dashboard-content">
+        <div class="container-fluid px-3 px-lg-4 py-4">
+          <div class="page-heading">
+            <div class="page-heading-copy">
+              <span class="page-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
+              <div>
+                <p class="eyebrow mb-1">Analytics</p>
+                <h1 class="h3 mb-1">Charts</h1>
+                <p class="text-muted mb-0">Visualisation dynamique des données de tickets.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Graphiques dynamiques -->
+          <section class="row g-3 mt-1">
+            <div class="col-12 col-xl-8">
+              <div class="panel h-100">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="h5 mb-1 section-title"><i class="bi bi-bar-chart-line" aria-hidden="true"></i><span>Répartition par statut</span></h2>
+                    <p class="text-muted mb-0">Nombre de tickets par statut actuel.</p>
+                  </div>
+                </div>
+                <div style="height:300px;">
+                  <canvas id="statusChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-xl-4">
+              <div class="panel h-100">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="h5 mb-1 section-title"><i class="bi bi-pie-chart" aria-hidden="true"></i><span>Type de remboursement</span></h2>
+                    <p class="text-muted mb-0">Répartition par type (AEV / Multiple).</p>
+                  </div>
+                </div>
+                <div style="height:250px;">
+                  <canvas id="typeChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Deuxième ligne : montant total remboursé (optionnel) -->
+          <section class="row g-3 mt-3">
+            <div class="col-12">
+              <div class="panel">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="h5 mb-1 section-title"><i class="bi bi-ticket-perforated" aria-hidden="true"></i><span>Nombre total de tickets</span></h2>
+                    <p class="text-muted mb-0">Somme des tickets créés, en attente RIB, validés et à renvoyer.</p>
+                  </div>
+                </div>
+                <div class="text-center py-3">
+                  <span id="totalTickets" class="display-4 fw-bold text-success">0.00 €</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="admin-footer">
+        <div class="container-fluid px-3 px-lg-4">
+          <span>Analytics chart examples.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../assets/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
+
+  
+  
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE = 'http://localhost:8000/api/admin';
+    const token = localStorage.getItem('jwt_token');
+
+    if (!token) {
+      window.location.href = '/auth/login.html';
+      return;
+    }
+
+    function fetchWithAuth(url, options = {}) {
+      return fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }).then(async res => {
+        if (res.status === 401) {
+          localStorage.removeItem('jwt_token');
+          window.location.href = '/auth/login.html';
+          return Promise.reject('Non authentifié');
+        }
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        // Vérifier que la réponse est du JSON
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Réponse non‑JSON');
+        }
+        return res.json();
+      });
+    }
+
+    // Récupérer les stats
+    fetchWithAuth(`${API_BASE}/stats`)
+      .then(data => {
+        // --- Graphique à barres : statuts ---
+        // Le contrôleur renvoie : crees, en_attente_rib, tickets_a_rembourser, tickets_a_renvoyer, aev_non_recu, paiement_multiple, monthlyStats
+        // On utilise uniquement les champs réellement fournis (pas de "valides"/"refuses" fictifs)
+        const labels = ['Créé', 'En attente RIB', 'Validé', 'À renvoyer'];
+        const values = [
+          data.crees ?? 0,
+          data.en_attente_rib ?? 0,
+          data.tickets_a_rembourser ?? 0,
+          data.tickets_a_renvoyer ?? 0
+        ];
+
+        const ctxBar = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctxBar, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Tickets',
+              data: values,
+              backgroundColor: ['#0d6efd', '#ffc107', '#198754', '#6c757d'],
+              borderColor: ['#0d6efd', '#ffc107', '#198754', '#6c757d'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+          }
+        });
+
+        // --- Graphique en donut : types ---
+        const typeLabels = ['AEV non reçu', 'Paiement multiple'];
+        const typeValues = [
+          data.aev_non_recu ?? 0,
+          data.paiement_multiple ?? 0
+        ];
+
+        const ctxDonut = document.getElementById('typeChart').getContext('2d');
+        new Chart(ctxDonut, {
+          type: 'doughnut',
+          data: {
+            labels: typeLabels,
+            datasets: [{
+              data: typeValues,
+              backgroundColor: ['#0d6efd', '#dc3545'],
+              borderColor: '#fff',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+
+        // --- Nombre total de tickets ---
+        // Pas de champ "total_tickets" dans l'API : on additionne les statuts réels
+        const totalTickets = (data.crees ?? 0)
+          + (data.en_attente_rib ?? 0)
+          + (data.tickets_a_rembourser ?? 0)
+          + (data.tickets_a_renvoyer ?? 0);
+        document.getElementById('totalTickets').textContent = totalTickets + ' tickets';
+      })
+      .catch(err => {
+        console.error('Erreur chargement charts:', err);
+        // Affichage d'un message d'erreur
+        const statusChartParent = document.querySelector('#statusChart')?.parentElement;
+        const typeChartParent = document.querySelector('#typeChart')?.parentElement;
+        if (statusChartParent) statusChartParent.innerHTML = '<p class="text-danger text-center mt-3">Impossible de charger les données.</p>';
+        if (typeChartParent) typeChartParent.innerHTML = '<p class="text-danger text-center mt-3">Impossible de charger les données.</p>';
+        document.getElementById('totalTickets').textContent = 'Erreur';
+      });
+  });
+
+  function parseJwt(t) {
+  try {
+    const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(atob(base64).split('').map(c =>
+      '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    ).join(''));
+    return JSON.parse(json);
+  } catch (e) {
+    return null;
+  }
+}
+
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
+
+    // Décoder le JWT pour extraire l'email
+    function parseJwt(t) {
+      try {
+        const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const json = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(json);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const payload = parseJwt(token);
+    const email = payload?.email || payload?.username || payload?.sub || 'Utilisateur';
+
+    // Mettre à jour tous les endroits où l'email apparaît
+    const sidebarStrong = document.querySelector('.sidebar-user strong');
+    if (sidebarStrong) sidebarStrong.textContent = email;
+
+    const navbarSpan = document.getElementById('navbarUserName');
+    if (navbarSpan) navbarSpan.textContent = email;
+
+    // Si un élément avec id="sidebarUserName" existe
+    const sidebarUserName = document.getElementById('sidebarUserName');
+    if (sidebarUserName) sidebarUserName.textContent = email;
+
+    // Pour les pages qui ont un élément .profile-name (comme add-user.html)
+    document.querySelectorAll('.profile-name').forEach(el => {
+      if (el.id !== 'navbarUserName') el.textContent = email;
+    });
+  });
+</script>
+<script>
+/* Active le lien du menu latéral selon la page courante */
+(function () {
+  function activateSidebarNav() {
+    const path = (window.location.pathname || '').replace(/\\/g, '/');
+    const file = path.split('/').pop() || 'index.html';
+    const current = file.toLowerCase() || 'index.html';
+
+    document.querySelectorAll('.admin-sidebar .sidebar-nav a.nav-link').forEach(function (link) {
+      link.classList.remove('active');
+      link.removeAttribute('aria-current');
+
+      const href = (link.getAttribute('href') || '').split('?')[0].split('#')[0];
+      const linkFile = href.split('/').pop().toLowerCase() || '';
+
+      const isMatch =
+        linkFile === current ||
+        (current === '' && (linkFile === 'index.html' || linkFile === '')) ||
+        (current === 'index.html' && (linkFile === 'index.html' || linkFile === ''));
+
+      if (isMatch) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', activateSidebarNav);
+  } else {
+    activateSidebarNav();
+  }
+})();
+</script>
+</body>
+</html>

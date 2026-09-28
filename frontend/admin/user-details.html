@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="adminHMD professional admin dashboard template">
+  <title>User Details</title>
+
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/vendors/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .role-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.35rem 0.75rem; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+      border: 1px solid transparent;
+    }
+    .role-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .role-user { background: rgba(59,130,246,0.12); color: #1d4ed8; border-color: rgba(59,130,246,0.25); }
+    .role-user::before { background: #3b82f6; }
+    .role-interlocuteur { background: rgba(245,158,11,0.14); color: #b45309; border-color: rgba(245,158,11,0.3); }
+    .role-interlocuteur::before { background: #f59e0b; }
+    .role-admin { background: rgba(239,68,68,0.12); color: #b91c1c; border-color: rgba(239,68,68,0.28); }
+    .role-admin::before { background: #ef4444; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.3rem 0.7rem; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 600;
+      background: rgba(34,197,94,0.14); color: #15803d;
+      border: 1px solid rgba(34,197,94,0.28);
+    }
+    .status-badge::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%;
+      background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+    }
+    .date-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.3rem 0.65rem; border-radius: 8px;
+      font-size: 0.8rem; font-weight: 500; color: #475569;
+      background: #f1f5f9; border: 1px solid #e2e8f0; white-space: nowrap;
+    }
+    .date-pill i { font-size: 0.85rem; opacity: 0.7; }
+    .user-avatar-xl {
+      width: 88px; height: 88px; border-radius: 20px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 2rem;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #fff; margin: 0 auto 1rem;
+      box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+    }
+    .info-list > div {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.65rem 0; border-bottom: 1px solid rgba(148,163,184,0.2);
+      gap: 1rem;
+    }
+    .info-list > div:last-child { border-bottom: none; }
+    .info-list span { color: #64748b; font-size: 0.85rem; }
+    .info-list strong { font-weight: 600; text-align: right; word-break: break-all; }
+    .mini-card {
+      background: rgba(148,163,184,0.08);
+      border: 1px solid rgba(148,163,184,0.15);
+      border-radius: 12px; padding: 1rem;
+    }
+    .mini-card span { display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 0.25rem; }
+    .mini-card strong { font-size: 1.05rem; }
+    [data-bs-theme="dark"] .date-pill {
+      background: rgba(148,163,184,0.12); color: #cbd5e1; border-color: rgba(148,163,184,0.2);
+    }
+    [data-bs-theme="dark"] .role-user { background: rgba(59,130,246,0.18); color: #93c5fd; }
+    [data-bs-theme="dark"] .role-interlocuteur { background: rgba(245,158,11,0.18); color: #fcd34d; }
+    [data-bs-theme="dark"] .role-admin { background: rgba(239,68,68,0.18); color: #fca5a5; }
+    [data-bs-theme="dark"] .status-badge { background: rgba(34,197,94,0.18); color: #86efac; }
+  </style>
+  <script>
+  /* Thème AVANT paint — clé = adminHMD.colorTheme (main.js) */
+  (function () {
+    try {
+      var t = localStorage.getItem('adminHMD.colorTheme')
+        || localStorage.getItem('theme')
+        || localStorage.getItem('bs-theme');
+      if (t !== 'dark' && t !== 'light') {
+        t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-bs-theme', t);
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+  </script>
+</head>
+
+<body>
+  <div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand-mark" href="index.html" aria-label="adminHMD dashboard">
+          <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+          <span class="brand-copy">
+            <span class="brand-title">Mada Ozi</span>
+            <span class="brand-subtitle">Admin Template</span>
+          </span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+        <a class="nav-link" href="users.html">
+          <span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+          <span class="nav-text">Users</span>
+        </a>
+        <a class="nav-link" href="add-user.html">
+          <span class="nav-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></span>
+          <span class="nav-text">Add User</span>
+        </a>
+        <a class="nav-link" href="profile.html">
+          <span class="nav-icon"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+          <span class="nav-text">Profile</span>
+        </a>
+        <a class="nav-link" href="charts.html">
+          <span class="nav-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
+          <span class="nav-text">Charts</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <strong id="sidebarUserName">—</strong>
+        <small>Active Workspace</small>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="status-dot"></span>
+        <span class="sidebar-footer-text"></span>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <nav class="navbar admin-navbar navbar-expand bg-white">
+        <div class="container-fluid px-3 px-lg-4">
+          <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true" aria-label="Toggle sidebar">
+            <span></span><span></span><span></span>
+          </button>
+
+          <form class="d-none d-md-flex ms-3 flex-grow-1" role="search">
+            <input class="form-control search-input" type="search" placeholder="Search users, orders, reports" aria-label="Search">
+          </form>
+
+          <div class="navbar-actions ms-auto">
+            <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+              <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+            </button>
+            <div class="dropdown">
+              <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="profile.html">Profil</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/auth/login.html">Déconnexion</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main class="dashboard-content">
+        <div class="container-fluid px-3 px-lg-4 py-4">
+          <div class="page-heading">
+            <div class="page-heading-copy">
+              <span class="page-icon"><i class="bi bi-person-lines-fill" aria-hidden="true"></i></span>
+              <div>
+                <p class="eyebrow mb-1">Management</p>
+                <h1 class="h3 mb-1">User Details</h1>
+                <p class="text-muted mb-0">Inspect account status, profile data and permissions.</p>
+              </div>
+            </div>
+            <div class="heading-actions">
+              <a class="btn btn-outline-secondary btn-sm" href="users.html">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to Users
+              </a>
+              <a class="btn btn-primary btn-sm" href="add-user.html">
+                <i class="bi bi-person-plus" aria-hidden="true"></i> Add User
+              </a>
+            </div>
+          </div>
+
+          <!-- Zone dynamique -->
+          <div id="user-detail-root">
+            <div class="text-center text-muted py-5">
+              <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+              Chargement…
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="admin-footer">
+        <div class="container-fluid px-3 px-lg-4"></div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../assets/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const API_BASE = 'http://localhost:8000';
+    const token = localStorage.getItem('jwt_token');
+
+    if (!token) {
+      window.location.href = '/auth/login.html';
+      return;
+    }
+
+    function parseJwt(t) {
+      try {
+        const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const json = decodeURIComponent(atob(base64).split('').map(c =>
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(json);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Email connecté (sidebar + navbar)
+    const payload = parseJwt(token);
+    const currentEmail = payload?.email || payload?.username || payload?.sub || 'Utilisateur';
+    const sidebarName = document.getElementById('sidebarUserName');
+    const navbarName = document.getElementById('navbarUserName');
+    if (sidebarName) sidebarName.textContent = currentEmail;
+    if (navbarName) navbarName.textContent = currentEmail;
+
+    const roleLabel = (role) => {
+      const map = {
+        'ROLE_USER': 'User',
+        'ROLE_INTERLOCUTEUR': 'Interlocuteur',
+        'ROLE_ADMIN': 'Admin'
+      };
+      return map[role] || role || '—';
+    };
+
+    const roleClass = (role) => {
+      if (role === 'ROLE_ADMIN') return 'role-admin';
+      if (role === 'ROLE_INTERLOCUTEUR') return 'role-interlocuteur';
+      return 'role-user';
+    };
+
+    const formatDate = (raw) => {
+      if (!raw) return '—';
+      const d = new Date(String(raw).replace(' ', 'T'));
+      if (isNaN(d.getTime())) return raw;
+      const jj = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const aaaa = d.getFullYear();
+      return jj + '/' + mm + '/' + aaaa;
+    };
+
+    const root = document.getElementById('user-detail-root');
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('id');
+
+    if (!userId) {
+      root.innerHTML = '<div class="alert alert-warning">ID utilisateur manquant. <a href="users.html">Retour à la liste</a></div>';
+      return;
+    }
+
+    fetch(`${API_BASE}/api/admin/users/${userId}`, {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(async (res) => {
+        if (res.status === 401) {
+          localStorage.removeItem('jwt_token');
+          window.location.href = '/auth/login.html';
+          return Promise.reject('Non authentifié');
+        }
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then((user) => {
+        // API peut renvoyer { user } ou l'objet direct
+        const u = user.user || user;
+        const email = u.email || '—';
+        const initial = (email !== '—' ? email.charAt(0) : '?').toUpperCase();
+        const role = roleLabel(u.role);
+        const rClass = roleClass(u.role);
+        const joined = formatDate(u.createdAt);
+
+        root.innerHTML = `
+          <section class="row g-3">
+            <div class="col-12 col-xl-4">
+              <div class="panel h-100 text-center profile-card">
+                <div class="pt-4 pb-2">
+                  <div class="user-avatar-xl">${initial}</div>
+                  <h2 class="h5 mb-1">${email}</h2>
+                  <p class="text-muted mb-3">ID #${u.id ?? '—'}</p>
+                  <span class="role-badge ${rClass}">${role}</span>
+                  <div class="mt-2"><span class="status-badge">Actif</span></div>
+                </div>
+                <div class="info-list mt-4 text-start px-3 pb-3">
+                  <div><span>Email</span><strong>${email}</strong></div>
+                  <div><span>Rôle</span><strong>${role}</strong></div>
+                  <div><span>Inscription</span><strong><span class="date-pill"><i class="bi bi-calendar3"></i>${joined}</span></strong></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-xl-8">
+              <div class="panel mb-3">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="h5 mb-1 section-title">
+                      <i class="bi bi-person-lines-fill" aria-hidden="true"></i>
+                      <span>Account Overview</span>
+                    </h2>
+                    <p class="text-muted mb-0">Permissions et informations du compte.</p>
+                  </div>
+                  <a class="btn btn-primary btn-sm" href="users.html">
+                    <i class="bi bi-arrow-left"></i> Retour
+                  </a>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <div class="mini-card">
+                      <span>Rôle</span>
+                      <strong>${role}</strong>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mini-card">
+                      <span>Statut</span>
+                      <strong>Actif</strong>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="mini-card">
+                      <span>Inscrit le</span>
+                      <strong>${joined}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-header">
+                  <div>
+                    <h2 class="h5 mb-1 section-title">
+                      <i class="bi bi-info-circle" aria-hidden="true"></i>
+                      <span>Détails</span>
+                    </h2>
+                    <p class="text-muted mb-0">Données renvoyées par l'API.</p>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <tbody>
+                      <tr><th class="text-muted" style="width:40%">ID</th><td>${u.id ?? '—'}</td></tr>
+                      <tr><th class="text-muted">Email</th><td>${email}</td></tr>
+                      <tr><th class="text-muted">Rôle (code)</th><td><code>${u.role || '—'}</code></td></tr>
+                      <tr><th class="text-muted">Rôle (affichage)</th><td><span class="role-badge ${rClass}">${role}</span></td></tr>
+                      <tr><th class="text-muted">Date d'inscription</th><td><span class="date-pill"><i class="bi bi-calendar3"></i>${joined}</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+      })
+      .catch((err) => {
+        console.error(err);
+        root.innerHTML = `
+          <div class="alert alert-danger">
+            Impossible de charger cet utilisateur.
+            <a href="users.html" class="alert-link">Retour à la liste</a>
+          </div>`;
+      });
+  });
+  </script>
+
+  <script>
+  /* Active le menu : user-details → Users */
+  (function () {
+    function activateSidebarNav() {
+      var path = (window.location.pathname || '').replace(/\\/g, '/');
+      var file = (path.split('/').pop() || 'index.html').toLowerCase();
+
+      document.querySelectorAll('.admin-sidebar .sidebar-nav a.nav-link').forEach(function (link) {
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
+
+        var href = (link.getAttribute('href') || '').split('?')[0].split('#')[0];
+        var linkFile = (href.split('/').pop() || '').toLowerCase();
+
+        var isMatch =
+          linkFile === file ||
+          (file === 'user-details.html' && linkFile === 'users.html') ||
+          (file === 'edit-user.html' && linkFile === 'users.html');
+
+        if (isMatch) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', activateSidebarNav);
+    } else {
+      activateSidebarNav();
+    }
+  })();
+  </script>
+</body>
+</html>

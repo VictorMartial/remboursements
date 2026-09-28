@@ -1,0 +1,16 @@
+--- a/Bundle/DependencyInjection/ApiPlatformExtension.php
++++ b/Bundle/DependencyInjection/ApiPlatformExtension.php
+@@ -98,13 +98,6 @@
+                 ],
+             ]);
+         }
+-        if (isset($container->getExtensions()['lexik_jwt_authentication'])) {
+-            $container->prependExtensionConfig('lexik_jwt_authentication', [
+-                'api_platform' => [
+-                    'enabled' => true,
+-                ],
+-            ]);
+-        }
+     }
+ 
+     /**

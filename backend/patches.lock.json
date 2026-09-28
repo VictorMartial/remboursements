@@ -1,0 +1,17 @@
+{
+    "_hash": "41ab59e2b0bc5c4e3f6b002e9b57fe1a7b27fcd5ba144d683193a7a2d06f3fe3",
+    "patches": {
+        "api-platform/symfony": [
+            {
+                "package": "api-platform/symfony",
+                "description": "Fix lexik_jwt_authentication enabled option bug",
+                "url": "patches/api-platform-lexik-fix.patch",
+                "sha256": "e2860b4542d549a222c5f9b8b5b21eca796b340544255bb38be8c794da6504fe",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}

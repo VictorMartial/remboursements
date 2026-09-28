@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n-title="auth.login.title">Connexion</title>
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/vendors/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    [data-bs-theme="dark"] { color-scheme: dark; }
+    [data-bs-theme="dark"] body { background-color: #12151c; color: #e6e8ec; }
+    [data-bs-theme="dark"] .auth-card { background-color: #1b2029; border-color: #262b36; color: #e6e8ec; }
+    [data-bs-theme="dark"] h1, [data-bs-theme="dark"] strong { color: #e6e8ec; }
+    [data-bs-theme="dark"] .text-muted { color: #9aa1ad !important; }
+    [data-bs-theme="dark"] .form-control { background-color: #12151c; border-color: #262b36; color: #e6e8ec; }
+    [data-bs-theme="dark"] .icon-button { color: #e6e8ec; }
+    a.auth-footer { text-decoration: none; cursor: pointer; color: inherit; }
+    a.auth-footer:hover { opacity: .75; text-decoration: underline; }
+    .password-field { position: relative; }
+    .password-field .form-control { padding-right: 42px; }
+    .password-toggle {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      border: none; background: none; color: #6b7280; padding: 4px; cursor: pointer;
+    }
+    .auth-top-actions { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; align-items: center; z-index: 10; }
+
+    .lang-flag { display: inline-flex; line-height: 0; }
+    .lang-flag svg { display: block; }
+  </style>
+</head>
+<body class="auth-body">
+  <div class="auth-top-actions">
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" id="languageButton" aria-label="Language">
+        <span class="lang-flag" data-lang-flag="current" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="14" viewBox="0 0 3 2" aria-hidden="true" style="display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.12)"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+          <a class="dropdown-item language-option d-flex align-items-center gap-2" href="#" data-lang="fr">
+            <span class="lang-flag" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="14" viewBox="0 0 3 2" aria-hidden="true" style="display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.12)"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg></span>
+            <span>Français</span>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item language-option d-flex align-items-center gap-2" href="#" data-lang="en">
+            <span class="lang-flag" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="14" viewBox="0 0 19 10" aria-hidden="true" style="display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.12)"><rect width="19" height="10" fill="#B22234"/><path d="M0 1.1h19M0 3.3h19M0 5.5h19M0 7.7h19M0 9.9h19" stroke="#fff" stroke-width="1.1"/><rect width="7.6" height="5.4" fill="#3C3B6E"/></svg></span>
+            <span>English</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <button class="icon-button theme-toggle" type="button" data-theme-toggle>
+      <i class="bi bi-moon-stars" data-theme-icon></i>
+    </button>
+  </div>
+  <main class="auth-page">
+    <section class="auth-card">
+      <a class="auth-brand" href="/auth/login.html">
+        <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+        <span><strong data-i18n="auth.brand">Mada Ozi</strong><small data-i18n="auth.brand.subtitle">Espace sécurisé</small></span>
+      </a>
+
+      <div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
+      <form id="loginForm" novalidate>
+        <div class="mb-4">
+          <p class="eyebrow mb-1" data-i18n="auth.secure">Accès sécurisé</p>
+          <h1 class="h3 mb-1" data-i18n="auth.login.heading">Connexion</h1>
+          <p class="text-muted mb-0" data-i18n="auth.login.subtitle">Connectez-vous à votre espace.</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="loginEmail" data-i18n="auth.login.email">Adresse email</label>
+          <input class="form-control" id="loginEmail" type="email" required>
+        </div>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between">
+            <label class="form-label" for="loginPassword" data-i18n="auth.login.password">Mot de passe</label>
+            <a class="small fw-semibold" href="/auth/forgot-password.html" data-i18n="auth.login.forgot">Oublié ?</a>
+          </div>
+          <div class="password-field">
+            <input class="form-control" id="loginPassword" type="password" minlength="6" required>
+            <button class="password-toggle" type="button" data-toggle-target="loginPassword">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" id="rememberMe">
+          <label class="form-check-label" for="rememberMe" data-i18n="auth.login.remember">Se souvenir de moi</label>
+        </div>
+        <button class="btn btn-primary w-100" type="submit">
+          <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="auth.login.submit">Se connecter</span>
+        </button>
+      </form>
+      <a class="auth-footer d-block mt-3" href="/auth/register.html">
+        <span data-i18n="auth.login.new">Nouveau ici ?</span> <strong data-i18n="auth.login.create">Créer un compte</strong>
+      </a>
+    </section>
+  </main>
+
+  <script src="../assets/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('loginForm');
+  const alertDiv = document.getElementById('loginAlert');
+  const API_BASE = 'http://localhost:8000';
+  const TOKEN_KEY = 'jwt_token';
+
+  document.querySelectorAll('.password-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const input = document.getElementById(btn.dataset.toggleTarget);
+      const icon = btn.querySelector('i');
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      icon.classList.toggle('bi-eye', !isHidden);
+      icon.classList.toggle('bi-eye-slash', isHidden);
+    });
+  });
+
+  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+  function clearSession() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem('user');
+    localStorage.removeItem('roles');
+  }
+  function decodeToken(token) {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (e) { return null; }
+  }
+  function isTokenExpired(token) {
+    const payload = decodeToken(token);
+    if (!payload || !payload.exp) return true;
+    return payload.exp * 1000 <= Date.now();
+  }
+  function getDashboardFromToken(token) {
+    const payload = decodeToken(token);
+    if (!payload) return null;
+    const roles = payload.roles || [];
+    if (roles.includes('ROLE_ADMIN')) return '/admin/index.html';
+    if (roles.includes('ROLE_INTERLOCUTEUR')) return '/interlocuteur/interlocuteur-dashboard.html';
+    if (roles.includes('ROLE_USER')) return '/user/dashboard-user.html';
+    return null;
+  }
+  function checkExistingSession() {
+    const token = getToken();
+    if (!token) return;
+    if (isTokenExpired(token)) { clearSession(); return; }
+    const dashboard = getDashboardFromToken(token);
+    if (dashboard) window.location.replace(dashboard);
+    else clearSession();
+  }
+  function showAlert(message, type = 'danger') {
+    alertDiv.textContent = message;
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.classList.remove('d-none');
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    alertDiv.classList.add('d-none');
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) {
+      showAlert(typeof t === 'function' ? t('auth.error.fill_all') : 'Veuillez remplir tous les champs.');
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Le serveur a retourné une réponse non-JSON.');
+      }
+      const data = await response.json();
+      if (!response.ok || !data.success || !data.token) {
+        throw new Error(data.message || 'Identifiants incorrects.');
+      }
+      localStorage.setItem(TOKEN_KEY, data.token);
+      if (isTokenExpired(data.token)) {
+        clearSession();
+        showAlert('Token expiré. Réessayez.');
+        return;
+      }
+      let redirect = data.redirect || getDashboardFromToken(data.token);
+      if (!redirect) {
+        clearSession();
+        showAlert('Votre rôle ne permet pas d’accéder à une interface.');
+        return;
+      }
+      window.location.replace(redirect);
+    } catch (error) {
+      showAlert(error.message || 'Problème de connexion au serveur.');
+    }
+  });
+
+  checkExistingSession();
+
+  // Drapeaux gérés uniquement par i18n.js (ne pas écraser ici)
+});
+</script>
+</body>
+</html>

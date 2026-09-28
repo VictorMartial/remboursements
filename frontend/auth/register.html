@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mada Ozi authentication page">
+  <title data-i18n-title="auth.register.title">Inscription</title>
+
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/vendors/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    /* Dark mode autonome : ne dépend pas de style.css (même correctif que login.html) */
+    [data-bs-theme="dark"] { color-scheme: dark; }
+    [data-bs-theme="dark"] body { background-color: #12151c; color: #e6e8ec; }
+    [data-bs-theme="dark"] .auth-card { background-color: #1b2029; border-color: #262b36; color: #e6e8ec; }
+    [data-bs-theme="dark"] h1, [data-bs-theme="dark"] h2, [data-bs-theme="dark"] h3,
+    [data-bs-theme="dark"] strong { color: #e6e8ec; }
+    [data-bs-theme="dark"] .text-muted { color: #9aa1ad !important; }
+    [data-bs-theme="dark"] .form-control { background-color: #12151c; border-color: #262b36; color: #e6e8ec; }
+    [data-bs-theme="dark"] .form-control:focus { background-color: #12151c; color: #e6e8ec; }
+    [data-bs-theme="dark"] .icon-button { color: #e6e8ec; }
+
+    a.auth-footer { text-decoration: none; cursor: pointer; color: inherit; transition: opacity .15s ease; }
+    a.auth-footer:hover { opacity: .75; text-decoration: underline; }
+
+    /* Bouton d'action : pilule, icône propre, ombre douce au survol */
+    .btn-pill {
+      border-radius: 50px; font-weight: 600; display: inline-flex; align-items: center;
+      justify-content: center; gap: 8px; border-width: 1.5px;
+      transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+    }
+    .btn-pill:disabled { transform: none !important; cursor: not-allowed; }
+    .btn-pill .bi, .btn-pill .spinner-border { font-size: 1rem; line-height: 1; }
+    .btn-send-pill {
+      background: var(--wiz-accent, #4f46e5); border-color: var(--wiz-accent, #4f46e5); color: #fff;
+      box-shadow: 0 6px 16px -6px rgba(79,70,229,.4);
+    }
+    .btn-send-pill:hover, .btn-send-pill:focus {
+      background: var(--wiz-accent-dark, #4338ca); border-color: var(--wiz-accent-dark, #4338ca); color: #fff;
+      transform: translateY(-2px); box-shadow: 0 12px 26px -8px rgba(79,70,229,.5);
+    }
+    .btn-send-pill:disabled { background: #a5b4fc; border-color: #a5b4fc; color: #fff; box-shadow: none; }
+
+    /* Champ mot de passe avec bouton afficher/masquer */
+    .password-field { position: relative; }
+    .password-field .form-control { padding-right: 42px; }
+    .password-toggle {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      border: none; background: none; color: var(--wiz-ink-soft, #6b7280); padding: 4px; line-height: 1;
+      cursor: pointer;
+    }
+    .password-toggle:hover { color: var(--wiz-ink, #111827); }
+  </style>
+</head>
+
+<body class="auth-body">
+  <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;align-items:center;z-index:10;">
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageButton">🇫🇷</button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
+        <li><a class="dropdown-item language-option" href="#" data-lang="en">🇺🇸 English</a></li>
+      </ul>
+    </div>
+    <button class="icon-button theme-toggle" type="button" data-theme-toggle>
+      <i class="bi bi-moon-stars" data-theme-icon></i>
+    </button>
+  </div>
+  <main class="auth-page">
+    <section class="auth-card">
+      <a class="auth-brand" href="/user/dashboard-user.html">
+        <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+        <span><strong data-i18n="auth.brand">Mada Ozi</strong><small data-i18n="auth.register.subtitle">Créez votre compte.</small></span>
+      </a>
+
+      <div id="registerAlert" class="alert alert-danger d-none" role="alert"></div>
+
+      <form id="registerForm" novalidate>
+        <div class="mb-4">
+          <p class="eyebrow mb-1" data-i18n="auth.secure">Accès sécurisé</p>
+          <h1 class="h3 mb-1" data-i18n="auth.register.heading">Inscription</h1>
+          <p class="text-muted mb-0" data-i18n="auth.register.subtitle">Créez votre compte.</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="registerName" data-i18n="auth.register.name">Nom complet</label>
+          <input class="form-control" id="registerName" type="text" required>
+          <div class="invalid-feedback">Full name is required.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="registerEmail" data-i18n="auth.register.email">Adresse email</label>
+          <input class="form-control" id="registerEmail" type="email" required>
+          <div class="invalid-feedback">Enter a valid email.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="registerPassword" data-i18n="auth.register.password">Mot de passe</label>
+          <div class="password-field">
+            <input class="form-control" id="registerPassword" type="password" minlength="6" required>
+            <button class="password-toggle" type="button" data-toggle-target="registerPassword" aria-label="Show password">
+              <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="invalid-feedback">Password must be at least 6 characters.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="registerPasswordConfirm" data-i18n="auth.register.password_confirm">Confirmer le mot de passe</label>
+          <div class="password-field">
+            <input class="form-control" id="registerPasswordConfirm" type="password" minlength="6" required>
+            <button class="password-toggle" type="button" data-toggle-target="registerPasswordConfirm" aria-label="Show password">
+              <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="invalid-feedback">Passwords must match.</div>
+        </div>
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" id="terms" required>
+          <label class="form-check-label" for="terms" data-i18n="auth.register.terms">J'accepte les conditions</label>
+          <div class="invalid-feedback">You must agree before continuing.</div>
+        </div>
+        <button class="btn btn-pill btn-send-pill w-100" type="submit" id="registerSubmit">
+          <i class="bi bi-person-plus-fill" id="registerSubmitIcon" aria-hidden="true"></i>
+          <span id="registerSubmitLabel" data-i18n="auth.register.submit">Créer le compte</span>
+        </button>
+      </form>
+
+      <!-- Étape 2 : saisie du code reçu par email -->
+      <div id="verifyStep" class="d-none">
+        <div class="mb-4">
+          <p class="eyebrow mb-1" data-i18n="auth.secure">Accès sécurisé</p>
+          <h1 class="h3 mb-1" data-i18n="auth.register.verify_heading">Code de confirmation</h1>
+          <p class="text-muted mb-0"><span data-i18n="auth.register.verify_text">Un code a été envoyé à</span> <strong id="verifyEmailDisplay"></strong>.</p>
+        </div>
+        <form id="verifyForm" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="verifyCode" data-i18n="auth.register.verify_code">Code à 6 chiffres</label>
+            <input class="form-control text-center" id="verifyCode" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required autocomplete="one-time-code" style="font-size:1.5rem;letter-spacing:0.4em;font-weight:700;">
+            <div class="invalid-feedback">Saisissez le code reçu par email.</div>
+          </div>
+          <button class="btn btn-pill btn-send-pill w-100 mb-3" type="submit" id="verifySubmit">
+            <i class="bi bi-shield-check" id="verifySubmitIcon" aria-hidden="true"></i>
+            <span id="verifySubmitLabel" data-i18n="auth.register.verify_submit">Valider le code</span>
+          </button>
+          <button class="btn btn-outline-secondary btn-pill w-100" type="button" id="resendCodeBtn">
+            <span data-i18n="auth.register.resend">Renvoyer le code</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="auth-footer"><span data-i18n="auth.register.have_account">Déjà un compte ?</span> <a href="login.html" data-i18n="auth.register.sign_in">Se connecter</a></div>
+    </section>
+  </main>
+
+  <script src="../assets/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const API_BASE = 'http://localhost:8000';
+
+  const form        = document.getElementById('registerForm');
+  const verifyStep  = document.getElementById('verifyStep');
+  const verifyForm  = document.getElementById('verifyForm');
+  const alertDiv    = document.getElementById('registerAlert');
+  const submitBtn   = document.getElementById('registerSubmit');
+  const submitIcon  = document.getElementById('registerSubmitIcon');
+  const submitLabel = document.getElementById('registerSubmitLabel');
+  const submitIconClass = submitIcon.className;
+  const verifySubmit = document.getElementById('verifySubmit');
+  const verifySubmitIcon = document.getElementById('verifySubmitIcon');
+  const verifySubmitLabel = document.getElementById('verifySubmitLabel');
+  const resendBtn = document.getElementById('resendCodeBtn');
+
+  let pendingEmail = '';
+
+  function showAlert(msg, type = 'danger') {
+    alertDiv.textContent = msg;
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.classList.remove('d-none');
+  }
+
+  function hideAlert() {
+    alertDiv.classList.add('d-none');
+  }
+
+  // Afficher / masquer le mot de passe
+  document.querySelectorAll('.password-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const input = document.getElementById(btn.dataset.toggleTarget);
+      const icon  = btn.querySelector('i');
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      icon.classList.toggle('bi-eye', !isHidden);
+      icon.classList.toggle('bi-eye-slash', isHidden);
+      btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+  });
+
+  function showVerifyStep(email) {
+    pendingEmail = email;
+    form.classList.add('d-none');
+    verifyStep.classList.remove('d-none');
+    document.getElementById('verifyEmailDisplay').textContent = email;
+    document.getElementById('verifyCode').focus();
+  }
+
+  // Étape 1 : inscription → envoi du code
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    hideAlert();
+
+    const name            = document.getElementById('registerName').value.trim();
+    const email           = document.getElementById('registerEmail').value.trim();
+    const password        = document.getElementById('registerPassword').value;
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+    const terms           = document.getElementById('terms').checked;
+
+    if (!name || !email || !password || !passwordConfirm) {
+      showAlert('Veuillez remplir tous les champs.');
+      return;
+    }
+    if (password.length < 6) {
+      showAlert('Le mot de passe doit faire au moins 6 caractères.');
+      return;
+    }
+    if (password !== passwordConfirm) {
+      showAlert('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    if (!terms) {
+      showAlert('Veuillez accepter les conditions pour continuer.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitIcon.className = 'spinner-border spinner-border-sm';
+    submitIcon.setAttribute('role', 'status');
+    submitLabel.textContent = 'Envoi du code...';
+
+    fetch(`${API_BASE}/api/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    })
+    .then(async (res) => {
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const text = await res.text();
+        throw new Error('Réponse non-JSON du serveur : ' + text.substring(0, 120));
+      }
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Erreur lors de l\'inscription.');
+      }
+      return data;
+    })
+    .then((data) => {
+      showAlert(data.message || 'Code envoyé par email.', 'success');
+      showVerifyStep(data.email || email);
+    })
+    .catch((err) => {
+      console.error('Erreur inscription :', err);
+      showAlert(err.message || 'Erreur réseau. Veuillez réessayer.');
+      submitBtn.disabled = false;
+      submitIcon.className = submitIconClass;
+      submitIcon.removeAttribute('role');
+      submitLabel.textContent = (typeof t === 'function' ? t('auth.register.submit') : 'Créer le compte');
+    });
+  });
+
+  // Étape 2 : validation du code
+  verifyForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    hideAlert();
+
+    const code = document.getElementById('verifyCode').value.trim();
+    if (!/^\d{6}$/.test(code)) {
+      showAlert('Saisissez le code à 6 chiffres reçu par email.');
+      return;
+    }
+
+    verifySubmit.disabled = true;
+    verifySubmitIcon.className = 'spinner-border spinner-border-sm';
+    verifySubmitLabel.textContent = 'Vérification...';
+
+    fetch(`${API_BASE}/api/register/verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email: pendingEmail, code })
+    })
+    .then(async (res) => {
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Code invalide.');
+      }
+      return data;
+    })
+    .then((data) => {
+      showAlert(data.message + ' Redirection...', 'success');
+      setTimeout(() => {
+        window.location.href = data.redirect || '/auth/login.html?registered=1';
+      }, 1200);
+    })
+    .catch((err) => {
+      showAlert(err.message || 'Code incorrect.');
+      verifySubmit.disabled = false;
+      verifySubmitIcon.className = 'bi bi-shield-check';
+      verifySubmitLabel.textContent = 'Valider le code';
+    });
+  });
+
+  // Renvoyer le code
+  resendBtn.addEventListener('click', function () {
+    if (!pendingEmail) return;
+    resendBtn.disabled = true;
+    hideAlert();
+    fetch(`${API_BASE}/api/register/resend-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email: pendingEmail })
+    })
+    .then(async (res) => {
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || 'Échec du renvoi.');
+      showAlert(data.message, 'success');
+    })
+    .catch((err) => showAlert(err.message || 'Impossible de renvoyer le code.'))
+    .finally(() => { resendBtn.disabled = false; });
+  });
+});
+</script>
+</body>
+</html>

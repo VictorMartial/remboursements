@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Mon espace | adminHMD</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .action-card {
+            border-radius: 16px;
+            border: 1px solid rgba(148,163,184,0.25);
+            background: #fff;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            height: 100%;
+        }
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(15,23,42,0.1);
+        }
+        [data-bs-theme="dark"] .action-card {
+            background: rgba(30,41,59,0.6);
+            border-color: rgba(148,163,184,0.15);
+        }
+        .action-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 1.35rem;
+        }
+        .action-icon.blue { background: rgba(99,102,241,0.12); color: #4f46e5; }
+        .action-icon.green { background: rgba(16,185,129,0.12); color: #059669; }
+        .info-panel {
+            border-radius: 16px;
+            border: 1px solid rgba(148,163,184,0.25);
+            background: #fff;
+            padding: 1.25rem 1.5rem;
+        }
+        [data-bs-theme="dark"] .info-panel {
+            background: rgba(30,41,59,0.6);
+            border-color: rgba(148,163,184,0.15);
+        }
+        .info-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid rgba(148,163,184,0.15);
+            gap: 1rem;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row span { color: #64748b; font-size: 0.9rem; }
+        .info-row strong { font-weight: 600; text-align: right; word-break: break-all; }
+        .date-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.3rem 0.65rem; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 500; color: #475569;
+            background: #f1f5f9; border: 1px solid #e2e8f0;
+        }
+        .date-pill i { font-size: 0.85rem; opacity: 0.7; }
+        [data-bs-theme="dark"] .date-pill {
+            background: rgba(148,163,184,0.12); color: #cbd5e1;
+            border-color: rgba(148,163,184,0.2);
+        }
+        .user-avatar {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.25);
+        }
+        .btn-pill {
+            border-radius: 999px !important;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            font-weight: 500;
+        }
+    </style>
+    <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('adminHMD.colorTheme')
+          || localStorage.getItem('theme')
+          || localStorage.getItem('bs-theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', t);
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+    </script>
+</head>
+<body>
+<div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
+        <div class="sidebar-header">
+            <a class="brand-mark" href="/user/dashboard-user.html" aria-label="adminHMD dashboard">
+                <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+                <span class="brand-copy">
+                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
+                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace User</span>
+                </span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-link active" href="/user/dashboard-user.html" aria-current="page">
+                <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+                <span class="nav-text" data-i18n="nav.dashboard">Dashboard</span>
+            </a>
+            <a class="nav-link" href="/user/tickets-list.html">
+                <span class="nav-icon"><i class="bi bi-list-ul" aria-hidden="true"></i></span>
+                <span class="nav-text" data-i18n="nav.tickets">Mes tickets</span>
+            </a>
+            <a class="nav-link" href="/ticket/ticket-create-step1.html">
+                <span class="nav-icon"><i class="bi bi-plus-circle" aria-hidden="true"></i></span>
+                <span class="nav-text" data-i18n="nav.new_ticket">Nouveau ticket</span>
+            </a>
+        </nav>
+        <div class="sidebar-user">
+            <strong id="sidebarUserName">Utilisateur</strong>
+            <small data-i18n="brand.subtitle">Espace personnel</small>
+        </div>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <nav class="navbar admin-navbar navbar-expand bg-white">
+            <div class="container-fluid px-3 px-lg-4">
+                <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true" aria-label="Toggle sidebar">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="languageButton">
+                            🇫🇷
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                        </ul>
+                    </div>
+                    <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">
+                        <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="container-fluid px-3 px-lg-4 py-4">
+                <div class="page-heading">
+                    <div class="page-heading-copy d-flex align-items-center gap-3">
+                        <div class="user-avatar" id="userAvatar">?</div>
+                        <div>
+                            <p class="eyebrow mb-1" data-i18n="page.eyebrow">Espace utilisateur</p>
+                            <h1 class="h3 mb-1"><span data-i18n="page.greeting">Bonjour,</span> <span id="userGreeting">—</span></h1>
+                            <p class="text-muted mb-0" data-i18n="page.subtitle">Voici un aperçu rapide de votre activité et des actions disponibles.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-panel mt-4">
+                    <h2 class="h5 mb-3 section-title">
+                        <i class="bi bi-person-vcard"></i>
+                        <span data-i18n="card.personal_info">Informations personnelles</span>
+                    </h2>
+                    <div class="info-row">
+                        <span data-i18n="label.email">Email</span>
+                        <strong id="profileEmail">—</strong>
+                    </div>
+                    <div class="info-row">
+                        <span data-i18n="label.registered">Inscrit le</span>
+                        <strong><span class="date-pill" id="profileCreatedAt"><i class="bi bi-calendar3"></i>—</span></strong>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-3">
+                    <div class="col-12 col-md-6">
+                        <div class="action-card p-4 d-flex flex-column">
+                            <div class="action-icon blue mb-3"><i class="bi bi-plus-circle"></i></div>
+                            <h3 class="h5 mb-2" data-i18n="actions.create_ticket.title">Créer un ticket</h3>
+                            <p class="text-muted flex-grow-1" data-i18n="actions.create_ticket.desc">Déposez une nouvelle demande de remboursement.</p>
+                            <a href="/ticket/ticket-create.html" class="btn btn-primary btn-pill mt-2 w-100">
+                                <i class="bi bi-plus-lg"></i>
+                                <span data-i18n="actions.create_ticket.button">Nouvelle demande</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="action-card p-4 d-flex flex-column">
+                            <div class="action-icon green mb-3"><i class="bi bi-list-ul"></i></div>
+                            <h3 class="h5 mb-2" data-i18n="actions.my_tickets.title">Mes tickets</h3>
+                            <p class="text-muted flex-grow-1" data-i18n="actions.my_tickets.desc">Consultez vos demandes et leurs statuts.</p>
+                            <a href="/user/tickets-list.html" class="btn btn-outline-secondary btn-pill mt-2 w-100">
+                                <i class="bi bi-ticket-perforated"></i>
+                                <span data-i18n="actions.my_tickets.button">Mes tickets</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="admin-footer"></footer>
+    </div>
+</div>
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/i18n.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE = 'http://localhost:8000';
+    const token = localStorage.getItem('jwt_token');
+
+    if (!token) {
+        window.location.href = '/auth/login.html';
+        return;
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+        });
+    }
+
+        function formatDate(raw) {
+        if (!raw) return '—';
+        var s = String(raw).trim();
+        // Déjà au format jj/mm/aaaa (API Symfony)
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) {
+            return s.split(' ')[0];
+        }
+        var d = new Date(s.replace(' ', 'T'));
+        if (isNaN(d.getTime())) return s;
+        var jj = String(d.getDate()).padStart(2, '0');
+        var mm = String(d.getMonth() + 1).padStart(2, '0');
+        var aaaa = d.getFullYear();
+        return jj + '/' + mm + '/' + aaaa;
+    }
+
+    function fetchWithAuth(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            headers: {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }).then(async res => {
+            if (res.status === 401) {
+                localStorage.removeItem('jwt_token');
+                window.location.href = '/auth/login.html';
+                return Promise.reject('Non authentifié');
+            }
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        });
+    }
+
+            fetchWithAuth(`${API_BASE}/api/user/profile`)
+        .then(data => {
+            const user = (data && data.user) ? data.user : (data || {});
+            const email = user.email || user.username || '—';
+            const created = user.createdAt || user.created_at || user.dateCreation || null;
+
+            const elGreeting = document.getElementById('userGreeting');
+            const elSidebar = document.getElementById('sidebarUserName');
+            const elNavbar = document.getElementById('navbarUserName');
+            const elEmail = document.getElementById('profileEmail');
+            const elDate = document.getElementById('profileCreatedAt');
+            const avatar = document.getElementById('userAvatar');
+
+            if (elGreeting) elGreeting.textContent = email;
+            if (elSidebar) elSidebar.textContent = email;
+            if (elNavbar) elNavbar.textContent = email;
+            if (elEmail) elEmail.textContent = email;
+            if (elDate) {
+                elDate.innerHTML = '<i class="bi bi-calendar3"></i> ' + formatDate(created);
+            }
+            if (avatar) avatar.textContent = (email && email !== '—' ? email.charAt(0) : '?').toUpperCase();
+        })
+        .catch(err => {
+            console.error('Erreur profil:', err);
+            if (typeof t === 'function') alert(t('server.error'));
+            else alert('Erreur serveur');
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+        });
+});
+</script>
+</body>
+</html>

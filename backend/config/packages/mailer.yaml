@@ -1,0 +1,8 @@
+framework:
+    mailer:
+        # Transports nommés explicitement
+        # "main" = défaut Symfony si X-Transport absent
+        transports:
+            main: '%env(CLIENT_MAILER_DSN)%'
+            client: '%env(CLIENT_MAILER_DSN)%'
+            banque: '%env(MAILER_DSN)%'

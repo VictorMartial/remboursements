@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="ticket.step3.title">Étape 3 - RIB | adminHMD</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wiz-accent: #4f46e5;
+            --wiz-accent-dark: #4338ca;
+            --wiz-accent-soft: #eef2ff;
+            --wiz-success: #16a34a;
+            --wiz-success-soft: #ecfdf5;
+            --wiz-danger: #dc2626;
+            --wiz-danger-soft: #fef2f2;
+            --wiz-ink: #111827;
+            --wiz-ink-soft: #6b7280;
+            --wiz-border: #e5e7eb;
+            --wiz-radius-sm: 10px;
+            --wiz-radius-md: 16px;
+            --wiz-shadow-rest: 0 1px 2px rgba(17,24,39,.06);
+        }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        .steps-indicator { position: relative; counter-reset: step; }
+        .steps-indicator::before {
+            content: ""; position: absolute; top: 15px; left: 8%; right: 8%; height: 2px;
+            background: var(--wiz-border); z-index: 0;
+        }
+        .steps-indicator .step {
+            position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center;
+            gap: 6px; background: transparent; color: var(--wiz-ink-soft); font-weight: 600; font-size: .82rem;
+            padding: 0; min-width: 84px;
+        }
+        .steps-indicator .step::before {
+            counter-increment: step; content: counter(step);
+            width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: #fff; border: 2px solid var(--wiz-border); color: var(--wiz-ink-soft); font-size: .85rem;
+            transition: all .25s ease;
+        }
+        .steps-indicator .step.active::before {
+            border-color: var(--wiz-accent); color: var(--wiz-accent); box-shadow: 0 0 0 4px var(--wiz-accent-soft);
+        }
+        .steps-indicator .step.active { color: var(--wiz-accent); }
+        .steps-indicator .step.done::before {
+            content: "\F633"; font-family: "bootstrap-icons"; background: var(--wiz-success); border-color: var(--wiz-success); color: #fff; font-size: .8rem;
+        }
+        .steps-indicator .step.done { color: var(--wiz-success); }
+
+        .panel { border-radius: var(--wiz-radius-md); }
+
+        .rib-upload {
+            border: 2px dashed var(--wiz-border); padding: 44px 24px; text-align: center; border-radius: var(--wiz-radius-md);
+            cursor: pointer; transition: border-color .2s ease, background .2s ease; background: #fafafa;
+        }
+        .rib-upload:hover { border-color: var(--wiz-accent); background: var(--wiz-accent-soft); }
+        .rib-upload i.bi-cloud-arrow-up { font-size: 2.4rem; color: var(--wiz-accent); display: block; margin-bottom: 10px; }
+        .rib-upload p { margin-bottom: 4px; color: var(--wiz-ink); font-weight: 500; }
+        .rib-upload .text-muted.small { color: var(--wiz-ink-soft) !important; }
+        .help-text { font-size: 0.83rem; color: var(--wiz-ink-soft); margin-top: 8px; }
+        .error-feedback { color: var(--wiz-danger); font-size: 0.85rem; margin-top: 0.4rem; display: none; }
+        .rib-upload.is-invalid { border-color: var(--wiz-danger); background: var(--wiz-danger-soft); }
+        .rib-upload.is-invalid ~ .error-feedback { display: block; }
+        #ribFileName { font-weight: 600; }
+
+        .btn-pill {
+            border-radius: 50px; padding: .6rem 1.5rem; font-weight: 600; font-size: .92rem;
+            display: inline-flex; align-items: center; gap: 8px; border-width: 1.5px;
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .btn-pill:disabled { transform: none !important; cursor: not-allowed; }
+        .btn-pill .bi, .btn-pill .spinner-border { font-size: 1rem; line-height: 1; }
+
+        .btn-cancel-pill { background: #fff; border-color: var(--wiz-border); color: var(--wiz-ink); }
+        .btn-cancel-pill:hover, .btn-cancel-pill:focus {
+            background: #fff; border-color: #cbd5e1; color: var(--wiz-ink);
+            transform: translateY(-2px); box-shadow: 0 8px 20px -8px rgba(17,24,39,.18);
+        }
+
+        .btn-send-pill {
+            background: var(--wiz-success); border-color: var(--wiz-success); color: #fff;
+            box-shadow: 0 6px 16px -6px rgba(22,163,74,.4);
+        }
+        .btn-send-pill:hover, .btn-send-pill:focus {
+            background: #15803d; border-color: #15803d; color: #fff;
+            transform: translateY(-2px); box-shadow: 0 12px 26px -8px rgba(22,163,74,.5);
+        }
+        .btn-send-pill:disabled {
+            background: #86efac; border-color: #86efac; color: #fff; box-shadow: none;
+        }
+
+        /* Toast */
+        .toast-item {
+            padding: 14px 18px; border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.14);
+            display: flex; align-items: flex-start; gap: 10px;
+            animation: toastIn .3s ease; font-size: .9rem; font-weight: 500;
+        }
+        .toast-item.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .toast-item.danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .toast-item.info    { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .toast-item .toast-close {
+            margin-left: auto; border: none; background: transparent;
+            cursor: pointer; opacity: .55; font-size: 1.15rem; line-height: 1;
+        }
+        .toast-item .toast-close:hover { opacity: 1; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(36px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        [data-bs-theme="dark"] .toast-item.success { background: rgba(16,185,129,.18); color: #6ee7b7; border-color: rgba(16,185,129,.3); }
+        [data-bs-theme="dark"] .toast-item.danger  { background: rgba(239,68,68,.18); color: #fca5a5; border-color: rgba(239,68,68,.3); }
+
+        @media (max-width: 400px) {
+            .steps-indicator .step { min-width: 0; font-size: 0.72rem; }
+            .steps-indicator .step::before { width: 26px; height: 26px; font-size: 0.75rem; }
+            .rib-upload { padding: 28px 14px; }
+        }
+        @media (min-width: 1400px) {
+            .container-fluid { max-width: 1200px; margin-inline: auto; }
+            .rib-upload { padding: 56px 32px; }
+        }
+    </style>
+    <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('adminHMD.colorTheme') || localStorage.getItem('theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', t);
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+    </script>
+</head>
+<body>
+<div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <a class="brand-mark" href="/user/dashboard-user.html">
+                <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+                <span class="brand-copy">
+                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
+                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace personnel</span>
+                </span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
+            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
+            <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
+        </nav>
+        <div class="sidebar-user">
+            <strong id="sidebarUserName">Utilisateur</strong>
+            <small data-i18n="brand.subtitle">Espace personnel</small>
+        </div>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <nav class="navbar admin-navbar navbar-expand bg-white">
+            <div class="container-fluid px-3 px-lg-4">
+                <button class="sidebar-toggle" type="button" data-sidebar-toggle>
+                    <span></span><span></span><span></span>
+                </button>
+                <form class="d-none d-md-flex ms-3 flex-grow-1" role="search">
+                    <input class="form-control search-input" type="search" placeholder="Rechercher...">
+                </form>
+                <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageButton">🇫🇷</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                        </ul>
+                    </div>
+                    <button class="icon-button theme-toggle" type="button" data-theme-toggle>
+                        <i class="bi bi-moon-stars" data-theme-icon></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/auth/login.html" data-i18n="logout">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="container-fluid px-3 px-lg-4 py-4">
+                <div class="page-heading mb-4">
+                    <div class="page-heading-copy">
+                        <span class="page-icon"><i class="bi bi-upload"></i></span>
+                        <div>
+                            <p class="eyebrow mb-1" data-i18n="ticket.step3.step_label">Étape 3/3</p>
+                            <h1 class="h3 mb-1" data-i18n="ticket.step3.heading">Ajouter votre RIB</h1>
+                            <p class="text-muted mb-0">
+                                <span data-i18n="ticket.step3.subheading">Sélectionnez le fichier RIB (PDF ou image) pour le ticket</span>
+                                <span id="ticketIdDisplay"></span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="steps-indicator mb-4 d-flex justify-content-center gap-3">
+                    <span class="step done">1. <span data-i18n="step.type">Type</span></span>
+                    <span class="step done">2. <span data-i18n="step.details">Détails</span></span>
+                    <span class="step active">3. <span data-i18n="step.rib">RIB</span></span>
+                </div>
+
+                <div id="infoMessage" class="alert alert-info"></div>
+
+                <div class="panel">
+                    <div class="panel-body">
+                        <form id="ribForm" novalidate>
+                            <div class="rib-upload" id="ribDropZone">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                                <p data-i18n="ticket.step3.dropzone">Glissez-déposez votre fichier RIB ici</p>
+                                <p class="text-muted small" data-i18n="ticket.step3.dropzone_click">ou cliquez pour sélectionner un fichier</p>
+                                <input type="file" id="ribFile" accept=".pdf,.jpg,.jpeg,.png" class="d-none" required>
+                                <div id="ribFileName" class="text-success mt-2" style="display:none;"></div>
+                            </div>
+                            <div class="error-feedback" id="ribFileError" data-i18n="ticket.step3.rib_required">
+                                Veuillez sélectionner un fichier valide (PDF, JPG, PNG, max 5 Mo).
+                            </div>
+                            <div class="help-text" data-i18n="ticket.step3.file_help">Format accepté : PDF, JPG, PNG - Taille max : 5MB</div>
+                            <div class="mt-3 d-flex gap-2">
+                                <a href="/user/tickets-list.html" class="btn btn-pill btn-cancel-pill">
+                                    <i class="bi bi-x-lg"></i> <span data-i18n="ticket.step3.cancel">Annuler</span>
+                                </a>
+                                <button type="submit" class="btn btn-pill btn-send-pill" id="submitRib">
+                                    <i class="bi bi-send-fill" id="submitRibIcon"></i>
+                                    <span id="submitRibLabel" data-i18n="ticket.step3.send_rib">Envoyer le RIB</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="admin-footer"></footer>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:10px;max-width:380px;"></div>
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/i18n.js"></script>
+<script>
+const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
+const token = localStorage.getItem('jwt_token');
+if (!token) window.location.href = '/auth/login.html';
+
+/* ===== Toast ===== */
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast-item ${type}`;
+    toast.innerHTML = `<span>${message}</span><button class="toast-close" aria-label="Fermer">&times;</button>`;
+    container.appendChild(toast);
+    const close = () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(36px)';
+        toast.style.transition = '.25s ease';
+        setTimeout(() => toast.remove(), 250);
+    };
+    toast.querySelector('.toast-close').addEventListener('click', close);
+    setTimeout(close, 4500);
+}
+
+function fetchWithAuth(url, options = {}) {
+    return fetch(url, {
+        ...options,
+        headers: { ...options.headers, 'Authorization': `Bearer ${token}` }
+    }).then(async res => {
+        if (res.status === 401) {
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+            return Promise.reject('Non authentifié');
+        }
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status} - ${text.substring(0, 150)}`);
+        }
+        return res.json();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const submitRib = document.getElementById('submitRib');
+    const submitRibIcon = document.getElementById('submitRibIcon');
+    const submitRibLabel = document.getElementById('submitRibLabel');
+    const submitRibIconClass = submitRibIcon.className;
+
+    const params = new URLSearchParams(window.location.search);
+    const ticketId = params.get('id');
+    if (!ticketId) {
+        document.getElementById('infoMessage').innerHTML = '❌ ID ticket manquant.';
+        return;
+    }
+    document.getElementById('ticketIdDisplay').textContent = `#${ticketId}`;
+
+    fetchWithAuth(`${API_BASE}/api/user/ticket/${ticketId}`)
+        .then(ticket => {
+            if (ticket.statut !== 'En attente RIB') {
+                document.getElementById('infoMessage').innerHTML =
+                    `⚠️ Ce ticket n'est plus en attente de RIB (${ticket.statut})`;
+                submitRib.disabled = true;
+                document.getElementById('ribDropZone').style.opacity = '0.5';
+                document.getElementById('ribDropZone').style.cursor = 'not-allowed';
+            } else {
+                document.getElementById('infoMessage').innerHTML =
+                    `✅ Ticket #${ticketId} prêt pour l'envoi du RIB.`;
+            }
+        })
+        .catch(err => {
+            document.getElementById('infoMessage').innerHTML = '❌ ' + err.message;
+        });
+
+    const dropZone = document.getElementById('ribDropZone');
+    const fileInput = document.getElementById('ribFile');
+    const fileNameDisplay = document.getElementById('ribFileName');
+    const fileError = document.getElementById('ribFileError');
+
+    function validateFile(file) {
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        const maxSize = 5 * 1024 * 1024;
+        if (!file || !allowedTypes.includes(file.type) || file.size > maxSize) {
+            dropZone.classList.add('is-invalid');
+            fileError.style.display = 'block';
+            return false;
+        }
+        dropZone.classList.remove('is-invalid');
+        fileError.style.display = 'none';
+        return true;
+    }
+
+    function showSelectedFile(file) {
+        if (validateFile(file)) {
+            fileNameDisplay.textContent = 'Fichier sélectionné : ' + file.name;
+            fileNameDisplay.style.display = 'block';
+        } else {
+            fileNameDisplay.style.display = 'none';
+        }
+    }
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#4f46e5';
+        dropZone.style.background = '#eef2ff';
+    });
+    dropZone.addEventListener('dragleave', e => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#e5e7eb';
+        dropZone.style.background = '#fafafa';
+    });
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#e5e7eb';
+        dropZone.style.background = '#fafafa';
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            showSelectedFile(e.dataTransfer.files[0]);
+        }
+    });
+    fileInput.addEventListener('change', function() {
+        if (this.files.length) showSelectedFile(this.files[0]);
+        else {
+            dropZone.classList.add('is-invalid');
+            fileError.style.display = 'block';
+            fileNameDisplay.style.display = 'none';
+        }
+    });
+
+    document.getElementById('ribForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!fileInput.files.length || !validateFile(fileInput.files[0])) {
+            dropZone.classList.add('is-invalid');
+            fileError.style.display = 'block';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('rib_file', fileInput.files[0]);
+
+        submitRib.disabled = true;
+        submitRibIcon.className = 'spinner-border spinner-border-sm';
+        submitRibIcon.setAttribute('role', 'status');
+        submitRibLabel.textContent = 'Envoi...';
+
+        fetchWithAuth(`${API_BASE}/api/ticket/${ticketId}/rib`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(data => {
+            if (data.success) {
+                showToast(
+                    (typeof t === 'function' ? t('ticket.rib_success') : null) || '✅ RIB envoyé avec succès !',
+                    'success'
+                );
+                setTimeout(() => {
+                    window.location.href = '/user/tickets-list.html';
+                }, 1200);
+            } else {
+                showToast(data.message || 'Erreur serveur', 'danger');
+            }
+        })
+        .catch(err => {
+            showToast(err.message || 'Erreur réseau', 'danger');
+        })
+        .finally(() => {
+            submitRib.disabled = false;
+            submitRibIcon.className = submitRibIconClass;
+            submitRibIcon.removeAttribute('role');
+            submitRibLabel.textContent = 'Envoyer le RIB';
+        });
+    });
+
+    // Nom utilisateur depuis JWT
+    function parseJwt(t) {
+        try {
+            const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(atob(base64).split('').map(c =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+            ).join(''));
+            return JSON.parse(json);
+        } catch (e) { return null; }
+    }
+    const payload = parseJwt(token);
+    const email = payload?.email || payload?.username || payload?.sub || 'Utilisateur';
+    const sidebarName = document.getElementById('sidebarUserName');
+    const navbarName = document.getElementById('navbarUserName');
+    if (sidebarName) sidebarName.textContent = email;
+    if (navbarName) navbarName.textContent = email;
+});
+</script>
+</body>
+</html>

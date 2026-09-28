@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="ticket.awaiting.title">En attente de confirmation | Mada Ozi</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        /* ============ Design tokens (harmonisés) ============ */
+        :root {
+            --glass-bg: rgba(226,232,240,0.78);
+            --glass-bg-strong: rgba(226,232,240,0.9);
+            --glass-border: rgba(71,85,105,0.35);
+            --glass-shadow: 0 8px 32px rgba(31,41,55,0.14);
+            --glass-shadow-hover: 0 12px 36px rgba(31,41,55,0.20);
+            --radius-md: 12px;
+            --radius-pill: 999px;
+        }
+        [data-bs-theme="dark"] {
+            --glass-bg: rgba(32,36,46,0.55);
+            --glass-bg-strong: rgba(32,36,46,0.75);
+            --glass-border: rgba(255,255,255,0.08);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            --glass-shadow-hover: 0 12px 36px rgba(0,0,0,0.45);
+        }
+
+        /* Boutons glassmorphism épais */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            border-radius: var(--radius-pill) !important;
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+            font-weight: 500;
+            padding: 10px 22px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow-hover); filter: brightness(1.03); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(79,70,229,0.88), rgba(67,56,202,0.88));
+            color: #fff; border-color: rgba(67,56,202,0.5);
+        }
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: #1e293b;
+            border-color: rgba(71,85,105,0.3);
+        }
+        [data-bs-theme="dark"] .btn-secondary { color: #e6e8ec; }
+        .btn-outline-secondary {
+            background: var(--glass-bg);
+            border: 1px solid rgba(71,85,105,0.3);
+            color: #1e293b;
+        }
+        [data-bs-theme="dark"] .btn-outline-secondary { color: #e6e8ec; }
+
+        .icon-button {
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px) saturate(180%);
+            -webkit-backdrop-filter: blur(14px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: var(--radius-pill);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .icon-button:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow-hover); }
+
+        /* Badge glass */
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px 5px 8px; border-radius: var(--radius-pill);
+            font-size: 0.74rem; font-weight: 600; letter-spacing: 0.01em;
+            border: 1px solid transparent;
+        }
+        .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .badge.bg-warning { background: #fde8b8 !important; color: #7c2d12; border-color: #f5c563; }
+        .badge.bg-warning::before { background: #d97706; }
+        .badge.bg-success { background: #bbf7d0 !important; color: #14532d; border-color: #86efac; }
+        .badge.bg-success::before { background: #16a34a; }
+        .badge.bg-danger { background: #fecdd3 !important; color: #881337; border-color: #fda4af; }
+        .badge.bg-danger::before { background: #e11d48; }
+        .badge.bg-primary { background: #c7d2fe !important; color: #312e81; border-color: #a5b4fc; }
+        .badge.bg-primary::before { background: #4f46e5; }
+        .badge.bg-info { background: #bfdbfe !important; color: #1e3a8a; border-color: #93c5fd; }
+        .badge.bg-info::before { background: #2563eb; }
+        .badge.bg-secondary { background: #e2e8f0 !important; color: #334155; border-color: #cbd5e1; }
+        .badge.bg-secondary::before { background: #64748b; }
+        [data-bs-theme="dark"] .badge.bg-warning { background: rgba(245,158,11,0.16) !important; color: #fbbf24; border-color: rgba(245,158,11,0.3); }
+        [data-bs-theme="dark"] .badge.bg-success { background: rgba(34,197,94,0.16) !important; color: #86efac; border-color: rgba(34,197,94,0.3); }
+        [data-bs-theme="dark"] .badge.bg-danger { background: rgba(244,63,94,0.16) !important; color: #fda4af; border-color: rgba(244,63,94,0.3); }
+        [data-bs-theme="dark"] .badge.bg-primary { background: rgba(99,102,241,0.16) !important; color: #c7d2fe; border-color: rgba(99,102,241,0.3); }
+        [data-bs-theme="dark"] .badge.bg-info { background: rgba(59,130,246,0.16) !important; color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+        [data-bs-theme="dark"] .badge.bg-secondary { background: rgba(148,163,184,0.16) !important; color: #cbd5e1; border-color: rgba(148,163,184,0.3); }
+
+        /* Carte d'attente */
+        .awaiting-card {
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            border-radius: 20px;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 2.5rem 2rem;
+        }
+        .awaiting-icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.15));
+            border: 1px solid rgba(245,158,11,0.35);
+            color: #d97706;
+            font-size: 2rem;
+            margin-bottom: 1.25rem;
+            animation: pulse-soft 2s ease-in-out infinite;
+        }
+        [data-bs-theme="dark"] .awaiting-icon {
+            background: rgba(245,158,11,0.12);
+            color: #fbbf24;
+            border-color: rgba(245,158,11,0.3);
+        }
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.06); opacity: 0.85; }
+        }
+        .ticket-info-box {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            text-align: left;
+            display: inline-block;
+            min-width: 260px;
+            box-shadow: var(--glass-shadow);
+        }
+        .ticket-info-box .info-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 0.4rem;
+            font-size: 0.92rem;
+        }
+        .ticket-info-box .info-row:last-child { margin-bottom: 0; }
+        .ticket-info-box .info-row i { opacity: 0.7; width: 18px; text-align: center; }
+
+        /* ===== Responsive : très petits écrans ===== */
+        @media (max-width: 400px) {
+            .awaiting-card { padding: 1.75rem 1.25rem; max-width: 100%; }
+            .awaiting-icon { width: 58px; height: 58px; font-size: 1.6rem; }
+            .ticket-info-box { min-width: 0; width: 100%; padding: 0.85rem 1rem; }
+            .ticket-info-box .info-row { font-size: 0.85rem; flex-wrap: wrap; }
+        }
+
+        /* ===== Responsive : grand écran de bureau ===== */
+        @media (min-width: 1400px) {
+            .container-fluid { max-width: 1200px; margin-inline: auto; }
+            .awaiting-card { max-width: 620px; padding: 3rem 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-shell">
+    <!-- Sidebar -->
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
+        <div class="sidebar-header">
+            <a class="brand-mark" href="/user/dashboard-user.html" aria-label="Mada Ozi dashboard">
+                <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+                <span class="brand-copy">
+                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
+                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace personnel</span>
+                </span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
+            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
+            <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
+        </nav>
+        <div class="sidebar-user">
+            <strong id="sidebarUserName">Utilisateur</strong>
+            <small data-i18n="brand.subtitle">Espace personnel</small>
+        </div>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <!-- Navbar -->
+        <nav class="navbar admin-navbar navbar-expand bg-white">
+            <div class="container-fluid px-3 px-lg-4">
+                <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true" aria-label="Toggle sidebar">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="languageButton">
+                            🇫🇷
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                        </ul>
+                    </div>
+                    <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">
+                        <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/auth/login.html" data-i18n="logout">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="container-fluid px-3 px-lg-4 py-5">
+                <div class="awaiting-card text-center">
+                    <div class="awaiting-icon" aria-hidden="true">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <h2 class="mb-3" data-i18n="ticket.awaiting.title">En attente de confirmation</h2>
+                    <p class="text-muted mb-2" data-i18n="ticket.awaiting.message">Votre demande a bien été enregistrée. Un interlocuteur doit la confirmer avant que vous puissiez envoyer votre RIB.</p>
+                    <p class="text-muted small mb-4" data-i18n="ticket.awaiting.auto_redirect">Vous serez redirigé automatiquement dès la confirmation.</p>
+                    <div id="ticketInfo" class="mb-4"></div>
+                    <a href="/user/dashboard-user.html" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                        <span data-i18n="ticket.awaiting.back_dashboard">Retour au tableau de bord</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="admin-footer"></footer>
+    </div>
+</div>
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/i18n.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
+        const token = localStorage.getItem('jwt_token');
+
+        if (!token) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        function parseJwt(t) {
+            try {
+                const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                const json = decodeURIComponent(atob(base64).split('').map(c =>
+                    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                ).join(''));
+                return JSON.parse(json);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        const jwtPayload = parseJwt(token);
+        const currentUserEmail = jwtPayload?.email || jwtPayload?.username || jwtPayload?.sub || 'Utilisateur';
+        const sidebarEl = document.getElementById('sidebarUserName');
+        const navbarEl = document.getElementById('navbarUserName');
+        if (sidebarEl) sidebarEl.textContent = currentUserEmail;
+        if (navbarEl) navbarEl.textContent = currentUserEmail;
+
+        function fetchWithAuth(url, options = {}) {
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }).then(async res => {
+                if (res.status === 401) {
+                    localStorage.removeItem('jwt_token');
+                    window.location.href = '/login.html';
+                    return Promise.reject('Non authentifié');
+                }
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            });
+        }
+
+        function currencySymbol(code) {
+            const map = { 'EUR': '€', 'USD': '$', 'GBP': '£', 'MGA': 'Ar' };
+            return map[code] || code;
+        }
+        function formatCurrency(amount, code) {
+            const num = parseFloat(amount) || 0;
+            return num.toFixed(2) + ' ' + currencySymbol(code || 'EUR');
+        }
+
+        const STATUS_I18N_KEYS = {
+            'Validé': 'ticket.status.validated',
+            'Refusé': 'ticket.status.refused',
+            'En attente RIB': 'ticket.status.pending_rib',
+            'RIB reçu': 'ticket.status.rib_received',
+            'En attente réponse banque': 'ticket.status.pending_bank',
+            'En attente confirmation': 'ticket.status.pending_confirmation'
+        };
+        function translateStatus(statut) {
+            if (!statut) return '-';
+            const key = STATUS_I18N_KEYS[statut];
+            if (!key) return statut;
+            const translated = (typeof t === 'function') ? t(key) : null;
+            if (translated && translated !== key) return translated;
+            const lang = (window.i18n && window.i18n.getLanguage && window.i18n.getLanguage()) || localStorage.getItem('language') || 'fr';
+            const fallbackEn = {
+                'Validé': 'Validated',
+                'Refusé': 'Refused',
+                'En attente RIB': 'Awaiting RIB',
+                'RIB reçu': 'RIB received',
+                'En attente réponse banque': 'Awaiting bank response',
+                'En attente confirmation': 'Awaiting confirmation'
+            };
+            return (lang === 'en' && fallbackEn[statut]) ? fallbackEn[statut] : statut;
+        }
+
+        function statusBadgeClass(statut) {
+            if (statut === 'Validé') return 'success';
+            if (statut === 'Refusé') return 'danger';
+            if (statut === 'En attente RIB') return 'primary';
+            if (statut === 'RIB reçu') return 'info';
+            if (statut === 'En attente réponse banque') return 'secondary';
+            if (statut === 'En attente confirmation') return 'warning';
+            return 'warning';
+        }
+
+        let currentTicket = null;
+
+        function renderTicketInfo(ticket) {
+            if (!ticket) return;
+            currentTicket = ticket;
+            const typeLabel = ticket.type === 'AEV_NON_RECU'
+                ? (t('ticket.step2.aev_display') || 'AEV non reçu')
+                : (t('ticket.step2.multiple_display') || 'Paiement multiple');
+
+            document.getElementById('ticketInfo').innerHTML = `
+                <div class="ticket-info-box">
+                    <div class="info-row">
+                        <i class="bi bi-ticket-detailed" aria-hidden="true"></i>
+                        <strong>${t('ticket.awaiting.ticket_label') || 'Ticket'} #${ticket.id}</strong>
+                    </div>
+                    <div class="info-row">
+                        <i class="bi bi-tag" aria-hidden="true"></i>
+                        <span>${t('ticket.awaiting.type_label') || 'Type'} : ${typeLabel}</span>
+                    </div>
+                    <div class="info-row">
+                        <i class="bi bi-cash-coin" aria-hidden="true"></i>
+                        <span>${t('ticket.awaiting.amount_label') || 'Montant'} : ${formatCurrency(ticket.montant, ticket.devise)}</span>
+                    </div>
+                    <div class="info-row">
+                        <i class="bi bi-flag" aria-hidden="true"></i>
+                        <span>${t('ticket.awaiting.status_label') || 'Statut actuel'} :</span>
+                        <span class="badge bg-${statusBadgeClass(ticket.statut)}">${translateStatus(ticket.statut)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id) {
+            fetchWithAuth(`${API_BASE}/api/user/ticket/${id}`)
+                .then(ticket => renderTicketInfo(ticket))
+                .catch(err => console.error(err));
+        }
+
+        document.addEventListener('languageChanged', function() {
+            if (currentTicket) renderTicketInfo(currentTicket);
+        });
+    });
+</script>
+</body>
+</html>

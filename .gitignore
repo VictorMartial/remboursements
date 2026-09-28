@@ -1,0 +1,20 @@
+﻿# Historique et editeur
+/.history/
+/.backups/
+/.vscode/
+/.idea/
+/.groupedtimelineinclude
+
+# Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+
+# Secrets et divers
+*.key
+*.bak
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
+/backend/public/uploads/

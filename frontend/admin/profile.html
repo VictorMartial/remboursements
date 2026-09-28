@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="adminHMD professional admin dashboard template">
+  <title>Profile</title>
+
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/vendors/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+<script>
+/* Thème AVANT paint — clé = adminHMD.colorTheme (main.js) */
+(function () {
+  try {
+    var t = localStorage.getItem('adminHMD.colorTheme')
+      || localStorage.getItem('theme')
+      || localStorage.getItem('bs-theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-bs-theme', t);
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+
+<body>
+  <div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand-mark" href="dashboard-user.html">
+          <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+          <span class="brand-copy">
+            <span class="brand-title">Mada Ozi</span>
+            <span class="brand-subtitle">admin</span>
+          </span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+        <a class="nav-link active" href="users.html" aria-current="page">
+          <span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+          <span class="nav-text">Users</span>
+        </a>
+        <a class="nav-link" href="add-user.html">
+          <span class="nav-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></span>
+          <span class="nav-text">Add User</span>
+        </a>
+        <a class="nav-link" href="profile.html">
+          <span class="nav-icon"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+          <span class="nav-text">Profile</span>
+        </a>
+        <a class="nav-link" href="charts.html">
+          <span class="nav-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
+          <span class="nav-text">Charts</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <strong id="sidebarUserName"></strong>
+        <small>Espace administrateur</small>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="status-dot"></span>
+        <span class="sidebar-footer-text">Connecté</span>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <!-- Navbar -->
+      <nav class="navbar admin-navbar navbar-expand bg-white">
+        <div class="container-fluid px-3 px-lg-4">
+          <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true">
+            <span></span><span></span><span></span>
+          </button>
+          <form class="d-none d-md-flex ms-3 flex-grow-1" role="search">
+            <input class="form-control search-input" type="search" placeholder="Rechercher...">
+          </form>
+          <div class="navbar-actions ms-auto">
+    <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+        <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+    </button>
+    <div class="dropdown">
+        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          
+            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/auth/login.html">Déconnexion</a></li>
+        </ul>
+    </div>
+</div>
+        </div>
+      </nav>
+
+      <main class="dashboard-content">
+        <div class="container-fluid px-3 px-lg-4 py-4">
+          <div class="page-heading">
+            <div class="page-heading-copy">
+              <span class="page-icon"><i class="bi bi-person-badge"></i></span>
+              <div>
+                <p class="eyebrow mb-1">Account</p>
+                <h1 class="h3 mb-1">Profile</h1>
+                <p class="text-muted mb-0">Manage your personal details and preferences.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="profileAlert" class="alert alert-success d-none" role="alert"></div>
+
+          <section class="row g-3">
+            <!-- Carte de profil -->
+            <div class="col-12 col-xl-4">
+              <div class="panel h-100 text-center profile-card">
+                <div class="profile-cover"></div>
+                <!-- Plus de badge de vérification -->
+                <div class="info-list mt-4 text-start">
+                  <div><span>Email</span><strong id="profileEmailDisplay">—</strong></div>
+                  <div><span>Inscrit le</span><strong id="profileCreatedDisplay">—</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Formulaire de mise à jour -->
+            <div class="col-12 col-xl-8">
+              <form id="profileForm" class="panel needs-validation" novalidate>
+                <div class="panel-header">
+                  <div>
+                    <h2 class="h5 mb-1 section-title"><i class="bi bi-person-gear"></i><span>Profile Settings</span></h2>
+                  </div>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="profileEmail">Email</label>
+                    <input class="form-control" id="profileEmail" type="email" required>
+                    <div class="invalid-feedback">Enter a valid email.</div>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="profileBio">Bio</label>
+                    <textarea class="form-control" id="profileBio" rows="5"></textarea>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="profilePassword">New password (leave blank to keep current)</label>
+                    <div class="input-group">
+                      <input class="form-control" id="profilePassword" type="password" minlength="6">
+                      <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn" tabindex="-1">
+                        <i class="bi bi-eye-slash" id="passwordToggleIcon"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                  <button class="btn btn-primary" type="submit">
+                    <i class="bi bi-check2-circle"></i> Save Profile
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="admin-footer">
+        <div class="container-fluid px-3 px-lg-4">
+        </div>
+      </footer>
+    </div>
+  </div>
+
+ <script src="../assets/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/main.js"></script>
+
+  
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const API_BASE = 'http://localhost:8000';
+      const apiBase = `${API_BASE}/api/user`;
+      const alertDiv = document.getElementById('profileAlert');
+      const token = localStorage.getItem('jwt_token');
+
+      if (!token) {
+        window.location.href = '/auth/login.html';
+        return;
+      }
+
+      function fetchWithAuth(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }).then(async res => {
+          if (res.status === 401) {
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+            return Promise.reject('Non authentifié');
+          }
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+          return res.json();
+        });
+      }
+
+      function loadProfile() {
+        fetchWithAuth(`${apiBase}/profile`)
+          .then(user => {
+            document.getElementById('sidebarUserName').textContent = user.email;
+            document.getElementById('navbarUserName').textContent = user.email;
+            document.getElementById('profileEmailDisplay').textContent = user.email;
+            document.getElementById('profileCreatedDisplay').textContent = user.createdAt || '—';
+
+            document.getElementById('profileEmail').value = user.email;
+            document.getElementById('profileBio').value = user.bio || '';
+
+            // Le badge de vérification a été supprimé, donc rien à faire
+          })
+          .catch(err => {
+            console.error('Erreur chargement profil:', err);
+            alertDiv.textContent = 'Erreur de chargement du profil. Veuillez vous reconnecter.';
+            alertDiv.className = 'alert alert-danger';
+            alertDiv.classList.remove('d-none');
+          });
+      }
+
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+      const passwordInput = document.getElementById('profilePassword');
+      const passwordIcon = document.getElementById('passwordToggleIcon');
+
+      togglePasswordBtn.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        passwordIcon.className = type === 'password' ? 'bi bi-eye-slash' : 'bi bi-eye';
+      });
+
+      const form = document.getElementById('profileForm');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alertDiv.classList.add('d-none');
+
+        const payload = {
+          email: document.getElementById('profileEmail').value.trim(),
+          bio: document.getElementById('profileBio').value.trim(),
+          password: document.getElementById('profilePassword').value || undefined
+        };
+
+        fetchWithAuth(`${apiBase}/profile`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        })
+        .then(data => {
+          if (data.success !== false) {
+            alertDiv.textContent = 'Profil mis à jour avec succès !';
+            alertDiv.className = 'alert alert-success';
+            alertDiv.classList.remove('d-none');
+            loadProfile();
+          } else {
+            alertDiv.textContent = data.message || 'Erreur lors de la mise à jour.';
+            alertDiv.className = 'alert alert-danger';
+            alertDiv.classList.remove('d-none');
+          }
+        })
+        .catch(err => {
+          alertDiv.textContent = 'Erreur réseau. Veuillez réessayer.';
+          alertDiv.className = 'alert alert-danger';
+          alertDiv.classList.remove('d-none');
+          console.error(err);
+        });
+      });
+
+      loadProfile();
+    });
+  </script>
+</body>
+<script>
+/* Active le lien du menu latéral selon la page courante */
+(function () {
+  function activateSidebarNav() {
+    const path = (window.location.pathname || '').replace(/\\/g, '/');
+    const file = path.split('/').pop() || 'index.html';
+    const current = file.toLowerCase() || 'index.html';
+
+    document.querySelectorAll('.admin-sidebar .sidebar-nav a.nav-link').forEach(function (link) {
+      link.classList.remove('active');
+      link.removeAttribute('aria-current');
+
+      const href = (link.getAttribute('href') || '').split('?')[0].split('#')[0];
+      const linkFile = href.split('/').pop().toLowerCase() || '';
+
+      const isMatch =
+        linkFile === current ||
+        (current === '' && (linkFile === 'index.html' || linkFile === '')) ||
+        (current === 'index.html' && (linkFile === 'index.html' || linkFile === ''));
+
+      if (isMatch) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', activateSidebarNav);
+  } else {
+    activateSidebarNav();
+  }
+})();
+</script>
+</html>

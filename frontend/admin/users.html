@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="adminHMD professional admin dashboard template">
+  <title>Users</title>
+
+  <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../assets/vendors/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    /* —— Modern user UI —— */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1px solid transparent;
+    }
+    .role-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .role-user {
+      background: rgba(59, 130, 246, 0.12);
+      color: #1d4ed8;
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+    .role-user::before { background: #3b82f6; }
+    .role-interlocuteur {
+      background: rgba(245, 158, 11, 0.14);
+      color: #b45309;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    .role-interlocuteur::before { background: #f59e0b; }
+    .role-admin {
+      background: rgba(239, 68, 68, 0.12);
+      color: #b91c1c;
+      border-color: rgba(239, 68, 68, 0.28);
+    }
+    .role-admin::before { background: #ef4444; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(34, 197, 94, 0.14);
+      color: #15803d;
+      border: 1px solid rgba(34, 197, 94, 0.28);
+    }
+    .status-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+    }
+
+    .date-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.3rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #475569;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    .date-pill i { font-size: 0.85rem; opacity: 0.7; }
+
+    [data-bs-theme="dark"] .date-pill {
+      background: rgba(148, 163, 184, 0.12);
+      color: #cbd5e1;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+    [data-bs-theme="dark"] .role-user {
+      background: rgba(59, 130, 246, 0.18);
+      color: #93c5fd;
+    }
+    [data-bs-theme="dark"] .role-interlocuteur {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fcd34d;
+    }
+    [data-bs-theme="dark"] .role-admin {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+    }
+    [data-bs-theme="dark"] .status-badge {
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-action {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #64748b;
+      transition: all 0.15s ease;
+    }
+    .btn-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    }
+    .btn-action.btn-view:hover {
+      background: #eef2ff;
+      color: #4f46e5;
+      border-color: #c7d2fe;
+    }
+    .btn-action.btn-delete:hover {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+    [data-bs-theme="dark"] .btn-action {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+    }
+  </style>
+  <script>
+/* Thème AVANT paint — clé = adminHMD.colorTheme (main.js) */
+(function () {
+  try {
+    var t = localStorage.getItem('adminHMD.colorTheme')
+      || localStorage.getItem('theme')
+      || localStorage.getItem('bs-theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-bs-theme', t);
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+</head>
+
+<body>
+  <div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <a class="brand-mark" href="index.html" aria-label="adminHMD dashboard">
+          <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
+          <span class="brand-copy">
+            <span class="brand-title">Mada Ozi</span>
+            <span class="brand-subtitle">Admin</span>
+          </span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+        <a class="nav-link active" href="users.html" aria-current="page">
+          <span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+          <span class="nav-text">Users</span>
+        </a>
+        <a class="nav-link" href="add-user.html">
+          <span class="nav-icon"><i class="bi bi-person-plus" aria-hidden="true"></i></span>
+          <span class="nav-text">Add User</span>
+        </a>
+        <a class="nav-link" href="profile.html">
+          <span class="nav-icon"><i class="bi bi-person-badge" aria-hidden="true"></i></span>
+          <span class="nav-text">Profile</span>
+        </a>
+        <a class="nav-link" href="charts.html">
+          <span class="nav-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
+          <span class="nav-text">Charts</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <strong id="sidebarUserName">—</strong>
+        <small>Active Workspace</small>
+      </div>
+
+      <div class="sidebar-footer">
+        
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <nav class="navbar admin-navbar navbar-expand bg-white">
+        <div class="container-fluid px-3 px-lg-4">
+          <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true" aria-label="Toggle sidebar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <form class="d-none d-md-flex ms-3 flex-grow-1" role="search">
+            <input class="form-control search-input" type="search" placeholder="Search users, roles, teams" aria-label="Search">
+          </form>
+
+          <div class="navbar-actions ms-auto">
+    <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+        <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+    </button>
+    <div class="dropdown">
+        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            
+            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/auth/login.html">Déconnexion</a></li>
+        </ul>
+    </div>
+</div>
+      </nav>
+
+      <main class="dashboard-content">
+        <div class="container-fluid px-3 px-lg-4 py-4">
+          <div class="page-heading">
+            <div class="page-heading-copy">
+              <span class="page-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+              <div>
+                <p class="eyebrow mb-1">Management</p>
+                <h1 class="h3 mb-1">Users</h1>
+                <p class="text-muted mb-0">Review accounts, roles, account status, and team ownership.</p>
+              </div>
+            </div>
+            <div class="heading-actions"><a class="btn btn-primary btn-sm" href="add-user.html"><i class="bi bi-person-plus" aria-hidden="true"></i> Add User</a></div>
+          </div>
+
+          <section class="row g-3 mt-1" aria-label="User summary">
+            <div class="col-12 col-sm-6 col-xl-3">
+              <article class="metric-card metric-primary">
+                <div class="metric-top">
+                  <span class="metric-label">Total Users</span>
+                  <span class="metric-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+                </div>
+                <div class="metric-value" id="statTotalUsers">—</div>
+                <div class="metric-meta">
+                  <span>tous rôles confondus</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+              <article class="metric-card metric-success">
+                <div class="metric-top">
+                  <span class="metric-label">Regular Users</span>
+                  <span class="metric-icon"><i class="bi bi-check2-circle" aria-hidden="true"></i></span>
+                </div>
+                <div class="metric-value" id="statRegularUsers">—</div>
+                <div class="metric-meta">
+                  <span>User</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+              <article class="metric-card metric-warning">
+                <div class="metric-top">
+                  <span class="metric-label">Admins</span>
+                  <span class="metric-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+                </div>
+                <div class="metric-value" id="statAdmins">—</div>
+                <div class="metric-meta">
+                  <span>Admin</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+              <article class="metric-card metric-danger">
+                <div class="metric-top">
+                  <span class="metric-label">New this month</span>
+                  <span class="metric-icon"><i class="bi bi-calendar-plus" aria-hidden="true"></i></span>
+                </div>
+                <div class="metric-value" id="statNewThisMonthCard">—</div>
+                <div class="metric-meta">
+                  <span>inscriptions récentes</span>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel mt-3">
+            <div class="panel-header">
+              <div>
+                <h2 class="h5 mb-1 section-title"><i class="bi bi-table" aria-hidden="true"></i><span>User List</span></h2>
+                <p class="text-muted mb-0">Search, review, and manage team member accounts.</p>
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                <input class="form-control form-control-sm table-search" type="search" placeholder="Search users" data-table-search="usersTable" aria-label="Search users">
+                <a class="btn btn-primary btn-sm" href="add-user.html"><i class="bi bi-person-plus" aria-hidden="true"></i> Add User</a>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0" id="usersTable" data-searchable-table>
+                <thead><tr><th scope="col">User</th><th scope="col">Role</th><th scope="col">Status</th><th scope="col">Joined</th><th scope="col" class="text-end">Action</th></tr></thead>
+                <tbody id="users-list">
+                  
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mt-3">
+              <p class="text-muted small mb-0">Showing 1 to 5 of 124 users</p>
+              <nav aria-label="Users pagination"><ul class="pagination pagination-sm mb-0"><li class="page-item disabled"><a class="page-link" href="#">Previous</a></li><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">2</a></li><li class="page-item"><a class="page-link" href="#">Next</a></li></ul></nav>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="admin-footer">
+        <div class="container-fluid px-3 px-lg-4">
+          
+          <span>User management dashboard.</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../assets/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
+  
+  
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const apiBase = 'http://localhost:8000/api/admin/users';
+  const token = localStorage.getItem('jwt_token');
+
+  if (!token) {
+    window.location.href = '/auth/login.html';
+    return;
+  }
+
+  // --- Affiche l'email de l'utilisateur connecté (décodé depuis le JWT) ---
+  function parseJwt(t) {
+    try {
+      const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
+      return JSON.parse(json);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const payload = parseJwt(token);
+  const currentUserEmail = payload?.email || payload?.username || payload?.sub || 'Utilisateur';
+  const sidebarName = document.getElementById('sidebarUserName');
+  const navbarName = document.getElementById('navbarUserName');
+  if (sidebarName) sidebarName.textContent = currentUserEmail;
+  if (navbarName) navbarName.textContent = currentUserEmail;
+
+  function fetchWithAuth(url, options = {}) {
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then(async res => {
+      if (res.status === 401) {
+        localStorage.removeItem('jwt_token');
+        window.location.href = '/auth/login.html';
+        return Promise.reject('Non authentifié');
+      }
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      return res.json();
+    });
+  }
+
+  // --- Cartes de stats ---
+  fetchWithAuth('http://localhost:8000/api/admin/user-stats')
+    .then(stats => {
+      document.getElementById('statTotalUsers').textContent = stats.total ?? 0;
+      document.getElementById('statRegularUsers').textContent = stats.regular ?? 0;
+      document.getElementById('statAdmins').textContent = stats.admins ?? 0;
+      document.getElementById('statNewThisMonthCard').textContent = stats.new_this_month ?? 0;
+    })
+    .catch(err => console.error('Erreur chargement stats users:', err));
+
+  // --- Helpers rôles & date ---
+  const roleLabel = (role) => {
+    const map = {
+      'ROLE_USER': 'User',
+      'ROLE_INTERLOCUTEUR': 'Interlocuteur',
+      'ROLE_ADMIN': 'Admin'
+    };
+    return map[role] || role || '—';
+  };
+
+  // Format date → jj/MM/AAAA (pas AAAA/MM/JJ)
+  const formatDate = (raw) => {
+    if (!raw) return '—';
+    const d = new Date(String(raw).replace(' ', 'T'));
+    if (isNaN(d.getTime())) return raw;
+    const jj = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const aaaa = d.getFullYear();
+    return jj + '/' + mm + '/' + aaaa;
+  };
+
+  // --- Liste des utilisateurs ---
+  fetchWithAuth(apiBase)
+    .then(data => {
+      const tbody = document.getElementById('users-list');
+      // API peut renvoyer { success, users } ou un tableau
+      const list = Array.isArray(data) ? data : (data.users || []);
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aucun utilisateur</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map((u) => {
+        const role = roleLabel(u.role);
+        const roleClass =
+          u.role === 'ROLE_ADMIN' ? 'role-admin' :
+          u.role === 'ROLE_INTERLOCUTEUR' ? 'role-interlocuteur' :
+          'role-user';
+        return `
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <div class="user-avatar">${(u.email || '?').charAt(0).toUpperCase()}</div>
+                <div>
+                  <p class="fw-semibold mb-0">${u.email || '—'}</p>
+                  <p class="text-muted small mb-0">ID #${u.id ?? '—'}</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="role-badge ${roleClass}">${role}</span></td>
+            <td><span class="status-badge">Actif</span></td>
+            <td><span class="date-pill"><i class="bi bi-calendar3"></i>${formatDate(u.createdAt)}</span></td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <a class="btn-action btn-view" href="user-details.html?id=${u.id}" title="Voir"><i class="bi bi-eye"></i></a>
+                <button type="button" class="btn-action btn-delete" onclick="deleteUser(${u.id})" title="Supprimer"><i class="bi bi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    })
+    .catch(err => console.error('Erreur chargement utilisateurs:', err));
+
+  window.deleteUser = function(id) {
+    if (!confirm('Confirmer la suppression ?')) return;
+    fetchWithAuth(`${apiBase}/${id}`, { method: 'DELETE' })
+      .then(() => location.reload())
+      .catch(err => alert('Erreur lors de la suppression'));
+  };
+});
+</script>
+<script>
+/* Active le lien du menu latéral selon la page courante */
+(function () {
+  function activateSidebarNav() {
+    const path = (window.location.pathname || '').replace(/\\/g, '/');
+    const file = path.split('/').pop() || 'index.html';
+    const current = file.toLowerCase() || 'index.html';
+
+    document.querySelectorAll('.admin-sidebar .sidebar-nav a.nav-link').forEach(function (link) {
+      link.classList.remove('active');
+      link.removeAttribute('aria-current');
+
+      const href = (link.getAttribute('href') || '').split('?')[0].split('#')[0];
+      const linkFile = href.split('/').pop().toLowerCase() || '';
+
+      const isMatch =
+        linkFile === current ||
+        (current === '' && (linkFile === 'index.html' || linkFile === '')) ||
+        (current === 'index.html' && (linkFile === 'index.html' || linkFile === ''));
+
+      if (isMatch) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', activateSidebarNav);
+  } else {
+    activateSidebarNav();
+  }
+})();
+</script>
+</body>
+</html>

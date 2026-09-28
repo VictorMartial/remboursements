@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Interlocuteur</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+    /* Dark mode */
+    [data-bs-theme="dark"] { color-scheme: dark; }
+    [data-bs-theme="dark"] body { background-color: #12151c; color: #e6e8ec; }
+    [data-bs-theme="dark"] .admin-sidebar { background-color: #171b24; border-color: #262b36; }
+    [data-bs-theme="dark"] .admin-navbar,
+    [data-bs-theme="dark"] .bg-white { background-color: #171b24 !important; }
+    [data-bs-theme="dark"] .panel,
+    [data-bs-theme="dark"] .metric-card,
+    [data-bs-theme="dark"] .card,
+    [data-bs-theme="dark"] .admin-footer { background-color: #1b2029; border-color: #262b36; color: #e6e8ec; }
+    [data-bs-theme="dark"] .table,
+    [data-bs-theme="dark"] .table-wrap table { color: #e6e8ec; --bs-table-bg: transparent; --bs-table-color: #e6e8ec; border-color: #262b36; }
+    [data-bs-theme="dark"] .table-wrap th,
+    [data-bs-theme="dark"] .table-wrap td { border-color: #262b36; }
+    [data-bs-theme="dark"] .table-wrap th { background: #20242e; }
+    [data-bs-theme="dark"] .table-wrap tbody tr:hover { background: #20242e; }
+    [data-bs-theme="dark"] .nav-link,
+    [data-bs-theme="dark"] .brand-title,
+    [data-bs-theme="dark"] .section-title,
+    [data-bs-theme="dark"] h1, [data-bs-theme="dark"] h2, [data-bs-theme="dark"] h3,
+    [data-bs-theme="dark"] strong { color: #e6e8ec; }
+    [data-bs-theme="dark"] .text-muted { color: #9aa1ad !important; }
+    [data-bs-theme="dark"] .form-control,
+    [data-bs-theme="dark"] .form-select,
+    [data-bs-theme="dark"] .search-input { background-color: #12151c; border-color: #262b36; color: #e6e8ec; }
+    [data-bs-theme="dark"] .icon-button { color: #e6e8ec; }
+    [data-bs-theme="dark"] .modal-box { background: #1b2029; color: #e6e8ec; }
+
+    :root {
+        --glass-bg: rgba(255,255,255,0.55);
+        --glass-bg-strong: rgba(255,255,255,0.72);
+        --glass-border: rgba(255,255,255,0.45);
+        --glass-shadow: 0 8px 32px rgba(31,41,55,0.10);
+        --glass-shadow-hover: 0 12px 36px rgba(31,41,55,0.16);
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --radius-pill: 999px;
+        --text-primary: #0f172a;
+        --text-secondary: #1e293b;
+        --text-muted: #334155;
+        --text-table-header: #1e293b;
+    }
+    body { color: var(--text-primary); }
+    h1, h2, h3, h4, .h4, .section-title, .brand-title, strong { color: var(--text-primary); }
+    .text-muted { color: var(--text-muted) !important; }
+    .card-header-text p, .card-header-text .text-muted { color: var(--text-muted) !important; }
+    .table-wrap td { color: var(--text-secondary); }
+    .nav-link { color: var(--text-secondary); }
+    .sidebar-footer-text, .sidebar-user small { color: var(--text-muted); }
+    .profile-name { color: var(--text-primary); }
+
+    [data-bs-theme="dark"] {
+        --glass-bg: rgba(32,36,46,0.55);
+        --glass-bg-strong: rgba(32,36,46,0.75);
+        --glass-border: rgba(255,255,255,0.08);
+        --glass-shadow: 0 8px 32px rgba(0,0,0,0.35);
+        --glass-shadow-hover: 0 12px 36px rgba(0,0,0,0.45);
+        --text-primary: #f1f5f9;
+        --text-secondary: #dbe2ea;
+        --text-muted: #a6adb8;
+        --text-table-header: #dbe2ea;
+    }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,18,25,0.45); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1050; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--glass-bg-strong); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); max-width: 500px; width: 90%; padding: 24px; box-shadow: var(--glass-shadow-hover); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+
+    .card-header-flex { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .card-header-flex .card-header-text { flex: 1 1 auto; min-width: 220px; }
+
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid rgba(148,163,184,0.18); box-shadow: 0 2px 12px rgba(15,23,42,0.05); }
+    .table-wrap table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .table-wrap th, .table-wrap td { padding: 13px 14px; border-bottom: 1px solid rgba(148,163,184,0.16); text-align: left; }
+    .table-wrap th { background: rgba(148,163,184,0.14); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-table-header); position: sticky; top: 0; }
+    .table-wrap tbody tr { transition: background-color 0.15s ease; }
+    .table-wrap tbody tr:hover { background: rgba(99,102,241,0.06); }
+    .table-wrap tbody tr:last-child td { border-bottom: none; }
+
+    .alert { padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 16px; border: 1px solid transparent; }
+    .alert-success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .alert-danger { background: #fce7f3; color: #be185d; border-color: #fbcfe8; }
+
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        border-radius: var(--radius-pill) !important;
+        backdrop-filter: blur(14px) saturate(180%);
+        -webkit-backdrop-filter: blur(14px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+        font-weight: 500;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow-hover); filter: brightness(1.03); }
+    .btn:active { transform: translateY(0); }
+    .btn-success { background: linear-gradient(135deg, rgba(5,150,105,0.92), rgba(4,120,87,0.92)); color: #fff; border-color: rgba(4,120,87,0.55); font-weight: 600; }
+    .btn-danger { background: linear-gradient(135deg, rgba(225,29,72,0.92), rgba(190,18,60,0.92)); color: #fff; border-color: rgba(190,18,60,0.55); font-weight: 600; }
+    .btn-secondary { background: rgba(148,163,184,0.45); color: #0f172a; border-color: rgba(100,116,139,0.5); font-weight: 600; }
+    [data-bs-theme="dark"] .btn-secondary { color: #e6e8ec; }
+    .btn-outline { background: var(--glass-bg); border: 1px solid rgba(71,85,105,0.45); color: #0f172a; font-weight: 600; }
+    .btn-outline:hover { background: rgba(226,232,240,0.9); color: #020617; }
+    [data-bs-theme="dark"] .btn-outline { color: #e6e8ec; }
+    [data-bs-theme="dark"] .btn-outline:hover { background: rgba(255,255,255,0.08); }
+    .btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+
+    .icon-button, .btn-icon-glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(14px) saturate(180%);
+        -webkit-backdrop-filter: blur(14px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--glass-shadow);
+        border-radius: var(--radius-pill);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        color: #0f172a;
+        font-weight: 600;
+    }
+    .icon-button:hover, .btn-icon-glass:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow-hover); }
+    [data-bs-theme="dark"] .icon-button,
+    [data-bs-theme="dark"] .btn-icon-glass { color: #e6e8ec; }
+    .btn.is-refreshing, button.is-refreshing { opacity: 0.75; cursor: wait; }
+    .btn.is-refreshing i, button.is-refreshing i { animation: dash-spin 0.7s linear infinite; }
+    @keyframes dash-spin { to { transform: rotate(360deg); } }
+
+    .badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 12px 5px 8px; border-radius: var(--radius-pill);
+        font-size: 0.74rem; font-weight: 600; letter-spacing: 0.01em;
+        border: 1px solid transparent;
+    }
+    .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .badge-amber { background: #fef3c7; color: #78350f; border-color: #fde68a; }
+    .badge-amber::before { background: #d97706; }
+    .badge-blue { background: #dbeafe; color: #1e3a8a; border-color: #bfdbfe; }
+    .badge-blue::before { background: #2563eb; }
+    .badge-rose { background: #ffe4e6; color: #881337; border-color: #fecdd3; }
+    .badge-rose::before { background: #e11d48; }
+    .badge-green { background: #dcfce7; color: #14532d; border-color: #bbf7d0; }
+    .badge-green::before { background: #16a34a; }
+    [data-bs-theme="dark"] .badge-amber { background: rgba(245,158,11,0.16); color: #fbbf24; border-color: rgba(245,158,11,0.3); }
+    [data-bs-theme="dark"] .badge-blue { background: rgba(59,130,246,0.16); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+    [data-bs-theme="dark"] .badge-rose { background: rgba(244,63,94,0.16); color: #fda4af; border-color: rgba(244,63,94,0.3); }
+    [data-bs-theme="dark"] .badge-green { background: rgba(34,197,94,0.16); color: #86efac; border-color: rgba(34,197,94,0.3); }
+
+    .form-label { color: var(--text-primary); font-weight: 600; }
+    .modal-box h3 { color: var(--text-primary); }
+    .actions-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .section-gap { margin-top: 30px; }
+
+    /* Toasts */
+    .toast-item {
+        padding: 14px 18px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        animation: toastIn 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .toast-item.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .toast-item.danger  { background: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+    .toast-item.info    { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .toast-item .toast-close {
+        margin-left: auto; border: none; background: transparent;
+        cursor: pointer; opacity: 0.6; font-size: 1.1rem; line-height: 1;
+    }
+    .toast-item .toast-close:hover { opacity: 1; }
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateX(40px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+    [data-bs-theme="dark"] .toast-item.success { background: rgba(34,197,94,0.2); color: #86efac; border-color: rgba(34,197,94,0.3); }
+    [data-bs-theme="dark"] .toast-item.danger  { background: rgba(244,63,94,0.2); color: #fda4af; border-color: rgba(244,63,94,0.3); }
+    [data-bs-theme="dark"] .toast-item.info    { background: rgba(59,130,246,0.2); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+    </style>
+    <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('adminHMD.colorTheme') || localStorage.getItem('theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', t);
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+    </script>
+</head>
+<body>
+<div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <a class="brand-mark" href="/interlocuteur/interlocuteur-dashboard.html">
+                <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+                <span class="brand-copy">
+                    <span class="brand-title">Interlocuteur</span>
+                </span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-link active" href="/interlocuteur/interlocuteur-dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        </nav>
+        <div class="sidebar-user">
+            <strong id="sidebarUserName">Interlocuteur</strong>
+            <small>Espace de travail</small>
+        </div>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span class="sidebar-footer-text">Connecté</span>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <nav class="navbar admin-navbar navbar-expand bg-white">
+            <div class="container-fluid px-3 px-lg-4">
+                <button class="sidebar-toggle" type="button" data-sidebar-toggle>
+                    <span></span><span></span><span></span>
+                </button>
+                <form class="d-none d-md-flex ms-3 flex-grow-1" role="search" id="globalSearchForm">
+                    <input class="form-control search-input" type="search" id="globalSearch"
+                           placeholder="Rechercher dans les tickets..." autocomplete="off">
+                </form>
+                <div class="navbar-actions ms-auto">
+                    <button class="icon-button" type="button" id="refreshAllBtn" title="Tout rafraîchir" onclick="rafraichirTout(this)">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">
+                        <i class="bi bi-moon-stars" data-theme-icon></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">Interlocuteur</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/auth/login.html">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="container-fluid px-3 px-lg-4 py-4">
+
+                <!-- Section 1 -->
+                <div class="card">
+                    <div class="card-header card-header-flex">
+                        <div class="card-header-text">
+                            <h1 class="h4">Tickets en attente de confirmation</h1>
+                            <p class="text-muted">Confirmez les demandes avant l'envoi du RIB.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th>#</th><th>Type</th><th>Utilisateur</th><th>Description</th><th>Date</th><th>Montant</th><th>Action</th>
+                                </tr></thead>
+                                <tbody id="ticketsAttenteBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="card section-gap">
+                    <div class="card-header card-header-flex">
+                        <div class="card-header-text">
+                            <h1 class="h4">RIB reçus — à envoyer à la banque</h1>
+                            <p class="text-muted">Vérifiez le RIB avant de le transmettre.</p>
+                        </div>
+                        <div>
+                            <button class="btn btn-success btn-sm" id="envoyerTousBanqueBtn" onclick="envoyerTousBanque(this)">
+                                <i class="bi bi-send-check"></i> Tout envoyer à la banque
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th>#</th><th>Type</th><th>Utilisateur</th><th>Réf. paiement</th><th>Montant</th><th>RIB</th><th>Action</th>
+                                </tr></thead>
+                                <tbody id="ribRecuBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div class="card section-gap">
+                    <div class="card-header card-header-flex">
+                        <div class="card-header-text">
+                            <h1 class="h4">Tickets en attente de réponse banque</h1>
+                            <p class="text-muted">Le RIB, le montant et la référence ont été transmis.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr>
+                                    <th>#</th><th>Type</th><th>Utilisateur</th><th>Réf. paiement</th><th>Montant</th><th>Email envoyé le</th><th>Action</th>
+                                </tr></thead>
+                                <tbody id="attenteBanqueBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="admin-footer"></footer>
+    </div>
+</div>
+
+<!-- Modale validation -->
+<div class="modal-overlay" id="validationModal">
+    <div class="modal-box">
+        <h3><i class="bi bi-check-circle-fill text-success"></i> Valider le ticket #<span id="validationTicketId"></span></h3>
+        <div class="alert" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;">
+            <strong>Demande initiale du client</strong>
+            <div>Montant : <span id="clientMontant">-</span> — Devise : <span id="clientDevise">-</span> — Référence : <span id="clientReference">-</span></div>
+            <small>Les valeurs saisies ci-dessous doivent être identiques à cette demande pour que le ticket soit validé.</small>
+        </div>
+        <form id="validationForm">
+            <div class="mb-3">
+                <label class="form-label">Devise</label>
+                <select id="validationDevise" class="form-select">
+                    <option value="EUR">Euro (€)</option>
+                    <option value="USD">Dollar ($)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">ID Transaction</label>
+                <input type="text" id="validationIdTransaction" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Montant à rembourser</label>
+                <input type="number" id="validationMontant" class="form-control" step="0.01" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Date de remboursement</label>
+                <input type="date" id="validationDateRemboursement" class="form-control" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fermerModal('validationModal')">Annuler</button>
+                <button type="submit" class="btn btn-success">Confirmer la validation</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modale de confirmation -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box" style="max-width:420px">
+        <h3 id="confirmTitle"><i class="bi bi-question-circle"></i> Confirmation</h3>
+        <p id="confirmMessage" class="mb-0 mt-2"></p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="confirmCancelBtn">Annuler</button>
+            <button type="button" class="btn btn-success" id="confirmOkBtn">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toasts -->
+<div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:2000; display:flex; flex-direction:column; gap:10px; max-width:380px;"></div>
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+
+<script>
+const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
+const token = localStorage.getItem('jwt_token');
+if (!token) window.location.href = '/auth/login.html';
+
+function parseJwt(t) {
+    try {
+        const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const json = decodeURIComponent(atob(base64).split('').map(c =>
+            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(json);
+    } catch (e) { return null; }
+}
+
+const jwtPayload = parseJwt(token);
+const currentUserEmail = jwtPayload?.email || jwtPayload?.username || jwtPayload?.sub || 'Interlocuteur';
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarName = document.getElementById('sidebarUserName');
+    const navbarName = document.getElementById('navbarUserName');
+    if (sidebarName) sidebarName.textContent = currentUserEmail;
+    if (navbarName) navbarName.textContent = currentUserEmail;
+});
+
+function fetchWithAuth(url, options = {}) {
+    return fetch(url, {
+        ...options,
+        headers: { ...options.headers, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+    }).then(async res => {
+        if (res.status === 401) {
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+            return Promise.reject('Non authentifié');
+        }
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status} - ${text.substring(0, 150)}`);
+        }
+        return res.json();
+    });
+}
+
+/* ===== Toast ===== */
+function showFlash(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast-item ${type}`;
+    toast.innerHTML = `<span>${message}</span><button class="toast-close" aria-label="Fermer">&times;</button>`;
+    container.appendChild(toast);
+    const close = () => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(40px)';
+        toast.style.transition = '0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+    };
+    toast.querySelector('.toast-close').addEventListener('click', close);
+    setTimeout(close, 4500);
+}
+
+/* ===== Confirmation popup ===== */
+function showConfirm(message, title = 'Confirmation') {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirmModal');
+        const titleEl = document.getElementById('confirmTitle');
+        const msgEl = document.getElementById('confirmMessage');
+        const okBtn = document.getElementById('confirmOkBtn');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+
+        titleEl.innerHTML = `<i class="bi bi-question-circle"></i> ${title}`;
+        msgEl.textContent = message;
+        modal.classList.add('open');
+
+        function cleanup(result) {
+            modal.classList.remove('open');
+            okBtn.removeEventListener('click', onOk);
+            cancelBtn.removeEventListener('click', onCancel);
+            modal.removeEventListener('click', onOutside);
+            resolve(result);
+        }
+        function onOk() { cleanup(true); }
+        function onCancel() { cleanup(false); }
+        function onOutside(e) { if (e.target === modal) cleanup(false); }
+
+        okBtn.addEventListener('click', onOk);
+        cancelBtn.addEventListener('click', onCancel);
+        modal.addEventListener('click', onOutside);
+    });
+}
+
+function currencySymbol(code) {
+    return ({ 'EUR': '€', 'USD': '$', 'GBP': '£', 'MGA': 'Ar' }[code] || code);
+}
+function formatCurrency(amount, code) {
+    if (amount === null || amount === undefined || amount === '') return '-';
+    return (parseFloat(amount) || 0).toFixed(2) + ' ' + currencySymbol(code || 'EUR');
+}
+
+function formatDateMadagascar(raw) {
+    if (!raw || raw === '—') return '—';
+    let d;
+    if (typeof raw === 'number') {
+        d = new Date(raw);
+    } else {
+        const s = String(raw).trim().replace(' ', 'T');
+        d = new Date(s);
+        if (!/[zZ]|[+-]\d{2}/.test(s) && !isNaN(d.getTime())) {
+            d = new Date(s + (s.includes('T') ? 'Z' : ''));
+        }
+    }
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleString('fr-FR', {
+        timeZone: 'Indian/Antananarivo',
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+    });
+}
+
+function retirerLigneParId(tbody, id, messageVide, colspan) {
+    if (!tbody) return;
+    tbody.querySelectorAll('tr').forEach(row => {
+        const firstCell = row.querySelector('td');
+        if (firstCell && firstCell.textContent.trim() === String(id)) row.remove();
+    });
+    if (!tbody.querySelector('tr')) {
+        tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center">${messageVide}</td></tr>`;
+    }
+}
+
+function setBoutonEnCours(btn, enCours) {
+    if (!btn) return;
+    if (enCours) {
+        btn.dataset.contenuOriginal = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Traitement...';
+    } else if (btn.dataset.contenuOriginal) {
+        btn.innerHTML = btn.dataset.contenuOriginal;
+        delete btn.dataset.contenuOriginal;
+    }
+    btn.disabled = enCours;
+    btn.classList.toggle('is-refreshing', enCours);
+}
+
+/* ===== Section 1 ===== */
+function loadTicketsAttente(silencieux = false) {
+    const tbody = document.getElementById('ticketsAttenteBody');
+    if (!silencieux) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
+    return fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets/en-attente`)
+        .then(tickets => {
+            if (!tickets.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucun ticket en attente.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = tickets.map(t => `
+                <tr>
+                    <td>${t.id}</td>
+                    <td><span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span></td>
+                    <td>${t.user || '-'}</td>
+                    <td>${t.description || '—'}</td>
+                    <td>${t.date || '-'}</td>
+                    <td>${formatCurrency(t.montant, t.devise)}</td>
+                    <td><button class="btn btn-success btn-sm" onclick="confirmerTicket(${t.id}, this)"><i class="bi bi-check-lg"></i> Confirmer</button></td>
+                </tr>
+            `).join('');
+        })
+        .catch(err => {
+            if (!silencieux) tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
+        });
+}
+
+window.confirmerTicket = async function(id, btn) {
+    const ok = await showConfirm('Confirmer ce ticket ?', 'Confirmation');
+    if (!ok) return;
+    setBoutonEnCours(btn, true);
+    fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/confirmer`, { method: 'POST' })
+        .then(data => {
+            if (data.success) {
+                showFlash(data.message, 'success');
+                retirerLigneParId(document.getElementById('ticketsAttenteBody'), id, 'Aucun ticket en attente.', 7);
+                rafraichirApresAction();
+            } else {
+                showFlash(data.message, 'danger');
+                setBoutonEnCours(btn, false);
+            }
+        })
+        .catch(() => {
+            showFlash('Erreur réseau', 'danger');
+            setBoutonEnCours(btn, false);
+        });
+};
+
+/* ===== Section 2 ===== */
+function loadRibRecu(silencieux = false) {
+    const tbody = document.getElementById('ribRecuBody');
+    if (!silencieux) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
+    return fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets/a-envoyer-banque`)
+        .then(tickets => {
+            if (!tickets.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucun RIB en attente.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = tickets.map(t => `
+                <tr>
+                    <td>${t.id}</td>
+                    <td><span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span></td>
+                    <td>${t.user || '-'}</td>
+                    <td>${t.reference || '-'}</td>
+                    <td>${formatCurrency(t.montant, t.devise)}</td>
+                    <td>${t.rib ? `<a href="${API_BASE}/uploads/rib/${t.rib}" target="_blank"><i class="bi bi-paperclip"></i> Voir</a>` : '—'}</td>
+                    <td><button class="btn btn-success btn-sm" onclick="envoyerBanque(${t.id}, this)"><i class="bi bi-send"></i> Envoyer à la banque</button></td>
+                </tr>
+            `).join('');
+        })
+        .catch(err => {
+            if (!silencieux) tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
+        });
+}
+
+window.envoyerBanque = async function(id, btn) {
+    const ok = await showConfirm('Envoyer le RIB à la banque ?', 'Envoi à la banque');
+    if (!ok) return;
+    setBoutonEnCours(btn, true);
+    fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/envoyer-banque`, { method: 'POST' })
+        .then(data => {
+            if (data.success) {
+                showFlash(data.message, 'success');
+                retirerLigneParId(document.getElementById('ribRecuBody'), id, 'Aucun RIB en attente.', 7);
+                rafraichirApresAction();
+            } else {
+                showFlash(data.message || 'Erreur lors de l\'envoi', 'danger');
+                setBoutonEnCours(btn, false);
+            }
+        })
+        .catch(() => {
+            showFlash('Erreur réseau', 'danger');
+            setBoutonEnCours(btn, false);
+        });
+};
+
+window.envoyerTousBanque = async function(btn) {
+    const tbody = document.getElementById('ribRecuBody');
+    if (!tbody) return;
+
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.querySelectorAll('td').length > 1);
+    if (rows.length === 0) {
+        showFlash('Aucun RIB à envoyer.', 'danger');
+        return;
+    }
+
+    const ok = await showConfirm(`Envoyer les ${rows.length} RIB à la banque ?`, 'Envoi groupé');
+    if (!ok) return;
+
+    setBoutonEnCours(btn, true);
+    const ids = rows.map(row => {
+        const firstCell = row.querySelector('td');
+        return firstCell ? firstCell.textContent.trim() : null;
+    }).filter(id => id);
+
+    Promise.allSettled(
+        ids.map(id =>
+            fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/envoyer-banque`, { method: 'POST' })
+                .then(data => ({ id, success: data.success, message: data.message }))
+        )
+    )
+    .then(results => {
+        const reussis = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+        const echecs  = results.length - reussis;
+        if (reussis > 0) showFlash(`${reussis} RIB envoyé(s) à la banque avec succès.`, 'success');
+        if (echecs > 0)  showFlash(`${echecs} envoi(s) ont échoué.`, 'danger');
+        rafraichirApresAction();
+    })
+    .catch(() => showFlash('Erreur réseau lors de l\'envoi groupé.', 'danger'))
+    .finally(() => setBoutonEnCours(btn, false));
+};
+
+/* ===== Section 3 ===== */
+function loadAttenteBanque(silencieux = false) {
+    const tbody = document.getElementById('attenteBanqueBody');
+    if (!silencieux) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
+    return fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets/en-attente-banque`)
+        .then(tickets => {
+            if (!tickets.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucun ticket en attente banque.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = tickets.map(t => `
+                <tr>
+                    <td>${t.id}</td>
+                    <td><span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span></td>
+                    <td>${t.user || '-'}</td>
+                    <td>${t.reference || '-'}</td>
+                    <td>${formatCurrency(t.montant, t.devise)}</td>
+                    <td>${formatDateMadagascar(t.emailEnvoyeAt)}</td>
+                    <td>
+                        <div class="actions-row">
+                            <button class="btn btn-success btn-sm" onclick="ouvrirModalValidation(${t.id})"><i class="bi bi-check-lg"></i> Valider</button>
+                            <button class="btn btn-outline btn-sm" onclick="renvoyerEmailBanque(${t.id}, this)"><i class="bi bi-arrow-repeat"></i> Renvoyer email</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        })
+        .catch(err => {
+            if (!silencieux) tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
+        });
+}
+
+window.renvoyerEmailBanque = async function(id, btn) {
+    const ok = await showConfirm('Renvoyer l\'email à la banque ?', 'Renvoi email');
+    if (!ok) return;
+    setBoutonEnCours(btn, true);
+    fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/resend-banque`, { method: 'POST' })
+        .then(data => {
+            if (data.success) {
+                showFlash(data.message, 'success');
+                loadAttenteBanque(true).finally(() => setBoutonEnCours(btn, false));
+            } else {
+                showFlash(data.message, 'danger');
+                setBoutonEnCours(btn, false);
+            }
+        })
+        .catch(() => {
+            showFlash('Erreur réseau', 'danger');
+            setBoutonEnCours(btn, false);
+        });
+};
+
+/* ===== Modale validation ===== */
+function ouvrirModalValidation(id) {
+    const modal = document.getElementById('validationModal');
+    document.getElementById('validationTicketId').textContent = id;
+    fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}`)
+        .then(ticket => {
+            document.getElementById('validationMontant').value = ticket.montant || 0;
+            document.getElementById('validationIdTransaction').value = ticket.reference || '';
+            document.getElementById('validationDevise').value = ticket.devise || 'EUR';
+            document.getElementById('validationDateRemboursement').value = new Date().toISOString().split('T')[0];
+            document.getElementById('clientMontant').textContent = formatCurrency(ticket.montant, ticket.devise);
+            document.getElementById('clientDevise').textContent = ticket.devise || 'EUR';
+            document.getElementById('clientReference').textContent = ticket.reference || '-';
+            modal.classList.add('open');
+        })
+        .catch(err => {
+            console.error(err);
+            showFlash('Erreur lors du chargement des infos du ticket.', 'danger');
+        });
+}
+
+function fermerModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+
+document.getElementById('validationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = document.getElementById('validationTicketId').textContent;
+    const devise = document.getElementById('validationDevise').value;
+    const idTransaction = document.getElementById('validationIdTransaction').value;
+    const montant = parseFloat(document.getElementById('validationMontant').value);
+    const dateRemboursement = document.getElementById('validationDateRemboursement').value;
+
+    if (!idTransaction || !montant || !dateRemboursement) {
+        showFlash('Veuillez remplir tous les champs.', 'danger');
+        return;
+    }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    setBoutonEnCours(submitBtn, true);
+
+    fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/valider`, {
+        method: 'POST',
+        body: JSON.stringify({ devise, idTransaction, montant, dateRemboursement })
+    })
+    .then(data => {
+        if (data.success) {
+            showFlash(data.message, 'success');
+            fermerModal('validationModal');
+            retirerLigneParId(document.getElementById('attenteBanqueBody'), id, 'Aucun ticket en attente banque.', 7);
+            rafraichirApresAction();
+        } else {
+            showFlash(data.message, 'danger');
+            if (data.mismatch) {
+                fermerModal('validationModal');
+                loadAttenteBanque(true);
+            }
+        }
+    })
+    .catch(err => {
+        showFlash('Erreur réseau', 'danger');
+        console.error(err);
+    })
+    .finally(() => setBoutonEnCours(submitBtn, false));
+});
+
+document.getElementById('validationModal').addEventListener('click', function(e) {
+    if (e.target === this) fermerModal('validationModal');
+});
+
+/* ===== WebSocket temps réel ===== */
+const WS_URL = window.WS_URL || ((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.hostname + ':8081/ws');
+let ws = null;
+let wsReconnectTimer = null;
+let wsConnected = false;
+let wsPingTimer = null;
+
+function wsConnect() {
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+    try {
+        ws = new WebSocket(WS_URL);
+    } catch (e) {
+        console.warn('[ws] connect failed', e);
+        scheduleWsReconnect();
+        return;
+    }
+    ws.addEventListener('open', function () {
+        console.log('[ws] connected', WS_URL);
+        wsConnected = true;
+        arreterPolling();
+        startWsPing();
+        chargerToutesLesDonnees({ silencieux: true, showBtn: false });
+    });
+    ws.addEventListener('message', function (ev) {
+        let msg;
+        try { msg = JSON.parse(ev.data); } catch (_) { return; }
+        if (!msg) return;
+
+        // Hub : { type, data, at } — ancien : { event, ... }
+        const eventName = msg.type || msg.event || '';
+        if (eventName === 'pong' || eventName === 'connected') return;
+        if (eventName.indexOf('ticket.') !== 0) return;
+
+        console.log('[ws] event', eventName, msg.data || msg);
+        rafraichirApresAction();
+        if (eventName === 'ticket.created' || eventName === 'ticket.rib_uploaded') {
+            showFlash('Nouvelle mise à jour ticket (temps réel).', 'info');
+        }
+    });
+    ws.addEventListener('close', function () {
+        console.warn('[ws] closed — fallback polling');
+        wsConnected = false;
+        stopWsPing();
+        scheduleWsReconnect();
+        if (!document.hidden) demarrerPolling();
+    });
+    ws.addEventListener('error', function () {
+        try { ws.close(); } catch (_) {}
+    });
+}
+function scheduleWsReconnect() {
+    if (wsReconnectTimer) return;
+    wsReconnectTimer = setTimeout(function () {
+        wsReconnectTimer = null;
+        wsConnect();
+    }, 4000);
+}
+function startWsPing() {
+    stopWsPing();
+    wsPingTimer = setInterval(function () {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            try { ws.send(JSON.stringify({ type: 'ping' })); } catch (_) {}
+        }
+    }, 25000);
+}
+function stopWsPing() {
+    if (wsPingTimer) { clearInterval(wsPingTimer); wsPingTimer = null; }
+}
+
+function onRealtimeEvent(msg) {
+    const type = msg.type || msg.event || '';
+    if (type.indexOf('ticket.') !== 0) return;
+    console.log('[ws] event', type);
+    rafraichirApresAction();
+    if (type === 'ticket.created' || type === 'ticket.rib_uploaded') {
+        showFlash('Nouvelle mise à jour ticket (temps réel).', 'info');
+    }
+}
+
+/* ===== Refresh (manuel + fallback polling si WS down) ===== */
+let refreshEnCours = false;
+let pollTimer = null;
+const POLL_INTERVAL_MS = 30000;
+
+function chargerToutesLesDonnees(options = {}) {
+    const silencieux = options.silencieux === true;
+    const showBtn = options.showBtn !== false && !silencieux;
+    if (refreshEnCours) return Promise.resolve();
+    refreshEnCours = true;
+    const btn = document.getElementById('refreshAllBtn');
+    if (showBtn && btn) btn.classList.add('is-refreshing');
+    return Promise.allSettled([
+        Promise.resolve(loadTicketsAttente(true)),
+        Promise.resolve(loadRibRecu(true)),
+        Promise.resolve(loadAttenteBanque(true))
+    ]).finally(() => {
+        refreshEnCours = false;
+        if (btn) setTimeout(() => btn.classList.remove('is-refreshing'), 350);
+    });
+}
+
+function rafraichirApresAction() {
+    return chargerToutesLesDonnees({ silencieux: true, showBtn: false });
+}
+
+function rafraichirTout(btn) {
+    if (btn && btn.classList.contains('is-refreshing')) return;
+    chargerToutesLesDonnees({ silencieux: false }).then(() => showFlash('Tableaux mis à jour.', 'success'));
+}
+
+function demarrerPolling() {
+    arreterPolling();
+    if (document.hidden || wsConnected) return;
+    pollTimer = setInterval(function () {
+        if (document.hidden || refreshEnCours || wsConnected) return;
+        chargerToutesLesDonnees({ silencieux: true, showBtn: false });
+    }, POLL_INTERVAL_MS);
+}
+
+function arreterPolling() {
+    if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+    }
+}
+
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        arreterPolling();
+        stopWsPing();
+    } else {
+        chargerToutesLesDonnees({ silencieux: true });
+        if (!wsConnected) {
+            demarrerPolling();
+            wsConnect();
+        }
+    }
+});
+
+/* ===== Démarrage unique ===== */
+let dashboardStarted = false;
+function demarrerDashboard() {
+    if (dashboardStarted) return;
+    dashboardStarted = true;
+    chargerToutesLesDonnees({ silencieux: false }).then(function () {
+        wsConnect();
+        demarrerPolling();
+    });
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', demarrerDashboard);
+} else {
+    demarrerDashboard();
+}
+
+window.addEventListener('beforeunload', function () {
+    arreterPolling();
+    stopWsPing();
+    try { if (ws) ws.close(); } catch (_) {}
+}); 
+
+document.addEventListener('DOMContentLoaded', function() {
+    chargerToutesLesDonnees({ silencieux: false }).then(function () {
+        wsConnect();
+        demarrerPolling();
+    });
+});
+
+window.addEventListener('beforeunload', function () {
+    arreterPolling();
+    try { if (ws) ws.close(); } catch (_) {}
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("globalSearch");
+    if (!searchInput) return;
+
+    searchInput.addEventListener("input", function () {
+        const searchValue = this.value.trim().toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        ["ticketsAttenteBody", "ribRecuBody", "attenteBanqueBody"].forEach(function (id) {
+            const tbody = document.getElementById(id);
+            if (!tbody) return;
+            tbody.querySelectorAll("tr").forEach(function (row) {
+                if (row.querySelectorAll("td").length === 1) return;
+                const rowText = row.textContent.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                row.style.display = rowText.includes(searchValue) ? "" : "none";
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>

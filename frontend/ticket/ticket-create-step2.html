@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Nouveau ticket - Détails | Mada Ozi</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wiz-accent: #4f46e5;
+            --wiz-accent-dark: #4338ca;
+            --wiz-accent-soft: #eef2ff;
+            --wiz-success: #16a34a;
+            --wiz-success-soft: #ecfdf5;
+            --wiz-danger: #dc2626;
+            --wiz-danger-soft: #fef2f2;
+            --wiz-ink: #111827;
+            --wiz-ink-soft: #6b7280;
+            --wiz-border: #e5e7eb;
+            --wiz-radius-sm: 10px;
+            --wiz-radius-md: 16px;
+            --wiz-radius-lg: 20px;
+            --wiz-shadow-rest: 0 1px 2px rgba(17,24,39,.06);
+        }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+        .choice-area {
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            padding: 2rem; border-radius: var(--wiz-radius-lg); position: relative; overflow: hidden;
+        }
+        .choice-card {
+            cursor: pointer; transition: transform .25s ease, box-shadow .25s ease, background .25s ease, border-color .25s ease;
+            background: rgba(255,255,255,0.55); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.6);
+            border-radius: var(--wiz-radius-lg); box-shadow: 0 8px 24px -8px rgba(79,70,229,.18);
+            padding: 2rem 1.5rem; text-align: center; color: var(--wiz-ink);
+        }
+        .choice-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.75); border-color: rgba(79,70,229,.35); box-shadow: 0 16px 36px -10px rgba(79,70,229,.3); }
+        .choice-card.selected { background: rgba(255,255,255,0.85); border-color: var(--wiz-accent); box-shadow: 0 0 0 2px var(--wiz-accent-soft), 0 12px 32px -8px rgba(79,70,229,.3); }
+        .choice-card .choice-icon { font-size: 3rem; margin-bottom: 0.5rem; display: block; color: var(--wiz-accent); }
+        .choice-card h4 { font-weight: 700; }
+
+        .step-panel { transition: opacity 0.25s ease; }
+        .step-panel.d-none, .step-panel[hidden] { display: none !important; }
+
+        .steps-indicator .step {
+            padding: 8px 18px; border-radius: 50px; background: #fff; border: 1.5px solid var(--wiz-border);
+            color: var(--wiz-ink-soft); font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;
+            transition: all .2s ease;
+        }
+        .steps-indicator .step.active { background: var(--wiz-accent); border-color: var(--wiz-accent); color: #fff; box-shadow: 0 4px 14px -4px rgba(79,70,229,.5); }
+        .steps-indicator .step.done { background: var(--wiz-success-soft); border-color: var(--wiz-success); color: var(--wiz-success); }
+
+        .form-control, .form-select {
+            border-radius: var(--wiz-radius-sm); border: 1.5px solid var(--wiz-border); padding: .55rem .8rem;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        .form-control:focus, .form-select:focus { border-color: var(--wiz-accent); box-shadow: 0 0 0 4px var(--wiz-accent-soft); }
+        .form-label { font-weight: 600; font-size: .9rem; color: var(--wiz-ink); }
+        .help-text { font-size: 0.83rem; color: var(--wiz-ink-soft); margin-top: 4px; }
+        .error-feedback { display: none; color: var(--wiz-danger); font-size: 0.85rem; margin-top: 0.3rem; }
+        .form-control.is-invalid ~ .error-feedback, .form-select.is-invalid ~ .error-feedback { display: block; }
+        .form-control.is-invalid, .form-select.is-invalid { border-color: var(--wiz-danger); }
+
+        .calc-box {
+            background: #fff; border: 1.5px solid var(--wiz-accent-soft); border-radius: var(--wiz-radius-md);
+            padding: 18px 20px; margin-top: 16px; box-shadow: var(--wiz-shadow-rest);
+        }
+        .calc-box h5 { font-weight: 700; color: var(--wiz-ink); font-size: .98rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .calc-box h5 i { color: var(--wiz-accent); }
+        .calc-box .calc-row { display: flex; justify-content: space-between; padding: 5px 0; color: var(--wiz-ink-soft); font-size: .92rem; }
+        .calc-box .calc-row.total { border-top: 1px dashed var(--wiz-border); margin-top: 8px; padding-top: 10px; font-weight: 700; color: var(--wiz-accent); font-size: 1.02rem; }
+
+        .info-box { padding: 16px 18px; border-radius: var(--wiz-radius-sm); margin-bottom: 16px; }
+        .info-box.success { background: var(--wiz-success-soft); border: 1px solid #bbf7d0; color: #14532d; }
+        .badge-auto, .status-badge.auto-refund {
+            background: var(--wiz-accent); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .ref-badge {
+            background: var(--wiz-accent); color: #fff; padding: 6px 12px; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 500;
+        }
+        .ref-badge .remove-ref {
+            cursor: pointer; background: rgba(255,255,255,.25); color: #fff; border-radius: 50%; width: 20px; height: 20px;
+            display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; line-height: 1;
+        }
+        .ref-badge .remove-ref:hover { background: rgba(0,0,0,.25); }
+        .ref-list.is-invalid { border: 2px solid var(--wiz-danger); padding: 6px; border-radius: var(--wiz-radius-sm); }
+
+        .account-id-wrapper { position: relative; }
+        .account-id-wrapper .bi { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); z-index: 5; color: var(--wiz-ink-soft); }
+        .account-id-wrapper input { padding-left: 42px; }
+
+        .btn-primary { background: var(--wiz-accent); border-color: var(--wiz-accent); font-weight: 600; }
+        .btn-primary:hover, .btn-primary:focus { background: var(--wiz-accent-dark); border-color: var(--wiz-accent-dark); }
+        .btn-primary:disabled { background: #a5b4fc; border-color: #a5b4fc; }
+        .btn-outline-primary { color: var(--wiz-accent); border-color: var(--wiz-accent); font-weight: 500; }
+        .btn-outline-primary:hover { background: var(--wiz-accent); border-color: var(--wiz-accent); color: #fff; }
+
+        /* Modale + Toast */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15,18,25,.45); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; z-index: 2000;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 16px; padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,.15); width: 90%; max-width: 480px;
+        }
+        [data-bs-theme="dark"] .modal-box { background: #1b2029; color: #e6e8ec; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+        .toast-item {
+            padding: 14px 18px; border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.14);
+            display: flex; align-items: flex-start; gap: 10px;
+            animation: toastIn .3s ease; font-size: .9rem; font-weight: 500;
+        }
+        .toast-item.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .toast-item.danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .toast-item.info    { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .toast-item .toast-close {
+            margin-left: auto; border: none; background: transparent;
+            cursor: pointer; opacity: .55; font-size: 1.15rem; line-height: 1;
+        }
+        .toast-item .toast-close:hover { opacity: 1; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(36px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        [data-bs-theme="dark"] .toast-item.success { background: rgba(16,185,129,.18); color: #6ee7b7; border-color: rgba(16,185,129,.3); }
+        [data-bs-theme="dark"] .toast-item.danger  { background: rgba(239,68,68,.18); color: #fca5a5; border-color: rgba(239,68,68,.3); }
+        [data-bs-theme="dark"] .toast-item.info    { background: rgba(99,102,241,.18); color: #a5b4fc; border-color: rgba(99,102,241,.3); }
+
+        @media (max-width: 767.98px) {
+            .choice-area { padding: 1rem; }
+            .choice-card { padding: 1.5rem 1rem; }
+            .choice-card .choice-icon { font-size: 2.4rem; }
+            .steps-indicator { gap: 0.5rem !important; }
+            .steps-indicator .step { padding: 7px 12px; font-size: 0.8rem; }
+        }
+        @media (max-width: 400px) {
+            .choice-card { padding: 1.1rem 0.8rem; }
+            .choice-card .choice-icon { font-size: 2rem; }
+            .steps-indicator .step { padding: 5px 9px; font-size: 0.72rem; }
+        }
+        @media (min-width: 1400px) {
+            .container-fluid { max-width: 1200px; margin-inline: auto; }
+            .choice-area { padding: 2.5rem; }
+            .choice-card { padding: 2.5rem 2rem; }
+        }
+    </style>
+    <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('adminHMD.colorTheme') || localStorage.getItem('theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', t);
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+    </script>
+</head>
+<body>
+<div class="admin-shell">
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <a class="brand-mark" href="/user/dashboard-user.html">
+                <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
+                <span class="brand-copy">
+                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
+                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace personnel</span>
+                </span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
+            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
+            <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
+        </nav>
+        <div class="sidebar-user">
+            <strong id="sidebarUserName">Utilisateur</strong>
+            <small data-i18n="brand.subtitle">Espace personnel</small>
+        </div>
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <nav class="navbar admin-navbar navbar-expand bg-white">
+            <div class="container-fluid px-3 px-lg-4">
+                <button class="sidebar-toggle" type="button" data-sidebar-toggle>
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageButton">🇫🇷</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                        </ul>
+                    </div>
+                    <button class="icon-button theme-toggle" type="button" data-theme-toggle>
+                        <i class="bi bi-moon-stars" data-theme-icon></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/auth/login.html" data-i18n="logout">Déconnexion</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="dashboard-content">
+            <div class="container-fluid px-3 px-lg-4 py-4">
+                <div class="page-heading mb-4">
+                    <div class="page-heading-copy">
+                        <span class="page-icon"><i class="bi bi-plus-circle"></i></span>
+                        <div>
+                            <p class="eyebrow mb-1" data-i18n="page.eyebrow">Demande</p>
+                            <h1 class="h3 mb-1"><i class="bi bi-clipboard-plus"></i> <span data-i18n="page.title">Nouvelle demande de remboursement</span></h1>
+                            <p class="text-muted mb-0" data-i18n="page.subtitle">Déposez votre demande. Le RIB sera demandé après confirmation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box success">
+                    <span class="status-badge auto-refund"><i class="bi bi-envelope-x"></i> <span data-i18n="type.aev.title">AEV non reçu</span></span>
+                    → <span data-i18n="type.aev.description">Remboursement total du montant payé.</span>
+                    &nbsp; | &nbsp;
+                    <span class="status-badge auto-refund"><i class="bi bi-arrow-repeat"></i> <span data-i18n="type.multiple.title">Paiement multiple</span></span>
+                    → <span data-i18n="type.multiple.description">Remboursement du surplus.</span>
+                </div>
+
+                <div class="steps-indicator mb-4 d-flex justify-content-center gap-3">
+                    <span class="step done" data-step="1"><i class="bi bi-1-circle"></i> <span data-i18n="step.type">Type</span></span>
+                    <span class="step active" data-step="2"><i class="bi bi-2-circle"></i> <span data-i18n="step.details">Détails</span></span>
+                </div>
+
+                <!-- Étape 2 -->
+                <div class="step-panel" id="step2">
+                    <form id="detailsForm" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-calendar-event"></i> <span data-i18n="field.order_date">Date de commande</span> *
+                                </label>
+                                <input type="date" name="date_commande" class="form-control" required>
+                                <div class="error-feedback" data-i18n="validation.order_date">Veuillez saisir une date valide (pas dans le futur).</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-tag"></i> <span data-i18n="field.order_id">ID commande</span> *
+                                </label>
+                                <input type="text" name="id_commande" id="idCommandeInput" class="form-control" placeholder="Ex : da22b0253848" required autocomplete="off">
+                                <div class="error-feedback" id="idCommandeError" data-i18n="validation.order_id">L'ID commande est obligatoire et doit être unique.</div>
+                            </div>
+                            <div class="col-12" id="referenceGroup">
+                                <label class="form-label" id="referenceLabel">
+                                    <i class="bi bi-hash"></i> <span data-i18n="field.order_reference">Référence commande</span> *
+                                </label>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="referenceInput" placeholder="Ex : EV-FB69186">
+                                    <button class="btn btn-outline-primary" type="button" id="addReferenceBtn"><i class="bi bi-plus-circle"></i> <span data-i18n="button.add_reference">Ajouter</span></button>
+                                </div>
+                                <div id="referenceList" class="d-flex flex-wrap gap-2 mb-2"></div>
+                                <div class="help-text" id="referenceHelp" data-i18n="help.reference_single">Référence de la commande (même ou différentes autorisées en multiple).</div>
+                                <div class="error-feedback" id="referenceError" data-i18n="validation.reference">Veuillez ajouter au moins une référence.</div>
+                                <input type="hidden" name="reference_commande" id="hiddenReferenceCommande">
+                                <input type="hidden" name="references_commande" id="hiddenReferencesCommande">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-credit-card"></i> <span data-i18n="field.payment_method">Méthode de paiement</span> *
+                                </label>
+                                <select name="methode_paiement" class="form-select" required>
+                                    <option value="" data-i18n="select.choose">-- Sélectionner --</option>
+                                    <option value="Visa">Visa</option>
+                                    <option value="Mastercard">Mastercard</option>
+                                </select>
+                                <div class="error-feedback" data-i18n="validation.payment_method">Veuillez sélectionner une méthode de paiement.</div>
+                            </div>
+                            <!-- Compte / carte : 1 pour AEV, liste (même ou différentes cartes) pour paiement multiple -->
+                            <div class="col-12" id="accountGroup">
+                                <label class="form-label" id="accountLabel">
+                                    <i class="bi bi-person-vcard"></i> <span data-i18n="field.account_id">Identifiant du compte / carte</span> *
+                                </label>
+                                <div class="input-group mb-2" id="accountInputGroup">
+                                    <div class="account-id-wrapper flex-grow-1">
+                                        <i class="bi bi-credit-card"></i>
+                                        <input type="text" id="accountInput" class="form-control" placeholder="Ex : 4251251234560515" inputmode="numeric" autocomplete="off" minlength="16" maxlength="16" pattern="[0-9]{16}">
+                                    </div>
+                                    <button class="btn btn-outline-primary" type="button" id="addAccountBtn"><i class="bi bi-plus-circle"></i> Ajouter</button>
+                                </div>
+                                <div id="accountList" class="d-flex flex-wrap gap-2 mb-2"></div>
+                                <div class="help-text" id="accountHelp" data-i18n="help.account_id">Saisissez exactement 16 chiffres puis cliquez sur Ajouter.</div>
+                                <div class="error-feedback" id="accountError">Veuillez ajouter au moins un identifiant de compte (16 chiffres).</div>
+                                <input type="hidden" name="identifiant_compte" id="hiddenIdentifiantCompte">
+                                <input type="hidden" name="identifiants_compte" id="hiddenIdentifiantsCompte">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-coin"></i> <span data-i18n="field.total_paid">Montant total payé</span> *
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" name="montant_commande" class="form-control" step="0.01" min="0.01" placeholder="Ex : 105.00" required>
+                                    <select name="devise" class="form-select" style="max-width: 120px;" required>
+                                        <option value="EUR">EUR €</option>
+                                        <option value="USD">USD $</option>
+                                    </select>
+                                </div>
+                                <div class="help-text" data-i18n="help.amount">Montant total effectivement débité.</div>
+                                <div class="error-feedback" data-i18n="validation.amount">Veuillez saisir un montant positif.</div>
+                            </div>
+                            <div class="col-md-6" id="quantiteGroup">
+                                <label class="form-label">
+                                    <i class="bi bi-hash"></i> <span data-i18n="field.quantity">Nombre de fois payé</span> *
+                                </label>
+                                <input type="number" name="quantite" class="form-control" value="1" min="1" readonly>
+                                <div class="help-text" id="quantiteHelp">Égal au nombre de références commande ajoutées.</div>
+                                <div class="error-feedback" data-i18n="validation.quantity">Doit correspondre au nombre de références ajoutées (minimum 1).</div>
+                            </div>
+                            <div class="col-md-6" id="unitaireGroup">
+                                <label class="form-label">
+                                    <i class="bi bi-calculator"></i> <span data-i18n="field.initial_amount">Montant initial dû</span>
+                                </label>
+                                <input type="number" name="montant_unitaire" class="form-control" readonly placeholder="Calculé automatiquement">
+                                <div class="help-text" data-i18n="help.initial_amount">Montant qui aurait dû être payé une seule fois.</div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="bi bi-text-paragraph"></i> <span data-i18n="field.description">Motif / description</span>
+                                </label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Détails du motif de remboursement..."></textarea>
+                            </div>
+                        </div>
+
+                        <div id="calcBox" class="calc-box d-none">
+                            <h5><i class="bi bi-calculator"></i> <span data-i18n="calculation.title">Calcul du remboursement</span></h5>
+                            <div class="calc-row"><span data-i18n="calculation.total">Montant total payé :</span> <span id="calcTotal">0.00 €</span></div>
+                            <div class="calc-row"><span data-i18n="calculation.quantity">Nombre de fois payé :</span> <span id="calcFois">1</span></div>
+                            <div class="calc-row"><span data-i18n="calculation.initial">Montant initial dû :</span> <span id="calcInitial">0.00 €</span></div>
+                            <div class="calc-row total"><span data-i18n="calculation.refund">Montant à rembourser :</span> <span id="calcRemboursement">0.00 €</span></div>
+                        </div>
+
+                        <input type="hidden" id="montant_remboursement" name="montant_remboursement" value="">
+
+                        <div class="mt-3 d-flex gap-2">
+                            <button type="button" class="btn btn-secondary" id="step2Back"><i class="bi bi-arrow-left-circle"></i> <span data-i18n="button.back">Retour</span></button>
+                            <button type="submit" class="btn btn-primary" id="step2Submit"><i class="bi bi-send"></i> <span data-i18n="button.submit">Soumettre la demande</span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <footer class="admin-footer"></footer>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:3000;display:flex;flex-direction:column;gap:10px;max-width:380px;"></div>
+
+<!-- Modale confirmation -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box" style="max-width:420px">
+        <h3 id="confirmTitle"><i class="bi bi-question-circle"></i> Confirmation</h3>
+        <p id="confirmMessage" class="mb-0 mt-2"></p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="confirmCancelBtn">Annuler</button>
+            <button type="button" class="btn btn-primary" id="confirmOkBtn">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/main.js"></script>
+<script src="/assets/js/i18n.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    'use strict';
+
+    const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
+    const token = localStorage.getItem('jwt_token');
+    if (!token) { window.location.href = '/auth/login.html'; return; }
+
+    /* ===== Toast ===== */
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast-item ${type}`;
+        toast.innerHTML = `<span>${message}</span><button class="toast-close" aria-label="Fermer">&times;</button>`;
+        container.appendChild(toast);
+        const close = () => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(36px)';
+            toast.style.transition = '.25s ease';
+            setTimeout(() => toast.remove(), 250);
+        };
+        toast.querySelector('.toast-close').addEventListener('click', close);
+        setTimeout(close, 4500);
+    }
+
+    /* ===== Confirmation ===== */
+    function showConfirm(message, title = 'Confirmation') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirmModal');
+            const titleEl = document.getElementById('confirmTitle');
+            const msgEl = document.getElementById('confirmMessage');
+            const okBtn = document.getElementById('confirmOkBtn');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+
+            titleEl.innerHTML = `<i class="bi bi-question-circle"></i> ${title}`;
+            msgEl.textContent = message;
+            modal.classList.add('open');
+
+            function cleanup(result) {
+                modal.classList.remove('open');
+                okBtn.removeEventListener('click', onOk);
+                cancelBtn.removeEventListener('click', onCancel);
+                modal.removeEventListener('click', onOutside);
+                resolve(result);
+            }
+            function onOk() { cleanup(true); }
+            function onCancel() { cleanup(false); }
+            function onOutside(e) { if (e.target === modal) cleanup(false); }
+
+            okBtn.addEventListener('click', onOk);
+            cancelBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onOutside);
+        });
+    }
+
+    // Éléments
+    const step2 = document.getElementById('step2');
+    const step2Back = document.getElementById('step2Back');
+    const step2Submit = document.getElementById('step2Submit');
+    const detailsForm = document.getElementById('detailsForm');
+    const stepIndicators = document.querySelectorAll('.steps-indicator .step');
+    const dateCommande = document.querySelector('input[name="date_commande"]');
+    const montantCommande = document.querySelector('input[name="montant_commande"]');
+    const quantite = document.querySelector('input[name="quantite"]');
+    const montantUnitaire = document.querySelector('input[name="montant_unitaire"]');
+    const devise = document.querySelector('select[name="devise"]');
+    const montantRemboursement = document.getElementById('montant_remboursement');
+    const calcBox = document.getElementById('calcBox');
+    const calcTotal = document.getElementById('calcTotal');
+    const calcFois = document.getElementById('calcFois');
+    const calcInitial = document.getElementById('calcInitial');
+    const calcRemboursement = document.getElementById('calcRemboursement');
+    const quantiteGroup = document.getElementById('quantiteGroup');
+    const unitaireGroup = document.getElementById('unitaireGroup');
+    const referenceInput = document.getElementById('referenceInput');
+    const addReferenceBtn = document.getElementById('addReferenceBtn');
+    const referenceList = document.getElementById('referenceList');
+    const hiddenRefs = document.getElementById('hiddenReferencesCommande');
+    const hiddenRefCommande = document.getElementById('hiddenReferenceCommande');
+    const referenceError = document.getElementById('referenceError');
+    const referenceLabel = document.getElementById('referenceLabel');
+    const referenceHelp = document.getElementById('referenceHelp');
+
+    let selectedType = null;
+    let references = [];
+
+    if (dateCommande) {
+        const today = new Date();
+        dateCommande.max = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    }
+
+    async function fetchWithAuth(url, options = {}) {
+        const headers = { ...(options.headers || {}), 'Authorization': `Bearer ${token}` };
+        const response = await fetch(url, { ...options, headers });
+        if (response.status === 401) {
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('ticket_type');
+            window.location.href = '/auth/login.html';
+            throw new Error('Session expirée.');
+        }
+        const text = await response.text();
+        if (!response.ok) {
+            let message = `Erreur HTTP ${response.status}`;
+            if (text) {
+                try { const json = JSON.parse(text); message = json.message || json.error || json.detail || message; }
+                catch (e) { message = text.substring(0, 300); }
+            }
+            throw new Error(message);
+        }
+        if (!text) return {};
+        try { return JSON.parse(text); }
+        catch (e) { throw new Error('Réponse serveur invalide.'); }
+    }
+
+    function goToStep1() {
+        window.location.href = '/ticket/ticket-create-step1.html';
+    }
+
+    function currencySymbol(code) {
+        return ({ EUR: '€', USD: '$', GBP: '£', MGA: 'Ar' }[code] || code || '');
+    }
+    function formatCurrency(amount, code) {
+        return (Number.parseFloat(amount) || 0).toFixed(2) + ' ' + currencySymbol(code);
+    }
+
+    // Comptes / cartes (même carte plusieurs fois ou cartes différentes)
+    let accounts = [];
+    const accountInput = document.getElementById('accountInput');
+    const addAccountBtn = document.getElementById('addAccountBtn');
+    const accountList = document.getElementById('accountList');
+    const accountHelp = document.getElementById('accountHelp');
+    const accountError = document.getElementById('accountError');
+    const hiddenIdentifiantCompte = document.getElementById('hiddenIdentifiantCompte');
+    const hiddenIdentifiantsCompte = document.getElementById('hiddenIdentifiantsCompte');
+
+    function syncQuantiteFromRefs() {
+        if (selectedType === 'PAIEMENT_MULTIPLE' && quantite) {
+            quantite.value = Math.max(1, references.length);
+            quantite.setAttribute('readonly', 'readonly');
+            calculRemboursement();
+        }
+    }
+
+    function updateReferenceUI() {
+        referenceList.innerHTML = '';
+        references.forEach((ref, index) => {
+            const badge = document.createElement('span');
+            badge.className = 'ref-badge';
+            const text = document.createElement('span');
+            text.textContent = ref;
+            const remove = document.createElement('span');
+            remove.className = 'remove-ref';
+            remove.dataset.index = index;
+            remove.textContent = '×';
+            remove.addEventListener('click', function() {
+                references.splice(Number(this.dataset.index), 1);
+                updateReferenceUI();
+            });
+            badge.appendChild(text);
+            badge.appendChild(remove);
+            referenceList.appendChild(badge);
+        });
+        hiddenRefs.value = references.join('\n');
+        hiddenRefCommande.value = references.join(', ');
+        if (selectedType === 'PAIEMENT_MULTIPLE') {
+            const has = references.length > 0;
+            referenceError.style.display = has ? 'none' : 'block';
+            referenceList.classList.toggle('is-invalid', !has);
+            syncQuantiteFromRefs();
+        }
+    }
+
+    function updateAccountUI() {
+        if (!accountList) return;
+        accountList.innerHTML = '';
+        accounts.forEach((acc, index) => {
+            const badge = document.createElement('span');
+            badge.className = 'ref-badge';
+            const masked = acc.length === 16 ? (acc.slice(0, 4) + '••••' + acc.slice(-4)) : acc;
+            const text = document.createElement('span');
+            text.textContent = masked;
+            const remove = document.createElement('span');
+            remove.className = 'remove-ref';
+            remove.dataset.index = index;
+            remove.textContent = '×';
+            remove.addEventListener('click', function() {
+                accounts.splice(Number(this.dataset.index), 1);
+                updateAccountUI();
+            });
+            badge.appendChild(text);
+            badge.appendChild(remove);
+            accountList.appendChild(badge);
+        });
+        if (hiddenIdentifiantsCompte) hiddenIdentifiantsCompte.value = accounts.join('\n');
+        if (hiddenIdentifiantCompte) hiddenIdentifiantCompte.value = accounts.join(', ');
+        // Retire l'erreur dès qu'au moins une carte est ajoutée
+        if (accounts.length > 0) {
+            if (accountError) accountError.style.display = 'none';
+            if (accountList) accountList.classList.remove('is-invalid');
+            if (accountInput) accountInput.classList.remove('is-invalid');
+        }
+    }
+
+    async function addReference() {
+        const value = referenceInput.value.trim();
+        if (!value) {
+            referenceInput.classList.add('is-invalid');
+            referenceError.style.display = 'block';
+            referenceError.textContent = 'Saisissez une référence avant d\'ajouter.';
+            referenceInput.focus();
+            return;
+        }
+        const used = await loadExistingReferences(false);
+        if (used.has(value.toLowerCase())) {
+            referenceInput.classList.add('is-invalid');
+            referenceError.style.display = 'block';
+            referenceError.textContent = 'Cette référence est déjà utilisée sur un autre ticket. Choisissez une autre référence.';
+            showToast('Référence déjà utilisée sur un autre ticket.', 'danger');
+            referenceInput.focus();
+            return;
+        }
+        referenceInput.classList.remove('is-invalid');
+        referenceError.style.display = 'none';
+        references.push(value);
+        referenceInput.value = '';
+        referenceInput.focus();
+        updateReferenceUI();
+    }
+
+    function addAccount() {
+        const value = (accountInput && accountInput.value || '').trim();
+        if (!/^[0-9]{16}$/.test(value)) {
+            if (accountInput) accountInput.classList.add('is-invalid');
+            if (accountError) {
+                accountError.style.display = 'block';
+                accountError.textContent = 'L\'identifiant doit contenir exactement 16 chiffres.';
+            }
+            if (accountInput) accountInput.focus();
+            return;
+        }
+        if (accountInput) accountInput.classList.remove('is-invalid');
+        if (selectedType === 'PAIEMENT_MULTIPLE') {
+            // En multiple : on empile les cartes (même carte ou différentes)
+            accounts.push(value);
+        } else {
+            // En AEV : une seule carte, la nouvelle remplace l'ancienne
+            accounts = [value];
+        }
+        if (accountInput) {
+            accountInput.value = '';
+            accountInput.focus();
+        }
+        if (accountError) accountError.style.display = 'none';
+        updateAccountUI();
+    }
+
+    addReferenceBtn.addEventListener('click', addReference);
+    referenceInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); addReference(); }
+    });
+    if (addAccountBtn) addAccountBtn.addEventListener('click', addAccount);
+    if (accountInput) {
+        accountInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); addAccount(); }
+        });
+    }
+
+    function configureReferences() {
+        if (selectedType === 'PAIEMENT_MULTIPLE') {
+            referenceHelp.textContent = typeof t === 'function' ? t('help.reference_multiple') : 'Ajoutez chaque référence une par une. Une référence déjà utilisée sur un autre ticket est refusée. Le nombre de fois payé = nombre de références.';
+            addReferenceBtn.style.display = 'inline-block';
+            referenceList.style.display = 'flex';
+            references = [];
+            if (accountList) accountList.style.display = 'flex';
+            if (accountHelp) accountHelp.textContent = 'Ajoutez chaque carte (16 chiffres). Même carte plusieurs fois ou cartes différentes autorisées.';
+            accounts = [];
+            updateAccountUI();
+            if (quantite) {
+                quantite.setAttribute('readonly', 'readonly');
+                quantite.value = '1';
+            }
+            updateReferenceUI();
+        } else {
+            referenceHelp.textContent = typeof t === 'function' ? t('help.reference_single') : 'Référence de la commande.';
+            addReferenceBtn.style.display = 'none';
+            referenceList.style.display = 'none';
+            references = [];
+            if (accountList) accountList.style.display = 'flex';
+            if (accountHelp) accountHelp.textContent = 'Saisissez exactement 16 chiffres puis cliquez sur Ajouter.';
+            accounts = [];
+            updateAccountUI();
+            if (quantite) {
+                quantite.removeAttribute('readonly');
+                quantite.value = '1';
+            }
+            updateReferenceUI();
+        }
+    }
+
+    function calculRemboursement() {
+        const total = Number.parseFloat(montantCommande.value) || 0;
+        const qty = Number.parseInt(quantite.value, 10) || 1;
+        const deviseCode = devise.value || 'EUR';
+
+        if (selectedType !== 'PAIEMENT_MULTIPLE') {
+            montantUnitaire.value = total > 0 ? total.toFixed(2) : '';
+            montantRemboursement.value = total > 0 ? total.toFixed(2) : '';
+            calcBox.classList.add('d-none');
+            return;
+        }
+        if (total > 0 && qty > 0) {
+            const initial = total / qty;
+            const surplus = Math.max(0, total - initial);
+            montantUnitaire.value = initial.toFixed(2);
+            montantRemboursement.value = surplus.toFixed(2);
+            calcBox.classList.remove('d-none');
+            calcTotal.textContent = formatCurrency(total, deviseCode);
+            calcFois.textContent = qty;
+            calcInitial.textContent = formatCurrency(initial, deviseCode);
+            calcRemboursement.textContent = formatCurrency(surplus, deviseCode);
+        } else {
+            montantUnitaire.value = '';
+            montantRemboursement.value = '';
+            calcBox.classList.add('d-none');
+        }
+    }
+
+    montantCommande.addEventListener('input', calculRemboursement);
+    quantite.addEventListener('input', calculRemboursement);
+    devise.addEventListener('change', calculRemboursement);
+
+    function getErrorElement(field) {
+        const parent = field.closest('.col-md-6, .col-12');
+        if (!parent) return null;
+        return parent.querySelector('.error-feedback:not(.devise-error)');
+    }
+    function setInvalid(field, message) {
+        const errorEl = getErrorElement(field);
+        field.classList.add('is-invalid');
+        if (errorEl) { errorEl.textContent = message; errorEl.style.display = 'block'; }
+        return false;
+    }
+    function setValid(field) {
+        const errorEl = getErrorElement(field);
+        field.classList.remove('is-invalid');
+        if (errorEl) { errorEl.textContent = ''; errorEl.style.display = 'none'; }
+        return true;
+    }
+    function validateField(field) {
+        if (field.name === 'quantite' && selectedType !== 'PAIEMENT_MULTIPLE') return true;
+        if (field.name === 'montant_unitaire') return true;
+        const value = (field.value || '').trim();
+        const requiredMessages = {
+            date_commande: 'Saisissez la date de la commande (AAAA-MM-JJ, pas dans le futur).',
+            id_commande: 'Saisissez un ID commande unique (ex. da22b0253848).',
+            methode_paiement: 'Sélectionnez une méthode de paiement (Visa, Mastercard…).',
+            identifiant_compte: 'Saisissez exactement 16 chiffres pour l\'identifiant du compte.',
+            montant_commande: 'Saisissez le montant total payé (nombre positif).',
+            devise: 'Sélectionnez la devise du paiement.',
+            quantite: 'Le nombre de fois payé doit être égal au nombre de références ajoutées.'
+        };
+        if (field.hasAttribute('required') && !value) {
+            const msg = requiredMessages[field.name] || 'Ce champ est obligatoire.';
+            return setInvalid(field, msg);
+        }
+        if (field.name === 'date_commande') {
+            if (!value) return setInvalid(field, requiredMessages.date_commande);
+            const selectedDate = new Date(value + 'T00:00:00');
+            const today = new Date(); today.setHours(0,0,0,0);
+            if (selectedDate > today) return setInvalid(field, 'La date ne peut pas être dans le futur.');
+        }
+        if (field.name === 'id_commande') {
+            if (!value) return setInvalid(field, 'L\'ID commande est obligatoire.');
+            if (value.length < 4) return setInvalid(field, 'L\'ID commande doit contenir au moins 4 caractères.');
+        }
+        if (field.name === 'identifiant_compte' || field.id === 'accountInput') {
+            if (selectedType === 'PAIEMENT_MULTIPLE') return true;
+            return true; // la validation du compte se fait via la liste accounts
+        }
+        if (field.name === 'montant_commande') {
+            const amount = Number.parseFloat(value);
+            if (!Number.isFinite(amount) || amount <= 0) return setInvalid(field, 'Veuillez saisir un montant positif.');
+        }
+        if (field.name === 'quantite') {
+            const num = Number.parseInt(value, 10);
+            if (!Number.isInteger(num) || num < 1) return setInvalid(field, 'Minimum 1.');
+            if (selectedType === 'PAIEMENT_MULTIPLE' && num !== references.length) {
+                return setInvalid(field, 'Doit être égal au nombre de références ajoutées (' + references.length + ').');
+            }
+        }
+        if (field.tagName === 'SELECT' && field.hasAttribute('required') && !value) {
+            return setInvalid(field, requiredMessages[field.name] || 'Veuillez sélectionner une option.');
+        }
+        return setValid(field);
+    }
+
+    // --- Unicité ID commande (front + serveur, message rouge sous le champ) ---
+    let existingOrderIds = null;
+    let isSubmitting = false;
+    const idCommandeInput = document.getElementById('idCommandeInput') || document.querySelector('input[name="id_commande"]');
+    const idCommandeError = document.getElementById('idCommandeError');
+
+    function showIdCommandeError(message) {
+        if (!idCommandeInput) return;
+        idCommandeInput.classList.add('is-invalid');
+        if (idCommandeError) {
+            idCommandeError.textContent = message;
+            idCommandeError.style.display = 'block';
+        }
+    }
+    function clearIdCommandeError() {
+        if (!idCommandeInput) return;
+        idCommandeInput.classList.remove('is-invalid');
+        if (idCommandeError) {
+            idCommandeError.textContent = '';
+            idCommandeError.style.display = 'none';
+        }
+    }
+
+    let existingReferences = null;
+
+    async function loadExistingOrderIds(forceReload) {
+        if (!forceReload && existingOrderIds !== null) return existingOrderIds;
+        try {
+            const tickets = await fetchWithAuth(`${API_BASE}/api/user/tickets`);
+            const list = Array.isArray(tickets) ? tickets : (tickets.tickets || tickets.data || []);
+            existingOrderIds = new Set(
+                list
+                    .map(t => String(t.id_commande || t.order_id || '').trim().toLowerCase())
+                    .filter(Boolean)
+            );
+            const refSet = new Set();
+            list.forEach(t => {
+                const single = String(t.reference || '').trim();
+                if (single && single !== '-') {
+                    single.split(/[\n,]+/).forEach(r => {
+                        const x = r.trim().toLowerCase();
+                        if (x) refSet.add(x);
+                    });
+                }
+                const multi = t.references;
+                if (Array.isArray(multi)) {
+                    multi.forEach(r => {
+                        const x = String(r || '').trim().toLowerCase();
+                        if (x) refSet.add(x);
+                    });
+                } else if (typeof multi === 'string' && multi.trim()) {
+                    multi.split(/[\n,]+/).forEach(r => {
+                        const x = r.trim().toLowerCase();
+                        if (x) refSet.add(x);
+                    });
+                }
+            });
+            existingReferences = refSet;
+        } catch (err) {
+            console.warn('Impossible de charger les tickets pour vérifier l\'unicité:', err);
+            if (existingOrderIds === null) existingOrderIds = new Set();
+            if (existingReferences === null) existingReferences = new Set();
+        }
+        return existingOrderIds;
+    }
+
+    async function loadExistingReferences(forceReload) {
+        if (!forceReload && existingReferences !== null) return existingReferences;
+        await loadExistingOrderIds(true);
+        return existingReferences || new Set();
+    }
+
+    async function checkIdCommandeUnique(value, forceReload) {
+        const v = (value || '').trim();
+        if (!v || v.length < 4) return true;
+        const set = await loadExistingOrderIds(!!forceReload);
+        return !set.has(v.toLowerCase());
+    }
+
+    async function validateIdCommandeField(forceReload) {
+        if (!idCommandeInput) return true;
+        const value = idCommandeInput.value.trim();
+        if (!value) {
+            showIdCommandeError('L\'ID commande est obligatoire.');
+            return false;
+        }
+        if (value.length < 4) {
+            showIdCommandeError('L\'ID commande doit contenir au moins 4 caractères.');
+            return false;
+        }
+        const unique = await checkIdCommandeUnique(value, forceReload);
+        if (!unique) {
+            showIdCommandeError('Cet ID commande existe déjà. Choisissez un autre ID commande.');
+            return false;
+        }
+        clearIdCommandeError();
+        return true;
+    }
+
+    detailsForm.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(f => {
+        f.addEventListener('blur', () => {
+            if (f.name === 'id_commande') validateIdCommandeField();
+            else validateField(f);
+        });
+        f.addEventListener('input', () => {
+            if (f.classList.contains('is-invalid')) {
+                if (f.name === 'id_commande') setValid(f);
+                else validateField(f);
+            }
+        });
+        f.addEventListener('change', () => validateField(f));
+    });
+
+    step2Back.addEventListener('click', function() { goToStep1(); });
+
+    detailsForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (isSubmitting) return;
+        if (!selectedType) {
+            showToast('Veuillez choisir un type de remboursement.', 'danger');
+            goToStep1();
+            return;
+        }
+
+        let allValid = true;
+        detailsForm.querySelectorAll('input, select, textarea').forEach(f => {
+            if (f.name === 'quantite' && selectedType !== 'PAIEMENT_MULTIPLE') return;
+            if (f.name === 'id_commande') return;
+            if (!validateField(f)) allValid = false;
+        });
+
+        const idOk = await validateIdCommandeField(true);
+        if (!idOk) allValid = false;
+
+        if (selectedType === 'PAIEMENT_MULTIPLE') {
+            if (references.length === 0) {
+                referenceError.style.display = 'block';
+                referenceError.textContent = 'Ajoutez au moins une référence (même référence ou différentes sur ce ticket).';
+                referenceList.classList.add('is-invalid');
+                allValid = false;
+            } else {
+                const used = await loadExistingReferences(true);
+                const conflict = references.filter(r => used.has(String(r).trim().toLowerCase()));
+                if (conflict.length > 0) {
+                    referenceError.style.display = 'block';
+                    referenceError.textContent = 'Référence(s) déjà utilisée(s) sur un autre ticket : ' + conflict.join(', ');
+                    referenceList.classList.add('is-invalid');
+                    allValid = false;
+                } else {
+                    referenceError.style.display = 'none';
+                    referenceList.classList.remove('is-invalid');
+                }
+            }
+            if (accounts.length === 0) {
+                if (accountError) {
+                    accountError.style.display = 'block';
+                    accountError.textContent = 'Ajoutez au moins une carte (même carte ou cartes différentes, 16 chiffres).';
+                }
+                if (accountInput) accountInput.classList.add('is-invalid');
+                if (accountList) accountList.classList.add('is-invalid');
+                allValid = false;
+            } else {
+                const invalidAcc = accounts.some(a => !/^[0-9]{16}$/.test(a));
+                if (invalidAcc) {
+                    if (accountError) {
+                        accountError.style.display = 'block';
+                        accountError.textContent = 'Chaque identifiant de carte doit contenir exactement 16 chiffres.';
+                    }
+                    allValid = false;
+                } else {
+                    if (accountError) accountError.style.display = 'none';
+                    if (accountInput) accountInput.classList.remove('is-invalid');
+                    if (accountList) accountList.classList.remove('is-invalid');
+                }
+            }
+            syncQuantiteFromRefs();
+            const q = Number.parseInt(quantite.value, 10);
+            if (q !== references.length) {
+                setInvalid(quantite, 'Le nombre de fois payé (' + q + ') doit être égal au nombre de références (' + references.length + ').');
+                allValid = false;
+            }
+        } else {
+            // AEV : 1 référence (unique globalement) + 1 carte (obligatoirement dans accounts)
+            const singleRef = referenceInput.value.trim();
+            if (!singleRef) {
+                referenceInput.classList.add('is-invalid');
+                referenceError.style.display = 'block';
+                referenceError.textContent = 'La référence commande est obligatoire.';
+                allValid = false;
+            } else {
+                const used = await loadExistingReferences(true);
+                if (used.has(singleRef.toLowerCase())) {
+                    referenceInput.classList.add('is-invalid');
+                    referenceError.style.display = 'block';
+                    referenceError.textContent = 'Cette référence est déjà utilisée sur un autre ticket. Choisissez une autre référence.';
+                    allValid = false;
+                } else {
+                    referenceInput.classList.remove('is-invalid');
+                    referenceError.style.display = 'none';
+                }
+            }
+            if (accounts.length === 0) {
+                if (accountInput) accountInput.classList.add('is-invalid');
+                if (accountError) {
+                    accountError.style.display = 'block';
+                    accountError.textContent = 'Cliquez sur "Ajouter" après avoir saisi les 16 chiffres de la carte.';
+                }
+                if (accountList) accountList.classList.add('is-invalid');
+                allValid = false;
+            } else {
+                const invalidAcc = accounts.some(a => !/^[0-9]{16}$/.test(a));
+                if (invalidAcc) {
+                    if (accountError) {
+                        accountError.style.display = 'block';
+                        accountError.textContent = 'Chaque identifiant de carte doit contenir exactement 16 chiffres.';
+                    }
+                    allValid = false;
+                } else {
+                    if (accountInput) accountInput.classList.remove('is-invalid');
+                    if (accountList) accountList.classList.remove('is-invalid');
+                    if (accountError) accountError.style.display = 'none';
+                }
+            }
+        }
+
+        calculRemboursement();
+        const remboursement = Number.parseFloat(montantRemboursement.value);
+        if (!Number.isFinite(remboursement) || remboursement < 0) {
+            allValid = false;
+            showToast('Montant de remboursement invalide.', 'danger');
+        }
+
+        // ⬇️ Focus immédiat sur le premier champ invalide (1 seul clic requis)
+        if (!allValid) {
+            showToast('Veuillez corriger les champs en rouge.', 'danger');
+            const firstInvalid = detailsForm.querySelector('.is-invalid');
+            if (firstInvalid) {
+                firstInvalid.focus();
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return;
+        }
+
+        // Préparer les champs cachés
+        if (selectedType === 'AEV_NON_RECU') {
+            hiddenRefCommande.value = referenceInput.value.trim();
+            hiddenRefs.value = referenceInput.value.trim();
+        }
+
+        const formData = new FormData(detailsForm);
+        formData.set('type_remboursement', selectedType);
+        if (selectedType === 'PAIEMENT_MULTIPLE') {
+            formData.set('reference_commande', hiddenRefCommande.value);
+            formData.set('references_commande', hiddenRefs.value);
+            formData.set('identifiant_compte', hiddenIdentifiantCompte ? hiddenIdentifiantCompte.value : accounts.join(', '));
+            formData.set('identifiants_compte', hiddenIdentifiantsCompte ? hiddenIdentifiantsCompte.value : accounts.join('\n'));
+        } else {
+            formData.set('reference_commande', referenceInput.value.trim());
+            formData.set('references_commande', '');
+            const oneAcc = accounts.join(', ');
+            formData.set('identifiant_compte', oneAcc);
+            formData.set('identifiants_compte', oneAcc);
+        }
+
+        isSubmitting = true;
+        step2Submit.disabled = true;
+        step2Submit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Envoi...';
+
+        try {
+            const data = await fetchWithAuth(`${API_BASE}/api/ticket/create`, { method: 'POST', body: formData });
+            if (data && (data.code === 'ID_COMMANDE_DUPLICATE' || (data.error || data.message) && /id.?commande|déjà|unique|duplicate|existe/i.test(String(data.error || data.message)) && /id.?commande/i.test(String(data.error || data.message + data.field)))) {
+                showIdCommandeError(data.message || data.error || 'Cet ID commande existe déjà. Choisissez un autre ID.');
+                showToast('ID commande déjà utilisé — corrigez le champ en rouge.', 'danger');
+                idCommandeInput.focus();
+                idCommandeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            if (data && (data.code === 'REFERENCE_DUPLICATE' || data.field === 'references_commande' || data.field === 'reference_commande')) {
+                const msg = data.error || data.message || 'Référence déjà utilisée sur un autre ticket.';
+                if (referenceError) {
+                    referenceError.style.display = 'block';
+                    referenceError.textContent = msg;
+                }
+                if (referenceInput) {
+                    referenceInput.classList.add('is-invalid');
+                    referenceInput.focus();
+                    referenceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                if (referenceList) referenceList.classList.add('is-invalid');
+                showToast(msg, 'danger');
+                return;
+            }
+            if (data.success) {
+                const usedId = (idCommandeInput && idCommandeInput.value || '').trim().toLowerCase();
+                if (usedId) {
+                    if (existingOrderIds === null) existingOrderIds = new Set();
+                    existingOrderIds.add(usedId);
+                }
+                if (existingReferences === null) existingReferences = new Set();
+                const refsToMark = selectedType === 'PAIEMENT_MULTIPLE'
+                    ? references
+                    : [(referenceInput.value || '').trim()];
+                refsToMark.forEach(r => {
+                    const x = String(r || '').trim().toLowerCase();
+                    if (x) existingReferences.add(x);
+                });
+                isSubmitting = true;
+                step2Submit.disabled = true;
+                showToast('Ticket créé avec succès !', 'success');
+                setTimeout(() => {
+                    if (data.id) window.location.href = `/ticket/ticket-awaiting.html?id=${encodeURIComponent(data.id)}`;
+                    else window.location.href = '/user/tickets-list.html';
+                }, 800);
+                return;
+            }
+            showToast(data.message || data.error || 'Erreur serveur', 'danger');
+        } catch (error) {
+            console.error(error);
+            const msg = error.message || 'Erreur serveur';
+            if (/référence|reference/i.test(msg) && /déjà|utilis|duplicate|existe/i.test(msg)) {
+                if (referenceError) {
+                    referenceError.style.display = 'block';
+                    referenceError.textContent = msg;
+                }
+                if (referenceInput) {
+                    referenceInput.classList.add('is-invalid');
+                    referenceInput.focus();
+                    referenceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                showToast(msg, 'danger');
+            } else if (/id.?commande|déjà|unique|duplicate|existe|409|conflict/i.test(msg)) {
+                showIdCommandeError('Cet ID commande existe déjà. Choisissez un autre ID commande.');
+                showToast('ID commande déjà utilisé — corrigez le champ en rouge.', 'danger');
+                if (idCommandeInput) {
+                    idCommandeInput.focus();
+                    idCommandeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                showToast(msg, 'danger');
+            }
+        } finally {
+            isSubmitting = false;
+            step2Submit.disabled = false;
+            step2Submit.innerHTML = '<i class="bi bi-send"></i> <span data-i18n="button.submit">Soumettre la demande</span>';
+        }
+    });
+
+    // Init
+    quantiteGroup.style.display = 'none';
+    unitaireGroup.style.display = 'none';
+    addReferenceBtn.style.display = 'none';
+    referenceList.style.display = 'none';
+    if (quantite) quantite.setAttribute('readonly', 'readonly');
+
+    const savedType = localStorage.getItem('ticket_type');
+    if (savedType !== 'AEV_NON_RECU' && savedType !== 'PAIEMENT_MULTIPLE') {
+        goToStep1();
+        return;
+    }
+    selectedType = savedType;
+    if (selectedType === 'PAIEMENT_MULTIPLE') {
+        quantiteGroup.style.display = 'block';
+        unitaireGroup.style.display = 'block';
+        quantite.setAttribute('required', 'required');
+    } else {
+        quantiteGroup.style.display = 'none';
+        unitaireGroup.style.display = 'none';
+        quantite.removeAttribute('required');
+    }
+    configureReferences();
+    calculRemboursement();
+
+    // JWT name
+    function parseJwt(t) {
+        try {
+            const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            return JSON.parse(json);
+        } catch (e) { return null; }
+    }
+    const payload = parseJwt(token);
+    const email = payload?.email || payload?.username || payload?.sub || 'Utilisateur';
+    const sidebarName = document.getElementById('sidebarUserName');
+    const navbarName = document.getElementById('navbarUserName');
+    if (sidebarName) sidebarName.textContent = email;
+    if (navbarName) navbarName.textContent = email;
+});
+</script>
+</body>
+</html>
