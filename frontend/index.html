@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - Système de remboursement</title>
+    <style>
+        /* ---------- Réinitialisation et base ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f6f9fc;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        /* ---------- Cartes ---------- */
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-body {
+            padding: 32px;
+        }
+
+        /* ---------- Badges ---------- */
+        .badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.9rem;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e4ed8;
+        }
+
+        .badge-green {
+            background: #d1fae5;
+            color: #0b7c4c;
+        }
+
+        .badge-amber {
+            background: #fef3c7;
+            color: #a16207;
+        }
+
+        /* ---------- Typographie ---------- */
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .page-subtitle {
+            color: #475569;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            max-width: 760px;
+        }
+
+        /* ---------- Navigation / boutons ---------- */
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 20px;
+            justify-content: flex-start;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            background: #1e4ed8;
+            color: white;
+            transition: background 0.2s, transform 0.1s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn:hover {
+            background: #1a3fa3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e9edf4;
+            color: #1e293b;
+        }
+
+        .btn-secondary:hover {
+            background: #d3dbe8;
+        }
+
+        /* ---------- Grille 3 colonnes ---------- */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 640px) {
+            .card-body {
+                padding: 24px 20px;
+            }
+
+            .page-title {
+                font-size: 1.6rem;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Carte principale -->
+        <div class="card">
+            <div class="card-body" style="padding: 32px;">
+                <div class="badge badge-blue" style="margin-bottom: 16px;">Système de remboursement</div>
+                <h1 class="page-title">Bienvenue dans votre espace remboursement</h1>
+                <p class="page-subtitle" style="font-size: 1.05rem; max-width: 760px;">
+                    Suivez vos demandes, préparez votre RIB et consultez l’historique du remboursement en toute simplicité.
+                </p>
+                <div class="nav-links" style="margin-top: 20px; justify-content: flex-start;">
+                    <!-- Remplacez les URLs par vos vraies routes -->
+                    <a class="btn" href="../auth/login.html">Se connecter</a>
+                    <a class="btn" href="../auth/login.html">Voir le tableau de bord</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grille des étapes -->
+        <div class="grid-3" style="margin-top: 20px;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="badge badge-blue">Étape 1</div>
+                    <h3 style="margin: 12px 0 8px;">Choisir un motif</h3>
+                    <p class="page-subtitle">Sélectionnez rapidement AEV non reçu ou paiement multiple.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="badge badge-green">Étape 2</div>
+                    <h3 style="margin: 12px 0 8px;">Compléter les détails</h3>
+                    <p class="page-subtitle">Ajoutez la commande, le paiement et le montant à rembourser.</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="badge badge-amber">Étape 3</div>
+                    <h3 style="margin: 12px 0 8px;">Uploader le RIB</h3>
+                    <p class="page-subtitle">Finalisez votre demande avec un document clair et sécurisé.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
