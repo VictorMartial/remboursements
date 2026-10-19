@@ -177,19 +177,20 @@
             <a class="brand-mark" href="/user/dashboard-user.html">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
                 <span class="brand-copy">
-                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
-                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace personnel</span>
+                    <span class="brand-title">Interlocuteur</span>
+                    <span class="brand-subtitle">Espace de travail</span>
                 </span>
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
-            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
-            <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
+            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+            <a class="nav-link" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span>Mes tickets</span></a>
+            <a class="nav-link active" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-dashboard.html"><i class="bi bi-inbox"></i> <span>Suivi RIB / Banque</span></a>
         </nav>
         <div class="sidebar-user">
-            <strong id="sidebarUserName">Utilisateur</strong>
-            <small data-i18n="brand.subtitle">Espace personnel</small>
+            <strong id="sidebarUserName">Interlocuteur</strong>
+            <small>Espace de travail</small>
         </div>
         <div class="sidebar-footer">
             <span class="status-dot"></span>
@@ -236,7 +237,7 @@
                         <div>
                             <p class="eyebrow mb-1" data-i18n="page.eyebrow">Demande</p>
                             <h1 class="h3 mb-1"><i class="bi bi-clipboard-plus"></i> <span data-i18n="page.title">Nouvelle demande de remboursement</span></h1>
-                            <p class="text-muted mb-0" data-i18n="page.subtitle">Déposez votre demande. Le RIB sera demandé après confirmation.</p>
+                            <p class="text-muted mb-0" data-i18n="page.subtitle">Déposez votre demande. L'email de demande de RIB sera envoyé immédiatement au client (sans attente de confirmation).</p>
                         </div>
                     </div>
                 </div>
@@ -343,6 +344,16 @@
                                 </label>
                                 <input type="number" name="montant_unitaire" class="form-control" readonly placeholder="Calculé automatiquement">
                                 <div class="help-text" data-i18n="help.initial_amount">Montant qui aurait dû être payé une seule fois.</div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="bi bi-envelope-at"></i> Email du client (saisie manuelle) <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" name="client_email" id="clientEmailInput" class="form-control" placeholder="ex. client@exemple.com" required autocomplete="off" inputmode="email">
+                                <div class="help-text">
+                                    Saisissez manuellement l’adresse email du client. Un email professionnel de <strong>demande de RIB</strong> sera envoyé immédiatement à cette adresse (sans attente de confirmation).
+                                </div>
+                                <div class="error-feedback" id="clientEmailError">Veuillez saisir un email client valide.</div>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">
@@ -923,6 +934,25 @@ document.addEventListener('DOMContentLoaded', function () {
         const idOk = await validateIdCommandeField(true);
         if (!idOk) allValid = false;
 
+        // Email client (saisie manuelle obligatoire) → destinataire de la demande RIB
+        const clientEmailInput = document.getElementById('clientEmailInput');
+        const clientEmailError = document.getElementById('clientEmailError');
+        const clientEmailVal = (clientEmailInput && clientEmailInput.value || '').trim();
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmailVal);
+        if (!clientEmailVal || !emailOk) {
+            if (clientEmailInput) clientEmailInput.classList.add('is-invalid');
+            if (clientEmailError) {
+                clientEmailError.textContent = !clientEmailVal
+                    ? 'L\'email du client est obligatoire (saisie manuelle).'
+                    : 'Veuillez saisir un email client valide.';
+                clientEmailError.style.display = 'block';
+            }
+            allValid = false;
+        } else {
+            if (clientEmailInput) clientEmailInput.classList.remove('is-invalid');
+            if (clientEmailError) clientEmailError.style.display = 'none';
+        }
+
         if (selectedType === 'PAIEMENT_MULTIPLE') {
             if (references.length === 0) {
                 referenceError.style.display = 'block';
@@ -1040,6 +1070,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const formData = new FormData(detailsForm);
         formData.set('type_remboursement', selectedType);
+        // Email client saisi manuellement → l'API envoie la demande de RIB à cette adresse
+        formData.set('client_email', clientEmailVal);
         if (selectedType === 'PAIEMENT_MULTIPLE') {
             formData.set('reference_commande', hiddenRefCommande.value);
             formData.set('references_commande', hiddenRefs.value);
@@ -1097,11 +1129,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 isSubmitting = true;
                 step2Submit.disabled = true;
-                showToast('Ticket créé avec succès !', 'success');
+                showToast('Ticket créé. Email de demande de RIB envoyé à ' + clientEmailVal, 'success');
                 setTimeout(() => {
-                    if (data.id) window.location.href = `/ticket/ticket-awaiting.html?id=${encodeURIComponent(data.id)}`;
-                    else window.location.href = '/user/tickets-list.html';
-                }, 800);
+                    window.location.href = '/user/tickets-list.html';
+                }, 900);
                 return;
             }
             showToast(data.message || data.error || 'Erreur serveur', 'danger');

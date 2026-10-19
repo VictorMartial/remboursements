@@ -5,13 +5,15 @@ parameters:
     realtime_hub_url: '%env(REALTIME_HUB_URL)%'
     realtime_hub_secret: '%env(REALTIME_HUB_SECRET)%'
 
-    # CLIENT (refund@evisamada-mg.com)
+    # Emails généraux / fallback
     app_email_from: '%env(APP_EMAIL_FROM)%'
     app_email_reply_to: '%env(APP_EMAIL_REPLY_TO)%'
-    client_email_from: '%env(CLIENT_EMAIL_FROM)%'
-    client_email_reply_to: '%env(CLIENT_EMAIL_REPLY_TO)%'
 
-    # BANQUE (remboursement@madaozi.mg)
+    # CLIENT email SUPPRIMÉ : le compte client devient compte interlocuteur.
+    # Les demandes de RIB partent désormais via l'email professionnel (banque).
+    # client_email_from / client_email_reply_to ne sont plus utilisés.
+
+    # BANQUE / PROFESSIONNEL (remboursement@madaozi.mg) — utilisé pour demander le RIB au client
     bank_email: '%env(BANK_EMAIL)%'
     bank_email_from: '%env(BANK_EMAIL_FROM)%'
     bank_email_reply_to: '%env(BANK_EMAIL_REPLY_TO)%'

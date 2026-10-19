@@ -30,6 +30,7 @@
         }
         .action-icon.blue { background: rgba(99,102,241,0.12); color: #4f46e5; }
         .action-icon.green { background: rgba(16,185,129,0.12); color: #059669; }
+        .action-icon.amber { background: rgba(245,158,11,0.14); color: #d97706; }
         .info-panel {
             border-radius: 16px;
             border: 1px solid rgba(148,163,184,0.25);
@@ -98,28 +99,32 @@
             <a class="brand-mark" href="/user/dashboard-user.html" aria-label="adminHMD dashboard">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
                 <span class="brand-copy">
-                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
-                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace User</span>
+                    <span class="brand-title" id="brandTitle">Interlocuteur</span>
+                    <span class="brand-subtitle" id="brandSubtitle">Espace de travail</span>
                 </span>
             </a>
         </div>
         <nav class="sidebar-nav">
             <a class="nav-link active" href="/user/dashboard-user.html" aria-current="page">
                 <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
-                <span class="nav-text" data-i18n="nav.dashboard">Dashboard</span>
+                <span class="nav-text">Dashboard</span>
             </a>
             <a class="nav-link" href="/user/tickets-list.html">
                 <span class="nav-icon"><i class="bi bi-list-ul" aria-hidden="true"></i></span>
-                <span class="nav-text" data-i18n="nav.tickets">Mes tickets</span>
+                <span class="nav-text">Mes tickets</span>
             </a>
             <a class="nav-link" href="/ticket/ticket-create-step1.html">
                 <span class="nav-icon"><i class="bi bi-plus-circle" aria-hidden="true"></i></span>
-                <span class="nav-text" data-i18n="nav.new_ticket">Nouveau ticket</span>
+                <span class="nav-text">Nouveau ticket</span>
+            </a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-dashboard.html">
+                <span class="nav-icon"><i class="bi bi-inbox" aria-hidden="true"></i></span>
+                <span class="nav-text">Suivi RIB / Banque</span>
             </a>
         </nav>
         <div class="sidebar-user">
-            <strong id="sidebarUserName">Utilisateur</strong>
-            <small data-i18n="brand.subtitle">Espace personnel</small>
+            <strong id="sidebarUserName">Interlocuteur</strong>
+            <small id="sidebarRoleLabel">Espace de travail</small>
         </div>
         <div class="sidebar-footer">
             <span class="status-dot"></span>
@@ -166,9 +171,9 @@
                     <div class="page-heading-copy d-flex align-items-center gap-3">
                         <div class="user-avatar" id="userAvatar">?</div>
                         <div>
-                            <p class="eyebrow mb-1" data-i18n="page.eyebrow">Espace utilisateur</p>
-                            <h1 class="h3 mb-1"><span data-i18n="page.greeting">Bonjour,</span> <span id="userGreeting">—</span></h1>
-                            <p class="text-muted mb-0" data-i18n="page.subtitle">Voici un aperçu rapide de votre activité et des actions disponibles.</p>
+                            <p class="eyebrow mb-1" id="pageEyebrow">Espace interlocuteur</p>
+                            <h1 class="h3 mb-1"><span>Bonjour,</span> <span id="userGreeting">—</span></h1>
+                            <p class="text-muted mb-0" id="pageSubtitle">Créez des demandes de remboursement et suivez les RIB / envois banque.</p>
                         </div>
                     </div>
                 </div>
@@ -189,25 +194,36 @@
                 </div>
 
                 <div class="row g-3 mt-3">
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4">
                         <div class="action-card p-4 d-flex flex-column">
                             <div class="action-icon blue mb-3"><i class="bi bi-plus-circle"></i></div>
-                            <h3 class="h5 mb-2" data-i18n="actions.create_ticket.title">Créer un ticket</h3>
-                            <p class="text-muted flex-grow-1" data-i18n="actions.create_ticket.desc">Déposez une nouvelle demande de remboursement.</p>
-                            <a href="/ticket/ticket-create.html" class="btn btn-primary btn-pill mt-2 w-100">
+                            <h3 class="h5 mb-2">Créer un ticket</h3>
+                            <p class="text-muted flex-grow-1">Nouvelle demande de remboursement (email RIB envoyé au client).</p>
+                            <a href="/ticket/ticket-create-step1.html" class="btn btn-primary btn-pill mt-2 w-100">
                                 <i class="bi bi-plus-lg"></i>
-                                <span data-i18n="actions.create_ticket.button">Nouvelle demande</span>
+                                <span>Nouvelle demande</span>
                             </a>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-4">
                         <div class="action-card p-4 d-flex flex-column">
                             <div class="action-icon green mb-3"><i class="bi bi-list-ul"></i></div>
-                            <h3 class="h5 mb-2" data-i18n="actions.my_tickets.title">Mes tickets</h3>
-                            <p class="text-muted flex-grow-1" data-i18n="actions.my_tickets.desc">Consultez vos demandes et leurs statuts.</p>
+                            <h3 class="h5 mb-2">Mes tickets</h3>
+                            <p class="text-muted flex-grow-1">Consultez vos demandes et leurs statuts.</p>
                             <a href="/user/tickets-list.html" class="btn btn-outline-secondary btn-pill mt-2 w-100">
                                 <i class="bi bi-ticket-perforated"></i>
-                                <span data-i18n="actions.my_tickets.button">Mes tickets</span>
+                                <span>Mes tickets</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="action-card p-4 d-flex flex-column">
+                            <div class="action-icon amber mb-3"><i class="bi bi-inbox"></i></div>
+                            <h3 class="h5 mb-2">Suivi RIB / Banque</h3>
+                            <p class="text-muted flex-grow-1">RIB reçus, envoi à la banque et validation des remboursements.</p>
+                            <a href="/interlocuteur/interlocuteur-dashboard.html" class="btn btn-warning btn-pill mt-2 w-100" id="btnSuiviRib">
+                                <i class="bi bi-send-check"></i>
+                                <span>Ouvrir le suivi</span>
                             </a>
                         </div>
                     </div>
@@ -224,12 +240,24 @@
 <script src="/assets/js/i18n.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const API_BASE = 'http://localhost:8000';
+    const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
     const token = localStorage.getItem('jwt_token');
 
     if (!token) {
         window.location.href = '/auth/login.html';
         return;
+    }
+
+    // Lien Suivi RIB : s'assurer que le token est présent avant navigation
+    const btnSuivi = document.getElementById('btnSuiviRib');
+    if (btnSuivi) {
+        btnSuivi.addEventListener('click', function (e) {
+            if (!localStorage.getItem('jwt_token')) {
+                e.preventDefault();
+                window.location.href = '/auth/login.html';
+            }
+            // sinon navigation normale vers /interlocuteur/interlocuteur-dashboard.html
+        });
     }
 
     const logoutBtn = document.getElementById('logoutBtn');

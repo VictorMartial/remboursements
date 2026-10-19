@@ -117,6 +117,10 @@ class Ticket
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $referencePaiement = null;
 
+    /** Email du client pour l'envoi de la demande de RIB (indépendant du compte interlocuteur) */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $clientEmail = null;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $emailBanqueEnvoyeAt = null;
 
@@ -182,6 +186,9 @@ class Ticket
     public function setTypeRemboursement(?string $typeRemboursement): static { $this->typeRemboursement = $typeRemboursement; return $this; }
     public function getReferencePaiement(): ?string { return $this->referencePaiement; }
     public function setReferencePaiement(?string $referencePaiement): static { $this->referencePaiement = $referencePaiement; return $this; }
+    public function getClientEmail(): ?string { return $this->clientEmail; }
+    public function setClientEmail(?string $clientEmail): static { $this->clientEmail = $clientEmail; return $this; }
+
     public function getEmailBanqueEnvoyeAt(): ?\DateTimeImmutable { return $this->emailBanqueEnvoyeAt; }
     public function setEmailBanqueEnvoyeAt(?\DateTimeImmutable $emailBanqueEnvoyeAt): static { $this->emailBanqueEnvoyeAt = $emailBanqueEnvoyeAt; return $this; }
     public function getDevise(): ?string { return $this->devise; }

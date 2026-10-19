@@ -54,24 +54,64 @@
             font-size: 0.74rem; font-weight: 600; border: 1px solid transparent;
         }
         #ticketsTable .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-        #ticketsTable .badge.bg-warning { background: #fde8b8 !important; color: #7c2d12; border-color: #f5c563; }
-        #ticketsTable .badge.bg-warning::before { background: #d97706; }
-        #ticketsTable .badge.bg-success { background: #bbf7d0 !important; color: #14532d; border-color: #86efac; }
-        #ticketsTable .badge.bg-success::before { background: #16a34a; }
-        #ticketsTable .badge.bg-danger { background: #fecdd3 !important; color: #881337; border-color: #fda4af; }
-        #ticketsTable .badge.bg-danger::before { background: #e11d48; }
-        #ticketsTable .badge.bg-primary { background: #c7d2fe !important; color: #312e81; border-color: #a5b4fc; }
-        #ticketsTable .badge.bg-primary::before { background: #4f46e5; }
-        #ticketsTable .badge.bg-info { background: #bfdbfe !important; color: #1e3a8a; border-color: #93c5fd; }
-        #ticketsTable .badge.bg-info::before { background: #2563eb; }
-        #ticketsTable .badge.bg-secondary { background: #e2e8f0 !important; color: #334155; border-color: #cbd5e1; }
-        #ticketsTable .badge.bg-secondary::before { background: #64748b; }
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-warning { background: rgba(245,158,11,0.16) !important; color: #fbbf24; border-color: rgba(245,158,11,0.3); }
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-success { background: rgba(34,197,94,0.16) !important; color: #86efac; border-color: rgba(34,197,94,0.3); }
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-danger { background: rgba(244,63,94,0.16) !important; color: #fda4af; border-color: rgba(244,63,94,0.3); }
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-primary { background: rgba(99,102,241,0.16) !important; color: #c7d2fe; border-color: rgba(99,102,241,0.3); }
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-info { background: rgba(59,130,246,0.16) !important; color: #93c5fd; border-color: rgba(59,130,246,0.3); }
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-secondary { background: rgba(148,163,184,0.16) !important; color: #cbd5e1; border-color: rgba(148,163,184,0.3); }
+        /* Palette harmonique des statuts */
+        #ticketsTable .badge.status-attente-rib,
+        #ticketsTable .badge.bg-primary {
+            background: #fef3c7 !important; color: #92400e; border-color: #fcd34d;
+        }
+        #ticketsTable .badge.status-attente-rib::before,
+        #ticketsTable .badge.bg-primary::before { background: #f59e0b; }
+        #ticketsTable .badge.status-rib-recu,
+        #ticketsTable .badge.bg-info {
+            background: #cffafe !important; color: #155e75; border-color: #67e8f9;
+        }
+        #ticketsTable .badge.status-rib-recu::before,
+        #ticketsTable .badge.bg-info::before { background: #06b6d4; }
+        #ticketsTable .badge.status-attente-banque,
+        #ticketsTable .badge.bg-secondary {
+            background: #ede9fe !important; color: #5b21b6; border-color: #c4b5fd;
+        }
+        #ticketsTable .badge.status-attente-banque::before,
+        #ticketsTable .badge.bg-secondary::before { background: #8b5cf6; }
+        #ticketsTable .badge.status-valide,
+        #ticketsTable .badge.bg-success {
+            background: #d1fae5 !important; color: #065f46; border-color: #6ee7b7;
+        }
+        #ticketsTable .badge.status-valide::before,
+        #ticketsTable .badge.bg-success::before { background: #10b981; }
+        #ticketsTable .badge.status-refuse,
+        #ticketsTable .badge.bg-danger {
+            background: #ffe4e6 !important; color: #9f1239; border-color: #fda4af;
+        }
+        #ticketsTable .badge.status-refuse::before,
+        #ticketsTable .badge.bg-danger::before { background: #f43f5e; }
+        #ticketsTable .badge.bg-warning {
+            background: #fef3c7 !important; color: #92400e; border-color: #fcd34d;
+        }
+        #ticketsTable .badge.bg-warning::before { background: #f59e0b; }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-attente-rib,
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-primary {
+            background: rgba(245,158,11,0.18) !important; color: #fcd34d; border-color: rgba(245,158,11,0.35);
+        }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-rib-recu,
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-info {
+            background: rgba(6,182,212,0.18) !important; color: #67e8f9; border-color: rgba(6,182,212,0.35);
+        }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-attente-banque,
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-secondary {
+            background: rgba(139,92,246,0.18) !important; color: #c4b5fd; border-color: rgba(139,92,246,0.35);
+        }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-valide,
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-success {
+            background: rgba(16,185,129,0.18) !important; color: #6ee7b7; border-color: rgba(16,185,129,0.35);
+        }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-refuse,
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-danger {
+            background: rgba(244,63,94,0.18) !important; color: #fda4af; border-color: rgba(244,63,94,0.35);
+        }
+        [data-bs-theme="dark"] #ticketsTable .badge.bg-warning {
+            background: rgba(245,158,11,0.18) !important; color: #fcd34d; border-color: rgba(245,158,11,0.35);
+        }
 
         .btn-action {
             width: 34px; height: 34px; padding: 0; border-radius: 10px;
@@ -177,19 +217,20 @@
             <a class="brand-mark" href="/user/dashboard-user.html">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
                 <span class="brand-copy">
-                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
-                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace Personnel</span>
+                    <span class="brand-title" id="brandTitle">Interlocuteur</span>
+                    <span class="brand-subtitle" id="brandSubtitle">Espace de travail</span>
                 </span>
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
-            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
+            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span>Mes tickets</span></a>
             <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
+            <a class="nav-link" id="navInterlocuteurDash" href="/interlocuteur/interlocuteur-dashboard.html"><i class="bi bi-inbox"></i> <span>Suivi RIB / Banque</span></a>
         </nav>
         <div class="sidebar-user">
-            <strong id="sidebarUserName">Utilisateur</strong>
-            <small data-i18n="brand.subtitle">Espace personnel</small>
+            <strong id="sidebarUserName">Interlocuteur</strong>
+            <small id="sidebarRoleLabel">Espace de travail</small>
         </div>
         <div class="sidebar-footer">
             <span class="status-dot"></span>
@@ -364,9 +405,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const jwtPayload = parseJwt(token);
-    const currentUserEmail = jwtPayload?.email || jwtPayload?.username || jwtPayload?.sub || 'Utilisateur';
+    const currentUserEmail = jwtPayload?.email || jwtPayload?.username || jwtPayload?.sub || 'Interlocuteur';
+    const roles = jwtPayload?.roles || jwtPayload?.role || [];
+    const roleList = Array.isArray(roles) ? roles : [roles];
+    const isInterlocuteur = roleList.some(r => String(r).toUpperCase().includes('INTERLOCUTEUR') || String(r).toUpperCase().includes('ADMIN'));
     document.getElementById('sidebarUserName').textContent = currentUserEmail;
     document.getElementById('navbarUserName').textContent = currentUserEmail;
+    // Espace interlocuteur (compte client → interlocuteur)
+    const brandTitle = document.getElementById('brandTitle');
+    const brandSubtitle = document.getElementById('brandSubtitle');
+    const sidebarRole = document.getElementById('sidebarRoleLabel');
+    if (brandTitle) brandTitle.textContent = isInterlocuteur ? 'Interlocuteur' : 'Utilisateur';
+    if (brandSubtitle) brandSubtitle.textContent = isInterlocuteur ? 'Espace de travail' : 'Espace personnel';
+    if (sidebarRole) sidebarRole.textContent = isInterlocuteur ? 'Espace de travail' : 'Espace personnel';
 
     function fetchWithAuth(url, options = {}) {
         return fetch(url, {
@@ -406,8 +457,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'Refusé': 'ticket.status.refused',
         'En attente RIB': 'ticket.status.pending_rib',
         'RIB reçu': 'ticket.status.rib_received',
-        'En attente réponse banque': 'ticket.status.pending_bank',
-        'En attente confirmation': 'ticket.status.pending_confirmation'
+        'En attente réponse banque': 'ticket.status.pending_bank'
+        // « En attente confirmation » supprimé du flux
     };
     function translateStatus(statut) {
         if (!statut) return '-';
@@ -428,12 +479,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 tbody.innerHTML = tickets.map(ticket => {
-                    let badgeClass = 'warning';
-                    if (ticket.statut === 'Validé') badgeClass = 'success';
-                    else if (ticket.statut === 'Refusé') badgeClass = 'danger';
-                    else if (ticket.statut === 'En attente RIB') badgeClass = 'primary';
-                    else if (ticket.statut === 'RIB reçu') badgeClass = 'info';
-                    else if (ticket.statut === 'En attente réponse banque') badgeClass = 'secondary';
+                    let badgeClass = 'status-attente-rib';
+                    if (ticket.statut === 'Validé') badgeClass = 'status-valide';
+                    else if (ticket.statut === 'Refusé') badgeClass = 'status-refuse';
+                    else if (ticket.statut === 'En attente RIB') badgeClass = 'status-attente-rib';
+                    else if (ticket.statut === 'RIB reçu') badgeClass = 'status-rib-recu';
+                    else if (ticket.statut === 'En attente réponse banque') badgeClass = 'status-attente-banque';
 
                     let actions = `
                         <a class="btn-action btn-view" href="/ticket/ticket-show.html?id=${ticket.id}" title="${typeof t === 'function' ? t('action.view') : 'Voir'}">
@@ -445,12 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="bi bi-paperclip"></i>
                         </a>`;
                     }
-                    if (ticket.statut === 'En attente confirmation') {
-                        actions += `
-                        <a class="btn-action btn-follow" href="/ticket/ticket-awaiting.html?id=${ticket.id}" title="${typeof t === 'function' ? t('action.follow') : 'Suivre'}">
-                            <i class="bi bi-hourglass-split"></i>
-                        </a>`;
-                    }
+                    // Plus de statut « En attente confirmation »
                     actions += `
                         <button type="button" class="btn-action btn-delete" onclick="deleteTicket(${ticket.id})" title="${typeof t === 'function' ? t('action.delete') : 'Supprimer'}">
                             <i class="bi bi-trash"></i>
@@ -462,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td>#${ticket.id}</td>
                             <td>${ticket.reference || '—'}</td>
                             <td class="amount-cell">${formatCurrency(ticket.montant, ticket.devise)}</td>
-                            <td><span class="badge bg-${badgeClass}">${translateStatus(ticket.statut)}</span></td>
+                            <td><span class="badge ${badgeClass}">${translateStatus(ticket.statut)}</span></td>
                             <td><span class="date-pill"><i class="bi bi-calendar3"></i>${formatDate(ticket.date || ticket.createdAt)}</span></td>
                             <td class="text-end"><div class="actions-cell">${actions}</div></td>
                         </tr>`;

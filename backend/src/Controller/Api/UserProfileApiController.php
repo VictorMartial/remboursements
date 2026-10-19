@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/user')]
-#[IsGranted('ROLE_USER')]
+#[IsGranted('IS_AUTHENTICATED_FULLY')] // User + Interlocuteur + Admin
 class UserProfileApiController extends AbstractController
 {
     #[Route('/profile', name: 'api_user_profile', methods: ['GET'])]

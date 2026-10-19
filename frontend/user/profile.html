@@ -91,32 +91,36 @@
             <a class="brand-mark" href="/user/dashboard-user.html">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
                 <span class="brand-copy">
-                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
-                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace User</span>
+                    <span class="brand-title" id="brandTitle">Interlocuteur</span>
+                    <span class="brand-subtitle" id="brandSubtitle">Espace de travail</span>
                 </span>
             </a>
         </div>
         <nav class="sidebar-nav">
             <a class="nav-link" href="/user/dashboard-user.html">
                 <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
-                <span class="nav-text" data-i18n="nav.dashboard">Dashboard</span>
+                <span class="nav-text">Dashboard</span>
             </a>
             <a class="nav-link" href="/user/tickets-list.html">
                 <span class="nav-icon"><i class="bi bi-list-ul"></i></span>
-                <span class="nav-text" data-i18n="nav.tickets">Mes tickets</span>
+                <span class="nav-text">Mes tickets</span>
             </a>
-            <a class="nav-link" href="/ticket/ticket-create.html">
+            <a class="nav-link" href="/ticket/ticket-create-step1.html">
                 <span class="nav-icon"><i class="bi bi-plus-circle"></i></span>
-                <span class="nav-text" data-i18n="nav.new_ticket">Nouveau ticket</span>
+                <span class="nav-text">Nouveau ticket</span>
+            </a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-dashboard.html">
+                <span class="nav-icon"><i class="bi bi-inbox"></i></span>
+                <span class="nav-text">Suivi RIB / Banque</span>
             </a>
             <a class="nav-link active" href="/user/profile.html" aria-current="page">
                 <span class="nav-icon"><i class="bi bi-person"></i></span>
-                <span class="nav-text" data-i18n="profile">Profil</span>
+                <span class="nav-text">Profil</span>
             </a>
         </nav>
         <div class="sidebar-user">
-            <strong id="sidebarUserName">Utilisateur</strong>
-            <small data-i18n="brand.subtitle">Espace personnel</small>
+            <strong id="sidebarUserName">Interlocuteur</strong>
+            <small id="sidebarRoleLabel">Espace de travail</small>
         </div>
         <div class="sidebar-footer">
             <span class="status-dot"></span>

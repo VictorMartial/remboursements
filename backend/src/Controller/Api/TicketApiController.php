@@ -7,10 +7,14 @@ use App\Entity\UsedOrderReference;
 use App\Service\ActivityLogger;
 use App\Service\RealtimeNotifier;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -23,7 +27,10 @@ class TicketApiController extends AbstractController
         private SluggerInterface $slugger,
         private ActivityLogger $activityLogger,
         private ValidatorInterface $validator,
-        private RealtimeNotifier $realtimeNotifier
+        private RealtimeNotifier $realtimeNotifier,
+        private MailerInterface $mailer,
+        private ParameterBagInterface $params,
+        private LoggerInterface $logger
     ) {}
 
     #[Route('/create', name: 'api_ticket_create', methods: ['POST'])]
@@ -171,7 +178,19 @@ class TicketApiController extends AbstractController
         : null
 );
         $ticket->setDescription($request->request->get('description'));
-        $ticket->setStatut('En attente confirmation');
+
+        // Email du client (obligatoire) — demande de RIB envoyée immédiatement, sans attente de confirmation
+        $clientEmail = trim((string) $request->request->get('client_email', ''));
+        if ($clientEmail === '' || !filter_var($clientEmail, FILTER_VALIDATE_EMAIL)) {
+            return $this->json([
+                'error' => 'L\'email du client est obligatoire et doit être valide.',
+                'field' => 'client_email',
+            ], 400);
+        }
+        $ticket->setClientEmail($clientEmail);
+
+        // Plus d'attente de confirmation : on passe directement en "En attente RIB"
+        $ticket->setStatut('En attente RIB');
         $ticket->setARembourser(true);
 
         $errors = $this->validator->validate($ticket);
@@ -201,9 +220,12 @@ class TicketApiController extends AbstractController
         }
         $this->em->flush();
 
+        // Envoi immédiat de l'email professionnel demandant le RIB au client
+        $this->sendRibRequestEmail($ticket);
+
         $this->activityLogger->log(
             $type === 'AEV_NON_RECU' ? 'AEV NON RECU' : 'PAIEMENT MULTIPLE',
-            sprintf('Ticket #%d créé via API', $ticket->getId()),
+            sprintf('Ticket #%d créé via API — email RIB envoyé à %s', $ticket->getId(), $clientEmail),
             'Ticket',
             $ticket->getId()
         );
@@ -214,8 +236,53 @@ class TicketApiController extends AbstractController
         return $this->json([
             'success' => true,
             'id' => $ticket->getId(),
-            'message' => 'Ticket créé avec succès. En attente de confirmation.'
+            'message' => 'Ticket créé avec succès. Email de demande de RIB envoyé au client.'
         ], 201);
+    }
+
+    /**
+     * Envoie un email professionnel au client pour demander son RIB.
+     * N'utilise plus le transport "client" : on utilise l'email professionnel (banque / interlocuteur).
+     */
+    private function sendRibRequestEmail(Ticket $ticket): void
+    {
+        $to = $ticket->getClientEmail();
+        if (!$to) {
+            return;
+        }
+        try {
+            // Email professionnel (plus de transport "client")
+            $from = $this->params->has('bank_email_from')
+                ? $this->params->get('bank_email_from')
+                : ($this->params->has('app_email_from') ? $this->params->get('app_email_from') : 'noreply@example.com');
+            $reply = $this->params->has('bank_email_reply_to')
+                ? $this->params->get('bank_email_reply_to')
+                : $from;
+
+            $email = (new Email())
+                ->from($from)
+                ->to($to)
+                ->replyTo($reply)
+                ->subject(sprintf('Demande de RIB pour votre remboursement #%d', $ticket->getId()))
+                ->html(sprintf(
+                    '<h2>Demande de RIB</h2>
+                    <p>Bonjour,</p>
+                    <p>Votre demande de remboursement (ticket #%d) a été enregistrée.</p>
+                    <p>Merci de nous transmettre votre RIB afin que nous puissions procéder au remboursement.</p>
+                    <p>Référence commande : %s</p>
+                    <p>Montant : %s %s</p>
+                    <p>Cordialement,<br>L\'équipe remboursements</p>',
+                    $ticket->getId(),
+                    $ticket->getReferenceCommande() ?? $ticket->getIdCommande() ?? 'N/A',
+                    $ticket->getMontantARembourser() ?? '0',
+                    $ticket->getDevise() ?: 'EUR'
+                ));
+            // Transport professionnel (banque) — plus de "client"
+            $email->getHeaders()->addTextHeader('X-Transport', 'banque');
+            $this->mailer->send($email);
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur envoi email demande RIB au client : ' . $e->getMessage());
+        }
     }
 
     /**
@@ -253,11 +320,20 @@ class TicketApiController extends AbstractController
     #[Route('/{id}/rib', name: 'api_ticket_rib', methods: ['POST'])]
     public function uploadRib(Ticket $ticket, Request $request): JsonResponse
     {
-        if ($ticket->getUser() !== $this->getUser()) {
+        $user = $this->getUser();
+        $isOwner = $ticket->getUser() === $user;
+        $isInterlocuteur = $user && method_exists($user, 'getRoles')
+            && (in_array('ROLE_INTERLOCUTEUR', $user->getRoles(), true)
+                || in_array('ROLE_ADMIN', $user->getRoles(), true));
+
+        // Propriétaire du ticket OU interlocuteur/admin peuvent déposer le RIB
+        if (!$isOwner && !$isInterlocuteur) {
             return $this->json(['error' => 'Accès refusé'], 403);
         }
 
-        if ($ticket->getStatut() !== 'En attente RIB') {
+        // Statut cohérent avec Ticket::STATUT_ATTENTE_RIB / STATUT_RIB
+        if ($ticket->getStatut() !== Ticket::STATUT_ATTENTE_RIB
+            && $ticket->getStatut() !== 'En attente RIB') {
             return $this->json(['error' => 'Le ticket n\'est pas en attente de RIB'], 400);
         }
 
@@ -273,20 +349,25 @@ class TicketApiController extends AbstractController
         $ribFile->move($this->getParameter('uploads_directory'), $newFilename);
 
         $ticket->setRib($newFilename);
+        // → statut "RIB reçu" → apparaît dans le tableau "RIB reçus — à envoyer à la banque"
         $ticket->setStatut(Ticket::STATUT_RIB_RECU);
         $this->em->flush();
 
         $this->activityLogger->log(
             'RIB UPLOAD',
-            sprintf('RIB ajouté au ticket #%d', $ticket->getId()),
+            sprintf('RIB ajouté au ticket #%d (statut: %s)', $ticket->getId(), Ticket::STATUT_RIB_RECU),
             'Ticket',
             $ticket->getId()
         );
 
-        // 🔔 Temps réel : l'interlocuteur voit le RIB arriver
+        // 🔔 Temps réel : l'interlocuteur voit le RIB arriver dans le tableau
         $this->realtimeNotifier->ticketUpdated('ticket.rib_uploaded', $ticket);
 
-        return $this->json(['success' => true, 'message' => 'RIB envoyé avec succès']);
+        return $this->json([
+            'success' => true,
+            'message' => 'RIB envoyé avec succès',
+            'statut' => Ticket::STATUT_RIB_RECU,
+        ]);
     }
 
     #[Route('/{id}/delete', name: 'api_ticket_delete', methods: ['POST', 'DELETE'])]

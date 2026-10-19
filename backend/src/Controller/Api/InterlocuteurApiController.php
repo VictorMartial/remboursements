@@ -78,21 +78,27 @@ class InterlocuteurApiController extends AbstractController
         }
     }
 
-    // ==== 3. RIB reçus ====
+    // ==== 3. RIB reçus (statut = Ticket::STATUT_RIB_RECU = "RIB reçu") ====
     #[Route('/tickets/a-envoyer-banque', name: 'api_interlocuteur_tickets_a_envoyer', methods: ['GET'])]
     public function ticketsAEnvoyerBanque(): JsonResponse
     {
         try {
-            $tickets = $this->ticketRepo->findBy(['statut' => 'RIB reçu']);
+            // Cohérent avec l'upload RIB qui fait setStatut(Ticket::STATUT_RIB_RECU)
+            $tickets = $this->ticketRepo->findBy(
+                ['statut' => Ticket::STATUT_RIB_RECU],
+                ['id' => 'DESC']
+            );
             $data = array_map(fn(Ticket $t) => [
                 'id' => $t->getId(),
-                // Référence : on affiche reference_paiement si présent, sinon reference_commande
                 'reference' => $t->getReferencePaiement() ?? $t->getReferenceCommande(),
                 'montant' => $t->getMontantARembourser(),
                 'devise' => $t->getDevise() ?: 'EUR',
                 'type' => $t->getTypeRemboursement(),
                 'rib' => $t->getRib(),
-                'user' => $t->getUser()?->getEmail(),
+                // Email client (saisi à la création) en priorité, sinon compte lié
+                'user' => $t->getClientEmail() ?: $t->getUser()?->getEmail(),
+                'client_email' => $t->getClientEmail(),
+                'statut' => $t->getStatut(),
             ], $tickets);
             return $this->json($data);
         } catch (\Exception $e) {
@@ -106,7 +112,7 @@ class InterlocuteurApiController extends AbstractController
     public function envoyerBanque(Ticket $ticket): JsonResponse
     {
         try {
-            if ($ticket->getStatut() !== 'RIB reçu') {
+            if ($ticket->getStatut() !== Ticket::STATUT_RIB_RECU) {
                 return $this->json(['success' => false, 'message' => 'Statut invalide.'], 400);
             }
             if (!$ticket->getRib()) {
@@ -142,7 +148,8 @@ class InterlocuteurApiController extends AbstractController
             $data = array_map(fn(Ticket $t) => [
                 'id' => $t->getId(),
                 'type' => $t->getTypeRemboursement(),
-                'user' => $t->getUser()?->getEmail(),
+                'user' => $t->getClientEmail() ?: $t->getUser()?->getEmail(),
+                'client_email' => $t->getClientEmail(),
                 // Référence : fallback sur reference_commande si reference_paiement est null
                 'reference' => $t->getReferencePaiement() ?? $t->getReferenceCommande(),
                 'montant' => $t->getMontantARembourser(),
@@ -301,30 +308,42 @@ class InterlocuteurApiController extends AbstractController
 
     private function notifyUserRib(Ticket $ticket): void
     {
-        $user = $ticket->getUser();
-        if (!$user || !$user->getEmail()) return;
+        // Priorité à l'email client saisi (nouveau flow), sinon email du compte utilisateur (legacy)
+        $to = $ticket->getClientEmail();
+        if (!$to) {
+            $user = $ticket->getUser();
+            $to = $user?->getEmail();
+        }
+        if (!$to) {
+            return;
+        }
         try {
-            // CLIENT : refund@evisamada-mg.com (transport "client")
-            $from = $this->params->has('client_email_from')
-                ? $this->params->get('client_email_from')
-                : $this->params->get('app_email_from');
-            $reply = $this->params->has('client_email_reply_to')
-                ? $this->params->get('client_email_reply_to')
-                : $this->params->get('app_email_reply_to');
+            // Email professionnel (plus de transport "client" / mail client)
+            $from = $this->params->has('bank_email_from')
+                ? $this->params->get('bank_email_from')
+                : ($this->params->has('app_email_from') ? $this->params->get('app_email_from') : 'noreply@example.com');
+            $reply = $this->params->has('bank_email_reply_to')
+                ? $this->params->get('bank_email_reply_to')
+                : $from;
 
             $email = (new Email())
                 ->from($from)
-                ->to($user->getEmail())
+                ->to($to)
                 ->replyTo($reply)
-                ->subject('Votre demande de remboursement est confirmée')
+                ->subject(sprintf('Demande de RIB pour votre remboursement #%d', $ticket->getId()))
                 ->html(sprintf(
-                    '<h2>Ticket confirmé</h2><p>Votre ticket #%d a été confirmé. Vous pouvez maintenant envoyer votre RIB.</p>',
+                    '<h2>Demande de RIB</h2>
+                    <p>Bonjour,</p>
+                    <p>Votre demande de remboursement (ticket #%d) a été enregistrée / confirmée.</p>
+                    <p>Merci de nous transmettre votre RIB afin que nous puissions procéder au remboursement.</p>
+                    <p>Cordialement,<br>L\'équipe remboursements</p>',
                     $ticket->getId()
                 ));
-            $email->getHeaders()->addTextHeader('X-Transport', 'client');
+            // Transport professionnel (banque) — suppression du mail client
+            $email->getHeaders()->addTextHeader('X-Transport', 'banque');
             $this->mailer->send($email);
         } catch (\Exception $e) {
-            $this->logger->error('Erreur email confirmation RIB : ' . $e->getMessage());
+            $this->logger->error('Erreur email demande RIB : ' . $e->getMessage());
         }
     }
 
@@ -372,20 +391,23 @@ class InterlocuteurApiController extends AbstractController
 
     private function notifyUserValidation(Ticket $ticket, string $devise, string $idTransaction, float $montant, string $date): void
     {
-        $user = $ticket->getUser();
-        if (!$user || !$user->getEmail()) return;
+        // Priorité email client saisi, sinon compte utilisateur
+        $to = $ticket->getClientEmail() ?: $ticket->getUser()?->getEmail();
+        if (!$to) {
+            return;
+        }
         try {
-            // CLIENT : refund@evisamada-mg.com (transport "client") — Remboursement validé
-            $from = $this->params->has('client_email_from')
-                ? $this->params->get('client_email_from')
-                : $this->params->get('app_email_from');
-            $reply = $this->params->has('client_email_reply_to')
-                ? $this->params->get('client_email_reply_to')
-                : $this->params->get('app_email_reply_to');
+            // Email professionnel (plus de transport / mail client)
+            $from = $this->params->has('bank_email_from')
+                ? $this->params->get('bank_email_from')
+                : ($this->params->has('app_email_from') ? $this->params->get('app_email_from') : 'noreply@example.com');
+            $reply = $this->params->has('bank_email_reply_to')
+                ? $this->params->get('bank_email_reply_to')
+                : $from;
 
             $email = (new Email())
                 ->from($from)
-                ->to($user->getEmail())
+                ->to($to)
                 ->replyTo($reply)
                 ->subject('✅ Votre remboursement a été validé')
                 ->html(sprintf(
@@ -402,7 +424,7 @@ class InterlocuteurApiController extends AbstractController
                     $devise,
                     (new \DateTimeImmutable($date))->format('d/m/Y')
                 ));
-            $email->getHeaders()->addTextHeader('X-Transport', 'client');
+            $email->getHeaders()->addTextHeader('X-Transport', 'banque');
             $this->mailer->send($email);
         } catch (\Exception $e) {
             $this->logger->error('Erreur email validation : ' . $e->getMessage());
@@ -451,20 +473,23 @@ class InterlocuteurApiController extends AbstractController
 
     private function notifyUserMismatch(Ticket $ticket, array $ecarts): void
     {
-        $user = $ticket->getUser();
-        if (!$user || !$user->getEmail()) return;
+        // Priorité email client saisi, sinon compte utilisateur
+        $to = $ticket->getClientEmail() ?: $ticket->getUser()?->getEmail();
+        if (!$to) {
+            return;
+        }
         try {
-            // CLIENT : refund@evisamada-mg.com (transport "client")
-            $from = $this->params->has('client_email_from')
-                ? $this->params->get('client_email_from')
-                : $this->params->get('app_email_from');
-            $reply = $this->params->has('client_email_reply_to')
-                ? $this->params->get('client_email_reply_to')
-                : $this->params->get('app_email_reply_to');
+            // Email professionnel (plus de transport / mail client)
+            $from = $this->params->has('bank_email_from')
+                ? $this->params->get('bank_email_from')
+                : ($this->params->has('app_email_from') ? $this->params->get('app_email_from') : 'noreply@example.com');
+            $reply = $this->params->has('bank_email_reply_to')
+                ? $this->params->get('bank_email_reply_to')
+                : $from;
 
             $email = (new Email())
                 ->from($from)
-                ->to($user->getEmail())
+                ->to($to)
                 ->replyTo($reply)
                 ->subject('⚠️ Validation banque non conforme à votre demande')
                 ->html(sprintf(
@@ -472,7 +497,7 @@ class InterlocuteurApiController extends AbstractController
                     $ticket->getId(),
                     implode(', ', $ecarts)
                 ));
-            $email->getHeaders()->addTextHeader('X-Transport', 'client');
+            $email->getHeaders()->addTextHeader('X-Transport', 'banque');
             $this->mailer->send($email);
         } catch (\Exception $e) {
             $this->logger->error('Erreur email mismatch utilisateur : ' . $e->getMessage());

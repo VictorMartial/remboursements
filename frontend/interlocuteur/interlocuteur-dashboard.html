@@ -210,7 +210,22 @@
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link active" href="/interlocuteur/interlocuteur-dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a class="nav-link active" href="/user/dashboard-user.html" aria-current="page">
+                <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a class="nav-link" href="/user/tickets-list.html">
+                <span class="nav-icon"><i class="bi bi-list-ul" aria-hidden="true"></i></span>
+                <span class="nav-text">Mes tickets</span>
+            </a>
+            <a class="nav-link" href="/ticket/ticket-create-step1.html">
+                <span class="nav-icon"><i class="bi bi-plus-circle" aria-hidden="true"></i></span>
+                <span class="nav-text">Nouveau ticket</span>
+            </a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-dashboard.html">
+                <span class="nav-icon"><i class="bi bi-inbox" aria-hidden="true"></i></span>
+                <span class="nav-text">Suivi RIB / Banque</span>
+            </a>
         </nav>
         <div class="sidebar-user">
             <strong id="sidebarUserName">Interlocuteur</strong>
@@ -244,7 +259,9 @@
                             <span class="profile-name d-none d-sm-inline" id="navbarUserName">Interlocuteur</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/auth/login.html">Déconnexion</a></li>
+                            <li><a class="dropdown-item" href="/user/profile.html">Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Déconnexion</a></li>
                         </ul>
                     </div>
                 </div>
@@ -254,28 +271,8 @@
         <main class="dashboard-content">
             <div class="container-fluid px-3 px-lg-4 py-4">
 
-                <!-- Section 1 -->
+                <!-- Section 1 : RIB reçus (plus de section « en attente de confirmation ») -->
                 <div class="card">
-                    <div class="card-header card-header-flex">
-                        <div class="card-header-text">
-                            <h1 class="h4">Tickets en attente de confirmation</h1>
-                            <p class="text-muted">Confirmez les demandes avant l'envoi du RIB.</p>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-wrap">
-                            <table>
-                                <thead><tr>
-                                    <th>#</th><th>Type</th><th>Utilisateur</th><th>Description</th><th>Date</th><th>Montant</th><th>Action</th>
-                                </tr></thead>
-                                <tbody id="ticketsAttenteBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 2 -->
-                <div class="card section-gap">
                     <div class="card-header card-header-flex">
                         <div class="card-header-text">
                             <h1 class="h4">RIB reçus — à envoyer à la banque</h1>
@@ -291,7 +288,7 @@
                         <div class="table-wrap">
                             <table>
                                 <thead><tr>
-                                    <th>#</th><th>Type</th><th>Utilisateur</th><th>Réf. paiement</th><th>Montant</th><th>RIB</th><th>Action</th>
+                                    <th>#</th><th>Type</th><th>Client</th><th>Réf. paiement</th><th>Montant</th><th>RIB</th><th>Action</th>
                                 </tr></thead>
                                 <tbody id="ribRecuBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
                             </table>
@@ -311,7 +308,7 @@
                         <div class="table-wrap">
                             <table>
                                 <thead><tr>
-                                    <th>#</th><th>Type</th><th>Utilisateur</th><th>Réf. paiement</th><th>Montant</th><th>Email envoyé le</th><th>Action</th>
+                                    <th>#</th><th>Type</th><th>Client</th><th>Réf. paiement</th><th>Montant</th><th>Email envoyé le</th><th>Action</th>
                                 </tr></thead>
                                 <tbody id="attenteBanqueBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
                             </table>
@@ -383,6 +380,21 @@
 const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
 const token = localStorage.getItem('jwt_token');
 if (!token) window.location.href = '/auth/login.html';
+
+function doLogout(e) {
+    if (e) e.preventDefault();
+    try {
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('roles');
+        localStorage.removeItem('ticket_type');
+    } catch (_) {}
+    window.location.replace('/auth/login.html');
+}
+document.addEventListener('DOMContentLoaded', function () {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+});
 
 function parseJwt(t) {
     try {
@@ -522,55 +534,7 @@ function setBoutonEnCours(btn, enCours) {
     btn.classList.toggle('is-refreshing', enCours);
 }
 
-/* ===== Section 1 ===== */
-function loadTicketsAttente(silencieux = false) {
-    const tbody = document.getElementById('ticketsAttenteBody');
-    if (!silencieux) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
-    return fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets/en-attente`)
-        .then(tickets => {
-            if (!tickets.length) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucun ticket en attente.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = tickets.map(t => `
-                <tr>
-                    <td>${t.id}</td>
-                    <td><span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span></td>
-                    <td>${t.user || '-'}</td>
-                    <td>${t.description || '—'}</td>
-                    <td>${t.date || '-'}</td>
-                    <td>${formatCurrency(t.montant, t.devise)}</td>
-                    <td><button class="btn btn-success btn-sm" onclick="confirmerTicket(${t.id}, this)"><i class="bi bi-check-lg"></i> Confirmer</button></td>
-                </tr>
-            `).join('');
-        })
-        .catch(err => {
-            if (!silencieux) tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
-        });
-}
-
-window.confirmerTicket = async function(id, btn) {
-    const ok = await showConfirm('Confirmer ce ticket ?', 'Confirmation');
-    if (!ok) return;
-    setBoutonEnCours(btn, true);
-    fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/confirmer`, { method: 'POST' })
-        .then(data => {
-            if (data.success) {
-                showFlash(data.message, 'success');
-                retirerLigneParId(document.getElementById('ticketsAttenteBody'), id, 'Aucun ticket en attente.', 7);
-                rafraichirApresAction();
-            } else {
-                showFlash(data.message, 'danger');
-                setBoutonEnCours(btn, false);
-            }
-        })
-        .catch(() => {
-            showFlash('Erreur réseau', 'danger');
-            setBoutonEnCours(btn, false);
-        });
-};
-
-/* ===== Section 2 ===== */
+/* ===== Section 1 : RIB reçus ===== */
 function loadRibRecu(silencieux = false) {
     const tbody = document.getElementById('ribRecuBody');
     if (!silencieux) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
@@ -868,7 +832,6 @@ function chargerToutesLesDonnees(options = {}) {
     const btn = document.getElementById('refreshAllBtn');
     if (showBtn && btn) btn.classList.add('is-refreshing');
     return Promise.allSettled([
-        Promise.resolve(loadTicketsAttente(true)),
         Promise.resolve(loadRibRecu(true)),
         Promise.resolve(loadAttenteBanque(true))
     ]).finally(() => {
@@ -959,7 +922,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const searchValue = this.value.trim().toLowerCase()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-        ["ticketsAttenteBody", "ribRecuBody", "attenteBanqueBody"].forEach(function (id) {
+        ["ribRecuBody", "attenteBanqueBody"].forEach(function (id) {
             const tbody = document.getElementById(id);
             if (!tbody) return;
             tbody.querySelectorAll("tr").forEach(function (row) {
