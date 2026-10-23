@@ -4,10 +4,12 @@ namespace App\Controller\Api;
 
 use App\Entity\Ticket;
 use App\Repository\ActivityLogRepository;
+use App\Repository\AppSettingRepository;
 use App\Repository\TicketRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -83,5 +85,55 @@ class AdminStatsApiController extends AbstractController
             ];
         }
         return $this->json($data);
+    }
+
+    // ------------------------------------------------------------------
+    // Paramètres système : Email Banque (saisie manuelle + stockage DB)
+    // ------------------------------------------------------------------
+
+    #[Route('/settings/bank-email', name: 'api_admin_bank_email', methods: ['GET'])]
+    public function getBankEmail(AppSettingRepository $settingRepo): JsonResponse
+    {
+        // Priorité : valeur en base, sinon fallback sur .env
+        $email = $settingRepo->getValue('bank_email', $_ENV['BANK_EMAIL'] ?? null);
+
+        $setting = $settingRepo->findOneBy(['settingKey' => 'bank_email']);
+
+        return $this->json([
+            'bank_email' => $email,
+            'updated_at' => $setting?->getUpdatedAt()?->format('Y-m-d H:i:s'),
+            'source'     => $setting ? 'database' : 'env',
+        ]);
+    }
+
+    #[Route('/settings/bank-email', name: 'api_admin_bank_email_update', methods: ['PUT', 'POST'])]
+    public function updateBankEmail(Request $request, AppSettingRepository $settingRepo): JsonResponse
+    {
+        $data  = json_decode($request->getContent(), true) ?? [];
+        $email = trim($data['bank_email'] ?? '');
+
+        if ($email === '') {
+            return $this->json([
+                'success' => false,
+                'message' => 'L\'email banque est obligatoire.',
+            ], 400);
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Format d\'email invalide.',
+            ], 400);
+        }
+
+        $setting = $settingRepo->setValue('bank_email', $email);
+
+        return $this->json([
+            'success'    => true,
+            'message'    => 'Email banque enregistré avec succès.',
+            'bank_email' => $setting->getSettingValue(),
+            'updated_at' => $setting->getUpdatedAt()->format('Y-m-d H:i:s'),
+            'source'     => 'database',
+        ]);
     }
 }

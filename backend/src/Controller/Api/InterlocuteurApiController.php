@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Ticket;
+use App\Repository\AppSettingRepository;
 use App\Repository\TicketRepository;
 use App\Service\ActivityLogger;
 use App\Service\RealtimeNotifier;
@@ -29,8 +30,28 @@ class InterlocuteurApiController extends AbstractController
         private LoggerInterface $logger,
         private MailerInterface $mailer,
         private RealtimeNotifier $realtimeNotifier,
-        private ParameterBagInterface $params
+        private ParameterBagInterface $params,
+        private AppSettingRepository $settingRepo
     ) {}
+
+    /**
+     * Email destinataire banque : priorité à la valeur saisie manuellement (base),
+     * sinon fallback sur le paramètre / .env (bank_email).
+     */
+    private function getBankEmailDestinataire(): ?string
+    {
+        $fromDb = $this->settingRepo->getValue('bank_email');
+        if ($fromDb !== null && $fromDb !== '') {
+            return $fromDb;
+        }
+        if ($this->params->has('bank_email')) {
+            $fromParams = $this->params->get('bank_email');
+            if ($fromParams !== null && $fromParams !== '') {
+                return $fromParams;
+            }
+        }
+        return null;
+    }
 
     // ==== 1. Tickets en attente de confirmation ====
     #[Route('/tickets/en-attente', name: 'api_interlocuteur_tickets_attente', methods: ['GET'])]
@@ -237,6 +258,16 @@ class InterlocuteurApiController extends AbstractController
             $ticket->setDateRemboursement(new \DateTimeImmutable($dateRemboursement));
             $ticket->setStatut('Validé');
             $ticket->setStatutRemboursement('Remboursé');
+            // Après validation banque : banque OK auto, client = sans retour par défaut
+            if (method_exists($ticket, 'setSuiviBanque')) {
+                $ticket->setSuiviBanque('ok');
+            }
+            if (method_exists($ticket, 'setSuiviClient')) {
+                $ticket->setSuiviClient('sans_retour');
+            }
+            if (method_exists($ticket, 'setSuiviMadaozi')) {
+                $ticket->setSuiviMadaozi('attente');
+            }
             $this->em->flush();
 
             // Emails
@@ -295,8 +326,255 @@ class InterlocuteurApiController extends AbstractController
                 'type' => $ticket->getTypeRemboursement(),
                 'rib' => $ticket->getRib(),
                 'user' => $ticket->getUser()?->getEmail(),
+                'client_email' => $ticket->getClientEmail(),
                 'dateCommande' => $ticket->getDateCommande()?->format('d/m/Y'),
                 'description' => $ticket->getDescription(),
+                'suivi_banque' => method_exists($ticket, 'getSuiviBanque') ? $ticket->getSuiviBanque() : null,
+                'suivi_client' => method_exists($ticket, 'getSuiviClient') ? $ticket->getSuiviClient() : null,
+                'suivi_madaozi' => method_exists($ticket, 'getSuiviMadaozi') ? $ticket->getSuiviMadaozi() : null,
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // ==== 9. Tickets validés — suivi post-validation (Banque / Client / Mada Ozi) ====
+    #[Route('/tickets/valides', name: 'api_interlocuteur_tickets_valides', methods: ['GET'])]
+    public function ticketsValides(): JsonResponse
+    {
+        try {
+            $tickets = $this->ticketRepo->findBy(
+                ['statut' => 'Validé'],
+                ['id' => 'DESC']
+            );
+            $data = array_map(fn(Ticket $t) => [
+                'id' => $t->getId(),
+                'type' => $t->getTypeRemboursement(),
+                'user' => $t->getClientEmail() ?: $t->getUser()?->getEmail(),
+                'client_email' => $t->getClientEmail(),
+                'reference' => $t->getReferencePaiement() ?? $t->getReferenceCommande(),
+                'montant' => $t->getMontantARembourser(),
+                'devise' => $t->getDevise() ?: 'EUR',
+                'statut' => $t->getStatut(),
+                'idTransaction' => method_exists($t, 'getIdTransaction') ? $t->getIdTransaction() : null,
+                'dateRemboursement' => method_exists($t, 'getDateRemboursement') && $t->getDateRemboursement()
+                    ? $t->getDateRemboursement()->format('d/m/Y')
+                    : null,
+                'suivi_banque' => method_exists($t, 'getSuiviBanque') ? $t->getSuiviBanque() : null,
+                'suivi_client' => method_exists($t, 'getSuiviClient') ? $t->getSuiviClient() : null,
+                'suivi_madaozi' => method_exists($t, 'getSuiviMadaozi') ? $t->getSuiviMadaozi() : null,
+            ], $tickets);
+            return $this->json($data);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Suivi post-validation d'un ticket Validé.
+     *
+     * Body JSON :
+     * {
+     *   "suivi_banque":  "ok" | "ko" | "attente",
+     *   "suivi_client":  "ok" | "sans_retour" | "attente",
+     *   "suivi_madaozi": "ok" | "attente",
+     *   "action":        "cloturer" | "sans_retour" | "renvoyer_banque" | "enregistrer"
+     * }
+     *
+     * - action=cloturer      → statut "Clôturé" (client OK + clôture totale)
+     * - action=sans_retour   → statut "Sans retour"
+     * - action=renvoyer_banque → renvoi email banque + statut "En attente réponse banque"
+     * - action=enregistrer   → enregistre uniquement les cases à cocher (reste Validé)
+     */
+    #[Route('/ticket/{id}/suivi', name: 'api_interlocuteur_ticket_suivi', methods: ['POST'])]
+    public function suiviTicket(Ticket $ticket, Request $request): JsonResponse
+    {
+        try {
+            $statut = $ticket->getStatut();
+            if (!in_array($statut, ['Validé', 'Sans retour'], true)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Seuls les tickets Validé (ou Sans retour) peuvent être suivis.',
+                ], 400);
+            }
+
+            $data = json_decode($request->getContent(), true) ?? [];
+            $suiviBanque  = $data['suivi_banque']  ?? null;
+            $suiviClient  = $data['suivi_client']  ?? null;
+            $suiviMadaozi = $data['suivi_madaozi'] ?? null;
+            $action       = $data['action']        ?? 'enregistrer';
+
+            $allowedBanque  = ['ok', 'ko', 'attente', null, ''];
+            $allowedClient  = ['ok', 'ko', 'sans_retour', 'attente', null, ''];
+            $allowedMadaozi = ['ok', 'attente', null, ''];
+
+            if (!in_array($suiviBanque, $allowedBanque, true)) {
+                return $this->json(['success' => false, 'message' => 'suivi_banque invalide.'], 400);
+            }
+            if (!in_array($suiviClient, $allowedClient, true)) {
+                return $this->json(['success' => false, 'message' => 'suivi_client invalide.'], 400);
+            }
+            if (!in_array($suiviMadaozi, $allowedMadaozi, true)) {
+                return $this->json(['success' => false, 'message' => 'suivi_madaozi invalide.'], 400);
+            }
+            if (!in_array($action, ['cloturer', 'sans_retour', 'renvoyer_banque', 'enregistrer'], true)) {
+                return $this->json(['success' => false, 'message' => 'action invalide.'], 400);
+            }
+
+            // Persister les cases à cocher si les setters existent sur l'entité
+            if ($suiviBanque !== null && $suiviBanque !== '' && method_exists($ticket, 'setSuiviBanque')) {
+                $ticket->setSuiviBanque($suiviBanque);
+            }
+            if ($suiviClient !== null && $suiviClient !== '' && method_exists($ticket, 'setSuiviClient')) {
+                $ticket->setSuiviClient($suiviClient);
+            }
+            if ($suiviMadaozi !== null && $suiviMadaozi !== '' && method_exists($ticket, 'setSuiviMadaozi')) {
+                $ticket->setSuiviMadaozi($suiviMadaozi);
+            }
+
+            $message = 'Suivi enregistré.';
+
+            switch ($action) {
+                case 'cloturer':
+                    // Client OK → clôture totale
+                    if (method_exists($ticket, 'setSuiviClient')) {
+                        $ticket->setSuiviClient('ok');
+                    }
+                    $ticket->setStatut('Clôturé');
+                    $message = 'Ticket clôturé (client OK).';
+                    $this->activityLogger->log(
+                        'CLOTURE',
+                        sprintf('Ticket #%d clôturé (suivi client OK).', $ticket->getId()),
+                        'Ticket',
+                        $ticket->getId()
+                    );
+                    break;
+
+                case 'sans_retour':
+                    if (method_exists($ticket, 'setSuiviClient')) {
+                        $ticket->setSuiviClient('sans_retour');
+                    }
+                    $ticket->setStatut('Sans retour');
+                    $message = 'Ticket marqué « Sans retour ».';
+                    $this->activityLogger->log(
+                        'SANS_RETOUR',
+                        sprintf('Ticket #%d marqué sans retour client.', $ticket->getId()),
+                        'Ticket',
+                        $ticket->getId()
+                    );
+                    break;
+
+                case 'renvoyer_banque':
+                    // Client non OK → plus Validé, plus étiquette sans retour, renvoi mail banque
+                    $sent = $this->sendBankEmail($ticket);
+                    if (!$sent) {
+                        return $this->json([
+                            'success' => false,
+                            'message' => 'Échec de l\'envoi de l\'email à la banque.',
+                        ], 500);
+                    }
+                    $ticket->setStatut('En attente réponse banque');
+                    if (method_exists($ticket, 'setEmailBanqueEnvoyeAt')) {
+                        $ticket->setEmailBanqueEnvoyeAt(new \DateTimeImmutable());
+                    }
+                    if (method_exists($ticket, 'setSuiviBanque')) {
+                        $ticket->setSuiviBanque('attente');
+                    }
+                    if (method_exists($ticket, 'setSuiviClient')) {
+                        $ticket->setSuiviClient('ko');
+                    }
+                    if (method_exists($ticket, 'setSuiviMadaozi')) {
+                        $ticket->setSuiviMadaozi(null);
+                    }
+                    $message = 'Client non OK : ticket repassé en attente banque, email renvoyé.';
+                    $this->activityLogger->log(
+                        'RENVOI_BANQUE',
+                        sprintf('Ticket #%d — client non OK, renvoyé à la banque.', $ticket->getId()),
+                        'Ticket',
+                        $ticket->getId()
+                    );
+                    break;
+
+                case 'enregistrer':
+                default:
+                    // Client OK → clôture
+                    if ($suiviClient === 'ok') {
+                        $ticket->setStatut('Clôturé');
+                        if (method_exists($ticket, 'setSuiviClient')) {
+                            $ticket->setSuiviClient('ok');
+                        }
+                        $message = 'Client OK : ticket clôturé.';
+                        $this->activityLogger->log(
+                            'CLOTURE',
+                            sprintf('Ticket #%d clôturé (client OK via enregistrer).', $ticket->getId()),
+                            'Ticket',
+                            $ticket->getId()
+                        );
+                        break;
+                    }
+                    // Client non OK → statut non Validé, enlève sans retour, renvoi banque
+                    if ($suiviClient === 'ko') {
+                        $sent = $this->sendBankEmail($ticket);
+                        if (!$sent) {
+                            return $this->json([
+                                'success' => false,
+                                'message' => 'Échec de l\'envoi de l\'email à la banque.',
+                            ], 500);
+                        }
+                        $ticket->setStatut('En attente réponse banque');
+                        if (method_exists($ticket, 'setEmailBanqueEnvoyeAt')) {
+                            $ticket->setEmailBanqueEnvoyeAt(new \DateTimeImmutable());
+                        }
+                        if (method_exists($ticket, 'setSuiviBanque')) {
+                            $ticket->setSuiviBanque('attente');
+                        }
+                        if (method_exists($ticket, 'setSuiviClient')) {
+                            $ticket->setSuiviClient('ko');
+                        }
+                        if (method_exists($ticket, 'setSuiviMadaozi')) {
+                            $ticket->setSuiviMadaozi(null);
+                        }
+                        $message = 'Client non OK : ticket non validé, email renvoyé à la banque.';
+                        $this->activityLogger->log(
+                            'RENVOI_BANQUE',
+                            sprintf('Ticket #%d client KO — renvoyé banque.', $ticket->getId()),
+                            'Ticket',
+                            $ticket->getId()
+                        );
+                        break;
+                    }
+                    // Client sans retour → marque statut
+                    if ($suiviClient === 'sans_retour') {
+                        $ticket->setStatut('Sans retour');
+                        $message = 'Ticket marqué « Sans retour ».';
+                    }
+                    $this->activityLogger->log(
+                        'SUIVI',
+                        sprintf(
+                            'Suivi ticket #%d : banque=%s, client=%s, madaozi=%s',
+                            $ticket->getId(),
+                            $suiviBanque ?? '-',
+                            $suiviClient ?? '-',
+                            $suiviMadaozi ?? '-'
+                        ),
+                        'Ticket',
+                        $ticket->getId()
+                    );
+                    break;
+            }
+
+            $this->em->flush();
+            $this->realtimeNotifier->ticketUpdated('ticket.updated', $ticket);
+
+            return $this->json([
+                'success' => true,
+                'message' => $message,
+                'statut' => $ticket->getStatut(),
+                'suivi_banque' => method_exists($ticket, 'getSuiviBanque') ? $ticket->getSuiviBanque() : $suiviBanque,
+                'suivi_client' => method_exists($ticket, 'getSuiviClient') ? $ticket->getSuiviClient() : $suiviClient,
+                'suivi_madaozi' => method_exists($ticket, 'getSuiviMadaozi') ? $ticket->getSuiviMadaozi() : $suiviMadaozi,
             ]);
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
@@ -351,7 +629,12 @@ class InterlocuteurApiController extends AbstractController
     {
         if (!$ticket->getRib()) return false;
         $ribPath = rtrim($this->getParameter('uploads_directory'), '/') . '/' . $ticket->getRib();
-        $destinataire = $this->params->get('bank_email');
+        // Destinataire = email banque saisi manuellement (base) ou fallback .env
+        $destinataire = $this->getBankEmailDestinataire();
+        if (!$destinataire) {
+            $this->logger->error('Email banque non configuré (ni en base ni en .env).');
+            return false;
+        }
         try {
             $devise = $ticket->getDevise() ?: 'EUR';
             // BANQUE : remboursement@madaozi.mg (transport "banque")
@@ -433,8 +716,12 @@ class InterlocuteurApiController extends AbstractController
 
     private function notifyBankValidation(Ticket $ticket, string $devise, string $idTransaction, float $montant, string $date): void
     {
-        $destinataire = $this->params->get('bank_email');
-        if (!$destinataire) return;
+        // Destinataire = email banque saisi manuellement (base) ou fallback .env
+        $destinataire = $this->getBankEmailDestinataire();
+        if (!$destinataire) {
+            $this->logger->error('Email banque non configuré (ni en base ni en .env) — notification validation non envoyée.');
+            return;
+        }
         try {
             // BANQUE : remboursement@madaozi.mg (transport "banque")
             $from = $this->params->has('bank_email_from')

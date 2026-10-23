@@ -23,18 +23,42 @@
 
         .table-wrap, .table-responsive {
             display: block; width: 100%; max-width: 100%;
-            overflow-x: auto !important; -webkit-overflow-scrolling: touch;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
             border-radius: var(--radius-md);
             border: 1px solid rgba(71,85,105,0.2);
             box-shadow: 0 2px 12px rgba(15,23,42,0.08);
         }
+        /* laisse le ruban visible dans le coin de chaque ligne */
+        #ticketsTable { border-collapse: separate; border-spacing: 0; }
         #ticketsTable {
-            width: max-content !important; min-width: 900px !important;
-            table-layout: auto !important; margin-bottom: 0;
+            width: 100% !important;
+            min-width: 0 !important;
+            table-layout: fixed !important;
+            margin-bottom: 0;
         }
         #ticketsTable th, #ticketsTable td {
-            white-space: nowrap !important; vertical-align: middle; padding: 12px 14px;
+            white-space: nowrap;
+            vertical-align: middle;
+            padding: 8px 10px;
+            font-size: 0.84rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        #ticketsTable td:nth-child(3),
+        #ticketsTable td:nth-child(4),
+        #ticketsTable td:nth-child(5) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #ticketsTable th:nth-child(1), #ticketsTable td:nth-child(1) { width: 36px; }
+        #ticketsTable th:nth-child(2), #ticketsTable td:nth-child(2) { width: 52px; }
+        #ticketsTable th:nth-child(3), #ticketsTable td:nth-child(3) { width: 16%; }
+        #ticketsTable th:nth-child(4), #ticketsTable td:nth-child(4) { width: 13%; }
+        #ticketsTable th:nth-child(5), #ticketsTable td:nth-child(5) { width: 16%; }
+        #ticketsTable th:nth-child(6), #ticketsTable td:nth-child(6) { width: 11%; }
+        #ticketsTable th:nth-child(7), #ticketsTable td:nth-child(7) { width: 150px; }
         #ticketsTable thead.table-dark { background: rgba(71,85,105,0.14) !important; }
         #ticketsTable thead.table-dark th {
             background: transparent; color: #334155 !important; font-weight: 700;
@@ -49,9 +73,10 @@
         [data-bs-theme="dark"] #ticketsTable tbody td { color: #e6e8ec; }
 
         #ticketsTable .badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 12px 5px 8px; border-radius: var(--radius-pill);
-            font-size: 0.74rem; font-weight: 600; border: 1px solid transparent;
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 9px 3px 6px; border-radius: var(--radius-pill);
+            font-size: 0.7rem; font-weight: 600; border: 1px solid transparent;
+            max-width: 100%;
         }
         #ticketsTable .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
         /* Palette harmonique des statuts */
@@ -113,8 +138,79 @@
             background: rgba(245,158,11,0.18) !important; color: #fcd34d; border-color: rgba(245,158,11,0.35);
         }
 
+
+        /* ===== Étiquette coin haut-droite — "Sans retour" lisible ===== */
+        #ticketsTable tbody tr { position: relative; }
+        #ticketsTable tbody td.actions-col,
+        #ticketsTable tbody td:last-child {
+            position: relative !important;
+            overflow: visible !important;
+            padding: 12px 58px 12px 6px !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+        }
+        #ticketsTable tbody td.actions-col .actions-cell,
+        #ticketsTable tbody td:last-child .actions-cell {
+            position: relative;
+            z-index: 3;
+            justify-content: flex-start;
+            gap: 5px;
+            flex-wrap: nowrap;
+        }
+        .corner-ribbon {
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 78px;
+            height: 78px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 4;
+        }
+        .corner-ribbon span {
+            position: absolute;
+            top: 14px;
+            right: -30px;
+            display: block;
+            width: 120px;
+            padding: 4px 0;
+            text-align: center;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: #fff;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+        .corner-ribbon.rib-ok span { background: #16a34a; }
+        .corner-ribbon.rib-ko span { background: #e11d48; }
+        .corner-ribbon.rib-sans span { background: #9f1239; }
+        .corner-ribbon.rib-attente span { background: #d97706; }
+        .corner-ribbon.rib-none span { background: #64748b; }
+
+        /* Modal suivi */
+        .suivi-modal-box { max-width: 460px; }
+        .suivi-grid { display: grid; gap: 12px; margin: 14px 0; }
+        .suivi-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            padding: 10px 12px; border-radius: 10px;
+            border: 1px solid rgba(71,85,105,0.18); background: rgba(148,163,184,0.06);
+        }
+        [data-bs-theme="dark"] .suivi-row { border-color: rgba(148,163,184,0.15); background: rgba(0,0,0,0.2); }
+        .suivi-row label { font-weight: 600; margin: 0; min-width: 90px; }
+        .suivi-row select {
+            flex: 1; max-width: 180px; border-radius: 8px; padding: 6px 10px;
+            border: 1px solid rgba(71,85,105,0.3); background: #fff; color: #0f172a;
+        }
+        [data-bs-theme="dark"] .suivi-row select { background: #12151c; color: #e6e8ec; border-color: #262b36; }
+        .suivi-hint { font-size: 0.82rem; color: #64748b; margin: 0 0 8px; }
+        .suivi-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+
         .btn-action {
-            width: 34px; height: 34px; padding: 0; border-radius: 10px;
+            width: 30px; height: 30px; padding: 0; border-radius: 8px;
             display: inline-flex; align-items: center; justify-content: center;
             border: 1px solid #e2e8f0; background: #fff; color: #64748b;
             transition: all 0.15s ease; text-decoration: none; cursor: pointer;
@@ -138,8 +234,8 @@
 
         .actions-cell { display: inline-flex; flex-wrap: nowrap; gap: 6px; align-items: center; }
         .date-pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 0.3rem 0.65rem; border-radius: 8px; font-size: 0.8rem; font-weight: 500;
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 0.2rem 0.45rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
             color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; white-space: nowrap;
         }
         .date-pill i { font-size: 0.85rem; opacity: 0.7; }
@@ -159,6 +255,7 @@
             background: rgba(15,18,25,.45); backdrop-filter: blur(4px);
             align-items: center; justify-content: center; z-index: 2000;
         }
+        #confirmModal.modal-overlay { z-index: 2100; }
         .modal-overlay.open { display: flex; }
         .modal-box {
             background: #fff; border-radius: 16px; padding: 24px;
@@ -191,9 +288,9 @@
         @media (min-width: 1400px) {
             .container-fluid { max-width: 1600px; margin-inline: auto; }
             .table-wrap, .table-responsive { max-height: 640px; }
-            #ticketsTable { width: 100% !important; min-width: 100% !important; }
-            #ticketsTable th, #ticketsTable td { padding: 16px 22px; font-size: 0.95rem; }
-            .btn-action { width: 38px; height: 38px; }
+            #ticketsTable { width: 100% !important; }
+            #ticketsTable th, #ticketsTable td { padding: 10px 12px; font-size: 0.88rem; }
+            .btn-action { width: 34px; height: 34px; }
         }
     </style>
     <script>
@@ -288,7 +385,7 @@
                 </div>
 
                 <div class="panel">
-                    <div class="table-responsive table-wrap" style="max-height:420px; overflow-y:auto;">
+                    <div class="table-responsive table-wrap" style="max-height:min(60vh,520px); overflow-y:auto; overflow-x:hidden;">
                         <table id="ticketsTable" class="table table-striped align-middle mb-0" data-searchable-table>
                             <thead class="table-dark">
                                 <tr>
@@ -324,6 +421,46 @@
         <div class="modal-actions">
             <button type="button" class="btn btn-secondary" id="confirmCancelBtn" data-i18n="button.cancel">Annuler</button>
             <button type="button" class="btn btn-danger" id="confirmOkBtn" data-i18n="button.confirm">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modale suivi Banque / Client / Mada Ozi -->
+<div class="modal-overlay" id="suiviModal">
+    <div class="modal-box suivi-modal-box">
+        <h3><i class="bi bi-bookmark-star"></i> Suivi ticket <span id="suiviModalTicketId">#</span></h3>
+        <p class="suivi-hint" id="suiviModalHint">
+            Client <strong>OK</strong> → clôture · <strong>Sans retour</strong> → marquer · <strong>Non OK</strong> → renvoyer à la banque.
+        </p>
+        <div class="suivi-grid">
+            <div class="suivi-row">
+                <label>Banque</label>
+                <select id="suiviBanqueSel">
+                    <option value="attente">En attente</option>
+                    <option value="ok">OK</option>
+                    <option value="ko">Non OK</option>
+                </select>
+            </div>
+            <div class="suivi-row">
+                <label>Client</label>
+                <select id="suiviClientSel">
+                    <option value="ok">OK → Clôturer</option>
+                    <option value="sans_retour">Sans retour</option>
+                    <option value="ko">Non OK → Renvoi banque</option>
+                </select>
+            </div>
+            <div class="suivi-row">
+                <label>Mada Ozi</label>
+                <select id="suiviMadaSel">
+                    <option value="attente">En attente</option>
+                    <option value="ok">OK</option>
+                    <option value="ko">Non OK</option>
+                </select>
+            </div>
+        </div>
+        <div class="suivi-actions" id="suiviModalActions">
+            <button type="button" class="btn btn-secondary btn-sm" id="suiviModalClose">Fermer</button>
+            <button type="button" class="btn btn-primary btn-sm" id="suiviSaveBtn" style="display:none;">Enregistrer</button>
         </div>
     </div>
 </div>
@@ -454,11 +591,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const STATUS_I18N_KEYS = {
         'Validé': 'ticket.status.validated',
+        'Clôturé': 'ticket.status.closed',
+        'Sans retour': 'ticket.status.no_return',
         'Refusé': 'ticket.status.refused',
         'En attente RIB': 'ticket.status.pending_rib',
         'RIB reçu': 'ticket.status.rib_received',
         'En attente réponse banque': 'ticket.status.pending_bank'
-        // « En attente confirmation » supprimé du flux
     };
     function translateStatus(statut) {
         if (!statut) return '-';
@@ -469,6 +607,148 @@ document.addEventListener('DOMContentLoaded', function() {
         return statut;
     }
 
+    function ribbonClass(val) {
+        if (val === 'ok') return 'rib-ok';
+        if (val === 'ko') return 'rib-ko';
+        if (val === 'sans_retour') return 'rib-sans';
+        if (val === 'attente') return 'rib-attente';
+        return 'rib-none';
+    }
+    /** Statuts d'avant validation banque : aucune étiquette n'est affichée */
+    const STATUTS_SANS_ETIQUETTE = ['En attente RIB', 'RIB reçu', 'En attente réponse banque', 'En attente confirmation'];
+
+    /** Étiquette unique, affichée uniquement à partir de la validation banque (Validé, Client OK/Non OK, Sans retour, Clôturé, Refusé) */
+    function cornerRibbonHtml(ticket) {
+        let label = null;
+        let cls = 'rib-none';
+        const st = ticket.statut || '';
+        if (STATUTS_SANS_ETIQUETTE.includes(st)) return '';
+        if (st === 'Clôturé') {
+            label = 'Clôturé'; cls = 'rib-ok';
+        } else if (st === 'Sans retour') {
+            label = 'Sans retour'; cls = 'rib-sans';
+        } else if (st === 'Validé') {
+            const client = ticket.suivi_client || 'sans_retour';
+            if (client === 'ok') { label = 'Client OK'; cls = 'rib-ok'; }
+            else if (client === 'ko') { label = 'Non OK'; cls = 'rib-ko'; }
+            else { label = 'Sans retour'; cls = 'rib-sans'; }
+        } else if (st === 'Refusé') {
+            label = 'Refusé'; cls = 'rib-ko';
+        } else if (st) {
+            label = translateStatus(st);
+            cls = 'rib-none';
+        }
+        if (!label) return '';
+        return `<div class="corner-ribbon ${cls}"><span>${label}</span></div>`;
+    }
+
+    window.__ticketsById = {};
+    window.__isInterlocuteur = isInterlocuteur;
+
+    window.ouvrirSuiviModal = function(id) {
+        const ticket = window.__ticketsById[id];
+        if (!ticket) return;
+        document.getElementById('suiviModalTicketId').textContent = '#' + id;
+        // Banque validée → coché OK auto ; client = sans retour par défaut
+        const banqueVal = ticket.suivi_banque || (ticket.statut === 'Validé' ? 'ok' : 'attente');
+        const clientVal = ticket.suivi_client || (ticket.statut === 'Validé' ? 'sans_retour' : 'attente');
+        document.getElementById('suiviBanqueSel').value = banqueVal;
+        document.getElementById('suiviClientSel').value = clientVal;
+        document.getElementById('suiviMadaSel').value = ticket.suivi_madaozi || 'attente';
+
+        const canEdit = window.__isInterlocuteur && ['Validé','Sans retour'].includes(ticket.statut);
+        document.getElementById('suiviBanqueSel').disabled = true; // banque déjà OK après validation
+        document.getElementById('suiviClientSel').disabled = !canEdit;
+        document.getElementById('suiviMadaSel').disabled = !canEdit;
+        document.getElementById('suiviSaveBtn').style.display = canEdit ? '' : 'none';
+        document.getElementById('suiviModalHint').textContent = canEdit
+            ? 'Client OK → clôture · Sans retour → marquer · Non OK → statut non validé + renvoi email banque.'
+            : 'Consultation des retours.';
+
+        document.getElementById('suiviModal').dataset.ticketId = id;
+        document.getElementById('suiviModal').classList.add('open');
+    };
+
+    function fermerSuiviModal() {
+        document.getElementById('suiviModal').classList.remove('open');
+    }
+    document.getElementById('suiviModalClose').addEventListener('click', fermerSuiviModal);
+    document.getElementById('suiviModal').addEventListener('click', function(e) {
+        if (e.target === this) fermerSuiviModal();
+    });
+
+    async function postSuivi(action) {
+        const id = document.getElementById('suiviModal').dataset.ticketId;
+        if (!id) return;
+
+        const client = document.getElementById('suiviClientSel').value;
+        let confirmMsg = 'Confirmer l\'enregistrement du suivi ?';
+        let confirmTitle = 'Confirmation';
+        if (client === 'ok') {
+            confirmMsg = 'Client OK — clôturer définitivement ce ticket ?';
+            confirmTitle = 'Clôture';
+        } else if (client === 'ko') {
+            confirmMsg = 'Client non OK — retirer la validation, enlever « Sans retour » et renvoyer l\'email à la banque ?';
+            confirmTitle = 'Renvoi banque';
+        } else if (client === 'sans_retour') {
+            confirmMsg = 'Marquer ce ticket « Sans retour » ?';
+            confirmTitle = 'Sans retour';
+        }
+
+        // 1) Confirmation d'abord (le modal suivi reste ouvert)
+        const ok = await showConfirm(confirmMsg, confirmTitle);
+        if (!ok) return; // annulation → on reste dans le modal suivi
+
+        const payload = {
+            suivi_banque: document.getElementById('suiviBanqueSel').value || 'ok',
+            suivi_client: client,
+            suivi_madaozi: document.getElementById('suiviMadaSel').value,
+            action: 'enregistrer'
+        };
+
+        const saveBtn = document.getElementById('suiviSaveBtn');
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Enregistrement…';
+        }
+
+        try {
+            // 2) Enregistrement API
+            const data = await fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/suivi`, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            if (data.success) {
+                showToast(data.message || 'Suivi enregistré', 'success');
+                // 3) Fermer seulement après succès
+                fermerSuiviModal();
+                loadTickets();
+            } else {
+                showToast(data.message || 'Erreur lors de l\'enregistrement', 'danger');
+            }
+        } catch (e) {
+            showToast(e.message || 'Erreur réseau', 'danger');
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Enregistrer';
+            }
+        }
+    }
+    document.getElementById('suiviSaveBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        postSuivi('enregistrer');
+    });
+
+    // Client select change → propose action
+    document.getElementById('suiviClientSel').addEventListener('change', function() {
+        const v = this.value;
+        if (v === 'ok') showToast('Client OK → cliquez Clôturer.', 'info');
+        else if (v === 'sans_retour') showToast('Sans retour (défaut après validation banque).', 'info');
+        else if (v === 'ko') showToast('Client non OK → Renvoyer à la banque.', 'info');
+    });
+
     function loadTickets() {
         return fetchWithAuth(`${API_BASE}/api/user/tickets`)
             .then(tickets => {
@@ -478,29 +758,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
+                window.__ticketsById = {};
+                tickets.forEach(tk => { window.__ticketsById[tk.id] = tk; });
+
                 tbody.innerHTML = tickets.map(ticket => {
                     let badgeClass = 'status-attente-rib';
-                    if (ticket.statut === 'Validé') badgeClass = 'status-valide';
-                    else if (ticket.statut === 'Refusé') badgeClass = 'status-refuse';
+                    if (ticket.statut === 'Validé' || ticket.statut === 'Clôturé') badgeClass = 'status-valide';
+                    else if (ticket.statut === 'Sans retour' || ticket.statut === 'Refusé') badgeClass = 'status-refuse';
                     else if (ticket.statut === 'En attente RIB') badgeClass = 'status-attente-rib';
                     else if (ticket.statut === 'RIB reçu') badgeClass = 'status-rib-recu';
                     else if (ticket.statut === 'En attente réponse banque') badgeClass = 'status-attente-banque';
 
-                    let actions = `
-                        <a class="btn-action btn-view" href="/ticket/ticket-show.html?id=${ticket.id}" title="${typeof t === 'function' ? t('action.view') : 'Voir'}">
-                            <i class="bi bi-eye"></i>
-                        </a>`;
+                    // Validé (banque OK) → modal pour client OK = clôture, sinon renvoi banque
+                    const canSuivi = ['Validé','Sans retour'].includes(ticket.statut);
+                    let actions = canSuivi
+                        ? `<button type="button" class="btn-action btn-view" onclick="ouvrirSuiviModal(${ticket.id})" title="Retour client — clôturer ou renvoyer banque"><i class="bi bi-bookmark-check"></i></button>`
+                        : `<a class="btn-action btn-view" href="/ticket/ticket-show.html?id=${ticket.id}" title="Voir"><i class="bi bi-eye"></i></a>`;
                     if (ticket.statut === 'En attente RIB') {
-                        actions += `
-                        <a class="btn-action btn-rib" href="/ticket/ticket-step3.html?id=${ticket.id}" title="${typeof t === 'function' ? t('action.send_rib') : 'Envoyer RIB'}">
-                            <i class="bi bi-paperclip"></i>
-                        </a>`;
+                        actions += `<a class="btn-action btn-rib" href="/ticket/ticket-step3.html?id=${ticket.id}" title="Envoyer RIB"><i class="bi bi-paperclip"></i></a>`;
                     }
-                    // Plus de statut « En attente confirmation »
-                    actions += `
-                        <button type="button" class="btn-action btn-delete" onclick="deleteTicket(${ticket.id})" title="${typeof t === 'function' ? t('action.delete') : 'Supprimer'}">
-                            <i class="bi bi-trash"></i>
-                        </button>`;
+                    actions += `<button type="button" class="btn-action btn-delete" onclick="deleteTicket(${ticket.id})" title="Supprimer"><i class="bi bi-trash"></i></button>`;
 
                     return `
                         <tr>
@@ -510,7 +787,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <td class="amount-cell">${formatCurrency(ticket.montant, ticket.devise)}</td>
                             <td><span class="badge ${badgeClass}">${translateStatus(ticket.statut)}</span></td>
                             <td><span class="date-pill"><i class="bi bi-calendar3"></i>${formatDate(ticket.date || ticket.createdAt)}</span></td>
-                            <td class="text-end"><div class="actions-cell">${actions}</div></td>
+                            <td class="actions-col">
+                                ${cornerRibbonHtml(ticket)}
+                                <div class="actions-cell">${actions}</div>
+                            </td>
                         </tr>`;
                 }).join('');
 

@@ -68,6 +68,25 @@
         [data-bs-theme="dark"] .badge.bg-info { background: rgba(59,130,246,0.16) !important; color: #93c5fd; border-color: rgba(59,130,246,0.3); }
         [data-bs-theme="dark"] .badge.bg-secondary { background: rgba(148,163,184,0.16) !important; color: #cbd5e1; border-color: rgba(148,163,184,0.3); }
 
+
+        /* Étiquette unique de suivi (comme tickets-list) */
+        .suivi-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px; border-radius: 999px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+            text-transform: uppercase; color: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+        .suivi-tag.rib-ok { background: #16a34a; }
+        .suivi-tag.rib-ko { background: #e11d48; }
+        .suivi-tag.rib-sans { background: #9f1239; }
+        .suivi-tag.rib-attente { background: #d97706; }
+        .suivi-tag.rib-none { background: #64748b; }
+        .suivi-tag::before {
+            content: ""; width: 7px; height: 7px; border-radius: 50%;
+            background: rgba(255,255,255,0.85); flex-shrink: 0;
+        }
+
         /* ===== Responsive : très petits écrans ===== */
         @media (max-width: 400px) {
             h2 { font-size: 1.15rem; }
@@ -235,6 +254,8 @@
         // Mapping des statuts backend (FR) → clés i18n
         const STATUS_I18N_KEYS = {
             'Validé': 'ticket.status.validated',
+            'Clôturé': 'ticket.status.closed',
+            'Sans retour': 'ticket.status.no_return',
             'Refusé': 'ticket.status.refused',
             'En attente RIB': 'ticket.status.pending_rib',
             'RIB reçu': 'ticket.status.rib_received',
@@ -262,13 +283,41 @@
         }
 
         function statusBadgeClass(statut) {
-            if (statut === 'Validé') return 'success';
-            if (statut === 'Refusé') return 'danger';
+            if (statut === 'Validé' || statut === 'Clôturé') return 'success';
+            if (statut === 'Sans retour' || statut === 'Refusé') return 'danger';
             if (statut === 'En attente RIB') return 'primary';
             if (statut === 'RIB reçu') return 'info';
             if (statut === 'En attente réponse banque') return 'secondary';
             if (statut === 'En attente confirmation') return 'warning';
             return 'warning';
+        }
+
+        /** Étiquette unique : suivi si Validé, sinon le statut du ticket (ex. RIB reçu) */
+        function suiviTagHtml(ticket) {
+            let label = null;
+            let cls = 'rib-none';
+            const st = ticket.statut || '';
+            if (st === 'Clôturé') {
+                label = 'Clôturé'; cls = 'rib-ok';
+            } else if (st === 'Sans retour') {
+                label = 'Sans retour'; cls = 'rib-sans';
+            } else if (st === 'Validé') {
+                const client = ticket.suivi_client || 'sans_retour';
+                if (client === 'ok') { label = 'Client OK'; cls = 'rib-ok'; }
+                else if (client === 'ko') { label = 'Non OK'; cls = 'rib-ko'; }
+                else { label = 'Sans retour'; cls = 'rib-sans'; }
+            } else if (st === 'Refusé') {
+                label = 'Refusé'; cls = 'rib-ko';
+            } else if (st) {
+                // Non validé → afficher le statut réel (RIB reçu, En attente RIB, etc.)
+                label = translateStatus(st);
+                if (st === 'RIB reçu') cls = 'rib-attente';
+                else if (st === 'En attente réponse banque') cls = 'rib-attente';
+                else if (st === 'En attente RIB' || st === 'En attente confirmation') cls = 'rib-attente';
+                else cls = 'rib-none';
+            }
+            if (!label) return '<span class="text-muted">—</span>';
+            return '<span class="suivi-tag ' + cls + '">' + label + '</span>';
         }
 
         let currentTicket = null;
@@ -291,6 +340,10 @@
                         <div class="col-md-6">
                             <strong data-i18n="ticket.detail.status">${t('ticket.detail.status') || 'Statut'}</strong> :
                             <span class="badge bg-${statusBadgeClass(ticket.statut)}">${translateStatus(ticket.statut)}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Suivi</strong> :
+                            <div class="mt-1">${suiviTagHtml(ticket)}</div>
                         </div>
                         <div class="col-md-6">
                             <strong data-i18n="ticket.detail.date">${t('ticket.detail.date') || 'Date'}</strong> :

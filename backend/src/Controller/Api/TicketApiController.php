@@ -407,6 +407,9 @@ class TicketApiController extends AbstractController
             'type' => $ticket->getTypeRemboursement(),
             'rib' => $ticket->getRib(),
             'devise' => $ticket->getDevise(),
+            'suivi_banque' => method_exists($ticket, 'getSuiviBanque') ? $ticket->getSuiviBanque() : null,
+            'suivi_client' => method_exists($ticket, 'getSuiviClient') ? $ticket->getSuiviClient() : null,
+            'suivi_madaozi' => method_exists($ticket, 'getSuiviMadaozi') ? $ticket->getSuiviMadaozi() : null,
         ]);
     }
 
@@ -424,6 +427,9 @@ class TicketApiController extends AbstractController
                 'statut' => $t->getStatut(),
                 'date' => $t->getDateCommande()?->format('d/m/Y'),
                 'devise' => $t->getDevise(),
+                'suivi_banque' => method_exists($t, 'getSuiviBanque') ? $t->getSuiviBanque() : null,
+                'suivi_client' => method_exists($t, 'getSuiviClient') ? $t->getSuiviClient() : null,
+                'suivi_madaozi' => method_exists($t, 'getSuiviMadaozi') ? $t->getSuiviMadaozi() : null,
             ];
         }, $tickets);
 

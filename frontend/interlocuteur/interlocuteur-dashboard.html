@@ -22,7 +22,7 @@
     [data-bs-theme="dark"] .table-wrap table { color: #e6e8ec; --bs-table-bg: transparent; --bs-table-color: #e6e8ec; border-color: #262b36; }
     [data-bs-theme="dark"] .table-wrap th,
     [data-bs-theme="dark"] .table-wrap td { border-color: #262b36; }
-    [data-bs-theme="dark"] .table-wrap th { background: #20242e; }
+    [data-bs-theme="dark"] .table-wrap th { background: #2a3140; }
     [data-bs-theme="dark"] .table-wrap tbody tr:hover { background: #20242e; }
     [data-bs-theme="dark"] .nav-link,
     [data-bs-theme="dark"] .brand-title,
@@ -77,15 +77,154 @@
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
 
     .card-header-flex { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .card-header-flex .card-header-text { flex: 1 1 auto; min-width: 220px; }
+    .card-header-flex .card-header-text { flex: 1 1 auto; min-width: 0; }
+    .card-header-flex .card-header-text h1 { font-size: clamp(1.05rem, 2.5vw, 1.35rem); margin: 0; }
+    .card { border-radius: var(--radius-lg); overflow: hidden; }
 
-    .table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid rgba(148,163,184,0.18); box-shadow: 0 2px 12px rgba(15,23,42,0.05); }
-    .table-wrap table { width: 100%; border-collapse: separate; border-spacing: 0; }
-    .table-wrap th, .table-wrap td { padding: 13px 14px; border-bottom: 1px solid rgba(148,163,184,0.16); text-align: left; }
-    .table-wrap th { background: rgba(148,163,184,0.14); font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-table-header); position: sticky; top: 0; }
+    /* —— Tableaux adaptatifs (sans superposition) —— */
+    .table-wrap {
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(148,163,184,0.18);
+        box-shadow: 0 2px 12px rgba(15,23,42,0.05);
+        max-width: 100%;
+        max-height: min(58vh, 480px);
+    }
+    .table-wrap::-webkit-scrollbar { width: 8px; height: 8px; }
+    .table-wrap::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.35); border-radius: 999px; }
+    .table-wrap table {
+        width: 100%;
+        min-width: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+    }
+    .table-wrap.table-suivi table { min-width: 0; }
+    .table-wrap th, .table-wrap td {
+        padding: 8px 10px;
+        border-bottom: 1px solid rgba(148,163,184,0.16);
+        text-align: left;
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 0; /* force ellipsis with table-layout:fixed */
+    }
+    .table-wrap th {
+        background: #e2e8f0;
+        font-weight: 700;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-table-header);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        box-shadow: 0 2px 0 rgba(100,116,139,0.25);
+        border-bottom: 2px solid rgba(71,85,105,0.28);
+    }
+    [data-bs-theme="dark"] .table-wrap th {
+        background: #2a3140;
+        color: #e2e8f0;
+        box-shadow: 0 2px 0 rgba(0,0,0,0.35);
+        border-bottom-color: rgba(148,163,184,0.25);
+    }
     .table-wrap tbody tr { transition: background-color 0.15s ease; }
     .table-wrap tbody tr:hover { background: rgba(99,102,241,0.06); }
     .table-wrap tbody tr:last-child td { border-bottom: none; }
+    .table-wrap td { font-size: 0.84rem; }
+    .table-wrap .col-id {
+        width: 52px;
+        max-width: 52px;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+    .table-wrap .col-actions {
+        width: 160px;
+        max-width: 160px;
+        text-align: right;
+        white-space: nowrap;
+        overflow: visible;
+        max-width: none;
+    }
+    .table-wrap .col-actions .actions-row {
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+        gap: 4px;
+    }
+    .table-wrap .col-actions .btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+    .table-wrap .cell-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .table-wrap .cell-amount {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        width: 100px;
+        max-width: 110px;
+    }
+
+    /* Vue cartes mobile */
+    .ticket-cards { display: none; gap: 12px; flex-direction: column; }
+    .ticket-card {
+        position: relative;
+        background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+        border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--glass-shadow);
+    }
+    .ticket-card .ticket-corner-label {
+        position: absolute; top: 10px; right: 10px;
+        z-index: 1;
+    }
+    .ticket-card-top {
+        display: flex; flex-wrap: wrap; align-items: center;
+        justify-content: space-between; gap: 8px; margin-bottom: 10px;
+        padding-right: 100px;
+    }
+    .ticket-card-id { font-weight: 700; font-size: 0.95rem; }
+    .ticket-card-meta {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 0.85rem;
+    }
+    .ticket-card-meta span {
+        color: var(--text-muted); display: block; font-size: 0.72rem;
+        text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 2px;
+    }
+    .ticket-card-meta strong { font-weight: 600; word-break: break-word; }
+    .ticket-card-actions {
+        display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+        padding-top: 12px; border-top: 1px solid rgba(148,163,184,0.15);
+    }
+    .ticket-card-actions .btn { flex: 1 1 auto; min-width: 120px; }
+
+    @media (max-width: 991px) {
+        .table-wrap { display: none; }
+        .ticket-cards { display: flex; }
+        .card-header-flex { flex-direction: column; align-items: stretch; }
+        .card-header-flex > div:last-child { width: 100%; }
+        .card-header-flex .btn { width: 100%; }
+    }
+    @media (min-width: 992px) {
+        .ticket-cards { display: none !important; }
+        .table-wrap { display: block; }
+    }
+    @media (max-width: 576px) {
+        .ticket-card-meta { grid-template-columns: 1fr; }
+        .dashboard-content .container-fluid { padding-left: 12px; padding-right: 12px; }
+        .section-gap { margin-top: 20px; }
+        .modal-box { width: 95%; padding: 18px; max-width: none; }
+        .modal-actions { flex-direction: column; }
+        .modal-actions .btn { width: 100%; }
+    }
+    @media (min-width: 1400px) {
+        .table-wrap th, .table-wrap td { padding: 10px 12px; }
+        .table-wrap td { font-size: 0.88rem; }
+    }
 
     .alert { padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 16px; border: 1px solid transparent; }
     .alert-success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
@@ -111,7 +250,7 @@
     .btn-outline:hover { background: rgba(226,232,240,0.9); color: #020617; }
     [data-bs-theme="dark"] .btn-outline { color: #e6e8ec; }
     [data-bs-theme="dark"] .btn-outline:hover { background: rgba(255,255,255,0.08); }
-    .btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+    .btn-sm { padding: 4px 10px; font-size: 0.78rem; }
 
     .icon-button, .btn-icon-glass {
         background: var(--glass-bg);
@@ -132,10 +271,13 @@
     @keyframes dash-spin { to { transform: rotate(360deg); } }
 
     .badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 5px 12px 5px 8px; border-radius: var(--radius-pill);
-        font-size: 0.74rem; font-weight: 600; letter-spacing: 0.01em;
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 3px 8px 3px 6px; border-radius: var(--radius-pill);
+        font-size: 0.68rem; font-weight: 600; letter-spacing: 0.01em;
         border: 1px solid transparent;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .badge-amber { background: #fef3c7; color: #78350f; border-color: #fde68a; }
@@ -288,11 +430,12 @@
                         <div class="table-wrap">
                             <table>
                                 <thead><tr>
-                                    <th>#</th><th>Type</th><th>Client</th><th>Réf. paiement</th><th>Montant</th><th>RIB</th><th>Action</th>
+                                    <th class="col-id">#</th><th>Type</th><th>Client</th><th>Réf. paiement</th><th>Montant</th><th>RIB</th><th class="col-actions">Action</th>
                                 </tr></thead>
                                 <tbody id="ribRecuBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
                             </table>
                         </div>
+                        <div class="ticket-cards" id="ribRecuCards"></div>
                     </div>
                 </div>
 
@@ -308,20 +451,15 @@
                         <div class="table-wrap">
                             <table>
                                 <thead><tr>
-                                    <th>#</th><th>Type</th><th>Client</th><th>Réf. paiement</th><th>Montant</th><th>Email envoyé le</th><th>Action</th>
+                                    <th class="col-id">#</th><th>Type</th><th>Client</th><th>Réf. paiement</th><th>Montant</th><th>Email envoyé le</th><th class="col-actions">Action</th>
                                 </tr></thead>
                                 <tbody id="attenteBanqueBody"><tr><td colspan="7" class="text-center">Chargement...</td></tr></tbody>
                             </table>
                         </div>
+                        <div class="ticket-cards" id="attenteBanqueCards"></div>
                     </div>
                 </div>
-            </div>
-        </main>
-        <footer class="admin-footer"></footer>
-    </div>
-</div>
 
-<!-- Modale validation -->
 <div class="modal-overlay" id="validationModal">
     <div class="modal-box">
         <h3><i class="bi bi-check-circle-fill text-success"></i> Valider le ticket #<span id="validationTicketId"></span></h3>
@@ -537,27 +675,55 @@ function setBoutonEnCours(btn, enCours) {
 /* ===== Section 1 : RIB reçus ===== */
 function loadRibRecu(silencieux = false) {
     const tbody = document.getElementById('ribRecuBody');
-    if (!silencieux) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
+    const cards = document.getElementById('ribRecuCards');
+    if (!silencieux) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
+        if (cards) cards.innerHTML = '<div class="text-center text-muted py-3">Chargement...</div>';
+    }
     return fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets/a-envoyer-banque`)
         .then(tickets => {
             if (!tickets.length) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucun RIB en attente.</td></tr>';
+                if (cards) cards.innerHTML = '<div class="text-center text-muted py-3">Aucun RIB en attente.</div>';
                 return;
             }
             tbody.innerHTML = tickets.map(t => `
                 <tr>
-                    <td>${t.id}</td>
+                    <td class="col-id">${t.id}</td>
                     <td><span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span></td>
-                    <td>${t.user || '-'}</td>
-                    <td>${t.reference || '-'}</td>
-                    <td>${formatCurrency(t.montant, t.devise)}</td>
+                    <td class="cell-truncate" title="${t.user || ''}">${t.user || '-'}</td>
+                    <td class="cell-truncate" title="${t.reference || ''}">${t.reference || '-'}</td>
+                    <td class="cell-amount">${formatCurrency(t.montant, t.devise)}</td>
                     <td>${t.rib ? `<a href="${API_BASE}/uploads/rib/${t.rib}" target="_blank"><i class="bi bi-paperclip"></i> Voir</a>` : '—'}</td>
-                    <td><button class="btn btn-success btn-sm" onclick="envoyerBanque(${t.id}, this)"><i class="bi bi-send"></i> Envoyer à la banque</button></td>
+                    <td class="col-actions"><button class="btn btn-success btn-sm" onclick="envoyerBanque(${t.id}, this)"><i class="bi bi-send"></i> Envoyer</button></td>
                 </tr>
             `).join('');
+            if (cards) {
+                cards.innerHTML = tickets.map(t => `
+                    <div class="ticket-card" data-id="${t.id}">
+                        <span class="ticket-corner-label badge badge-green">RIB reçu</span>
+                        <div class="ticket-card-top">
+                            <span class="ticket-card-id">#${t.id}</span>
+                            <span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span>
+                        </div>
+                        <div class="ticket-card-meta">
+                            <div><span>Client</span><strong>${t.user || '-'}</strong></div>
+                            <div><span>Réf. paiement</span><strong>${t.reference || '-'}</strong></div>
+                            <div><span>Montant</span><strong>${formatCurrency(t.montant, t.devise)}</strong></div>
+                            <div><span>RIB</span><strong>${t.rib ? `<a href="${API_BASE}/uploads/rib/${t.rib}" target="_blank">Voir le fichier</a>` : '—'}</strong></div>
+                        </div>
+                        <div class="ticket-card-actions">
+                            <button class="btn btn-success btn-sm" onclick="envoyerBanque(${t.id}, this)"><i class="bi bi-send"></i> Envoyer à la banque</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         })
         .catch(err => {
-            if (!silencieux) tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
+            if (!silencieux) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
+                if (cards) cards.innerHTML = `<div class="text-danger text-center py-3">Erreur : ${err.message}</div>`;
+            }
         });
 }
 
@@ -621,32 +787,61 @@ window.envoyerTousBanque = async function(btn) {
 /* ===== Section 3 ===== */
 function loadAttenteBanque(silencieux = false) {
     const tbody = document.getElementById('attenteBanqueBody');
-    if (!silencieux) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
+    const cards = document.getElementById('attenteBanqueCards');
+    if (!silencieux) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Chargement...</td></tr>';
+        if (cards) cards.innerHTML = '<div class="text-center text-muted py-3">Chargement...</div>';
+    }
     return fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets/en-attente-banque`)
         .then(tickets => {
             if (!tickets.length) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center">Aucun ticket en attente banque.</td></tr>';
+                if (cards) cards.innerHTML = '<div class="text-center text-muted py-3">Aucun ticket en attente banque.</div>';
                 return;
             }
             tbody.innerHTML = tickets.map(t => `
                 <tr>
-                    <td>${t.id}</td>
+                    <td class="col-id">${t.id}</td>
                     <td><span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span></td>
-                    <td>${t.user || '-'}</td>
-                    <td>${t.reference || '-'}</td>
-                    <td>${formatCurrency(t.montant, t.devise)}</td>
+                    <td class="cell-truncate" title="${t.user || ''}">${t.user || '-'}</td>
+                    <td class="cell-truncate" title="${t.reference || ''}">${t.reference || '-'}</td>
+                    <td class="cell-amount">${formatCurrency(t.montant, t.devise)}</td>
                     <td>${formatDateMadagascar(t.emailEnvoyeAt)}</td>
-                    <td>
+                    <td class="col-actions">
                         <div class="actions-row">
                             <button class="btn btn-success btn-sm" onclick="ouvrirModalValidation(${t.id})"><i class="bi bi-check-lg"></i> Valider</button>
-                            <button class="btn btn-outline btn-sm" onclick="renvoyerEmailBanque(${t.id}, this)"><i class="bi bi-arrow-repeat"></i> Renvoyer email</button>
+                            <button class="btn btn-outline btn-sm" onclick="renvoyerEmailBanque(${t.id}, this)"><i class="bi bi-arrow-repeat"></i> Renvoyer</button>
                         </div>
                     </td>
                 </tr>
             `).join('');
+            if (cards) {
+                cards.innerHTML = tickets.map(t => `
+                    <div class="ticket-card" data-id="${t.id}">
+                        <span class="ticket-corner-label badge badge-amber">Attente banque</span>
+                        <div class="ticket-card-top">
+                            <span class="ticket-card-id">#${t.id}</span>
+                            <span class="badge ${t.type === 'AEV_NON_RECU' ? 'badge-amber' : 'badge-blue'}">${t.type === 'AEV_NON_RECU' ? 'AEV non reçu' : 'Paiement multiple'}</span>
+                        </div>
+                        <div class="ticket-card-meta">
+                            <div><span>Client</span><strong>${t.user || '-'}</strong></div>
+                            <div><span>Réf. paiement</span><strong>${t.reference || '-'}</strong></div>
+                            <div><span>Montant</span><strong>${formatCurrency(t.montant, t.devise)}</strong></div>
+                            <div><span>Email envoyé</span><strong>${formatDateMadagascar(t.emailEnvoyeAt)}</strong></div>
+                        </div>
+                        <div class="ticket-card-actions">
+                            <button class="btn btn-success btn-sm" onclick="ouvrirModalValidation(${t.id})"><i class="bi bi-check-lg"></i> Valider</button>
+                            <button class="btn btn-outline btn-sm" onclick="renvoyerEmailBanque(${t.id}, this)"><i class="bi bi-arrow-repeat"></i> Renvoyer email</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         })
         .catch(err => {
-            if (!silencieux) tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
+            if (!silencieux) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-danger">Erreur : ${err.message}</td></tr>`;
+                if (cards) cards.innerHTML = `<div class="text-danger text-center py-3">Erreur : ${err.message}</div>`;
+            }
         });
 }
 
@@ -824,6 +1019,14 @@ let refreshEnCours = false;
 let pollTimer = null;
 const POLL_INTERVAL_MS = 30000;
 
+
+
+
+
+
+
+
+
 function chargerToutesLesDonnees(options = {}) {
     const silencieux = options.silencieux === true;
     const showBtn = options.showBtn !== false && !silencieux;
@@ -930,6 +1133,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 const rowText = row.textContent.toLowerCase()
                     .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 row.style.display = rowText.includes(searchValue) ? "" : "none";
+            });
+        });
+        ["ribRecuCards", "attenteBanqueCards"].forEach(function (id) {
+            const box = document.getElementById(id);
+            if (!box) return;
+            box.querySelectorAll(".ticket-card").forEach(function (card) {
+                const text = card.textContent.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                card.style.display = text.includes(searchValue) ? "" : "none";
             });
         });
     });

@@ -86,6 +86,9 @@ class UserProfileApiController extends AbstractController
                     'devise' => $ticket->getDevise() ?? 'EUR',
                     'statut' => $ticket->getStatut() ?? 'Inconnu',
                     'date' => $ticket->getDateCommande()?->format('d/m/Y') ?? '-',
+                    'suivi_banque' => method_exists($ticket, 'getSuiviBanque') ? ($ticket->getSuiviBanque() ?? null) : null,
+                    'suivi_client' => method_exists($ticket, 'getSuiviClient') ? ($ticket->getSuiviClient() ?? null) : null,
+                    'suivi_madaozi' => method_exists($ticket, 'getSuiviMadaozi') ? ($ticket->getSuiviMadaozi() ?? null) : null,
                 ];
             }, $tickets);
 
@@ -118,6 +121,9 @@ class UserProfileApiController extends AbstractController
                 'description' => $ticket->getDescription() ?? '',
                 'type' => $ticket->getTypeRemboursement() ?? '',
                 'rib' => $ticket->getRib() ?? null,
+                'suivi_banque' => method_exists($ticket, 'getSuiviBanque') ? ($ticket->getSuiviBanque() ?? null) : null,
+                'suivi_client' => method_exists($ticket, 'getSuiviClient') ? ($ticket->getSuiviClient() ?? null) : null,
+                'suivi_madaozi' => method_exists($ticket, 'getSuiviMadaozi') ? ($ticket->getSuiviMadaozi() ?? null) : null,
             ]);
         } catch (\Exception $e) {
             error_log('Erreur dans /api/user/ticket/{id} : ' . $e->getMessage());
@@ -141,5 +147,14 @@ class UserProfileApiController extends AbstractController
             error_log('Erreur dans /api/user/ticket/delete : ' . $e->getMessage());
             return $this->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    private function suiviVal(Ticket $ticket, string $getter): ?string
+    {
+        if (!method_exists($ticket, $getter)) {
+            return null;
+        }
+        $v = $ticket->$getter();
+        return $v !== null && $v !== '' ? (string) $v : null;
     }
 }
