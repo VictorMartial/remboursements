@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="adminHMD professional admin dashboard template">
-  <title>Profile</title>
+  <title>Mon Profil</title>
 
   <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="../assets/vendors/bootstrap-icons/bootstrap-icons.css">
@@ -33,7 +33,7 @@
 
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
       <div class="sidebar-header">
-        <a class="brand-mark" href="dashboard-user.html">
+        <a class="brand-mark" href="index.html">
           <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
           <span class="brand-copy">
             <span class="brand-title">Mada Ozi</span>
@@ -47,7 +47,7 @@
           <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
           <span class="nav-text">Dashboard</span>
         </a>
-        <a class="nav-link active" href="users.html" aria-current="page">
+        <a class="nav-link" href="users.html">
           <span class="nav-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
           <span class="nav-text">Users</span>
         </a>
@@ -63,10 +63,14 @@
           <span class="nav-icon"><i class="bi bi-bar-chart-line" aria-hidden="true"></i></span>
           <span class="nav-text">Charts</span>
         </a>
+        <a class="nav-link" href="settings.html">
+          <span class="nav-icon"><i class="bi bi-gear" aria-hidden="true"></i></span>
+          <span class="nav-text">Paramètres</span>
+        </a>
       </nav>
 
       <div class="sidebar-user">
-        <strong id="sidebarUserName"></strong>
+        <strong id="sidebarUserName">—</strong>
         <small>Espace administrateur</small>
       </div>
 
@@ -77,7 +81,6 @@
     </aside>
 
     <div class="admin-main">
-      <!-- Navbar -->
       <nav class="navbar admin-navbar navbar-expand bg-white">
         <div class="container-fluid px-3 px-lg-4">
           <button class="sidebar-toggle" type="button" data-sidebar-toggle aria-controls="adminSidebar" aria-expanded="true">
@@ -87,21 +90,20 @@
             <input class="form-control search-input" type="search" placeholder="Rechercher...">
           </form>
           <div class="navbar-actions ms-auto">
-    <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
-        <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
-    </button>
-    <div class="dropdown">
-        <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          
-            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-            
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/auth/login.html">Déconnexion</a></li>
-        </ul>
-    </div>
-</div>
+            <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme" title="Switch color theme">
+              <i class="bi bi-moon-stars" data-theme-icon aria-hidden="true"></i>
+            </button>
+            <div class="dropdown">
+              <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="profile.html">Profil</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logoutBtn">Déconnexion</a></li>
+              </ul>
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -111,9 +113,9 @@
             <div class="page-heading-copy">
               <span class="page-icon"><i class="bi bi-person-badge"></i></span>
               <div>
-                <p class="eyebrow mb-1">Account</p>
-                <h1 class="h3 mb-1">Profile</h1>
-                <p class="text-muted mb-0">Manage your personal details and preferences.</p>
+                <p class="eyebrow mb-1">Compte</p>
+                <h1 class="h3 mb-1">Mon Profil</h1>
+                <p class="text-muted mb-0">Gérez vos informations personnelles et votre mot de passe.</p>
               </div>
             </div>
           </div>
@@ -125,7 +127,6 @@
             <div class="col-12 col-xl-4">
               <div class="panel h-100 text-center profile-card">
                 <div class="profile-cover"></div>
-                <!-- Plus de badge de vérification -->
                 <div class="info-list mt-4 text-start">
                   <div><span>Email</span><strong id="profileEmailDisplay">—</strong></div>
                   <div><span>Inscrit le</span><strong id="profileCreatedDisplay">—</strong></div>
@@ -138,23 +139,24 @@
               <form id="profileForm" class="panel needs-validation" novalidate>
                 <div class="panel-header">
                   <div>
-                    <h2 class="h5 mb-1 section-title"><i class="bi bi-person-gear"></i><span>Profile Settings</span></h2>
+                    <h2 class="h5 mb-1 section-title"><i class="bi bi-person-gear"></i><span>Paramètres du profil</span></h2>
+                    <p class="text-muted mb-0">Modifiez votre email, bio et mot de passe.</p>
                   </div>
                 </div>
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label class="form-label" for="profileEmail">Email</label>
                     <input class="form-control" id="profileEmail" type="email" required>
-                    <div class="invalid-feedback">Enter a valid email.</div>
+                    <div class="invalid-feedback">Entrez un email valide.</div>
                   </div>
                   <div class="col-12">
                     <label class="form-label" for="profileBio">Bio</label>
-                    <textarea class="form-control" id="profileBio" rows="5"></textarea>
+                    <textarea class="form-control" id="profileBio" rows="5" placeholder="Quelques mots sur vous..."></textarea>
                   </div>
                   <div class="col-12">
-                    <label class="form-label" for="profilePassword">New password (leave blank to keep current)</label>
+                    <label class="form-label" for="profilePassword">Nouveau mot de passe <span class="text-muted">(laisser vide pour conserver l’actuel)</span></label>
                     <div class="input-group">
-                      <input class="form-control" id="profilePassword" type="password" minlength="6">
+                      <input class="form-control" id="profilePassword" type="password" minlength="6" autocomplete="new-password">
                       <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn" tabindex="-1">
                         <i class="bi bi-eye-slash" id="passwordToggleIcon"></i>
                       </button>
@@ -163,7 +165,7 @@
                 </div>
                 <div class="d-flex justify-content-end mt-4">
                   <button class="btn btn-primary" type="submit">
-                    <i class="bi bi-check2-circle"></i> Save Profile
+                    <i class="bi bi-check2-circle"></i> Enregistrer
                   </button>
                 </div>
               </form>
@@ -173,102 +175,136 @@
       </main>
 
       <footer class="admin-footer">
-        <div class="container-fluid px-3 px-lg-4">
-        </div>
+        <div class="container-fluid px-3 px-lg-4"></div>
       </footer>
     </div>
   </div>
 
- <script src="../assets/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/js/main.js"></script>
-
-  
+  <script src="../assets/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/main.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const API_BASE = 'http://localhost:8000';
-      const apiBase = `${API_BASE}/api/user`;
-      const alertDiv = document.getElementById('profileAlert');
-      const token = localStorage.getItem('jwt_token');
+  document.addEventListener('DOMContentLoaded', function () {
+    const API_BASE = 'http://localhost:8000';
+    const apiBase = `${API_BASE}/api/user`;
+    const alertDiv = document.getElementById('profileAlert');
+    const token = localStorage.getItem('jwt_token');
 
-      if (!token) {
-        window.location.href = '/auth/login.html';
-        return;
-      }
+    // ---- Déconnexion propre ----
+    function logout() {
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('token'); // au cas où
+      window.location.href = '/auth/login.html';
+    }
 
-      function fetchWithAuth(url, options = {}) {
-        return fetch(url, {
-          ...options,
-          headers: {
-            ...options.headers,
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }).then(async res => {
-          if (res.status === 401) {
-            localStorage.removeItem('jwt_token');
-            window.location.href = '/auth/login.html';
-            return Promise.reject('Non authentifié');
-          }
-          if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-          }
-          return res.json();
+    // Bouton de déconnexion
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        logout();
+      });
+    }
+
+    if (!token) {
+      logout();
+      return;
+    }
+
+    function fetchWithAuth(url, options = {}) {
+      return fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }).then(async res => {
+        if (res.status === 401) {
+          logout();
+          return Promise.reject('Non authentifié');
+        }
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+        return res.json();
+      });
+    }
+
+    // Met à jour l'affichage de l'email partout (sidebar + navbar + carte)
+    function updateConnectedUserDisplay(email) {
+      const sidebarName = document.getElementById('sidebarUserName');
+      const navbarName = document.getElementById('navbarUserName');
+      const emailDisplay = document.getElementById('profileEmailDisplay');
+
+      if (sidebarName) sidebarName.textContent = email;
+      if (navbarName) navbarName.textContent = email;
+      if (emailDisplay) emailDisplay.textContent = email;
+    }
+
+    function loadProfile() {
+      fetchWithAuth(`${apiBase}/profile`)
+        .then(user => {
+          const email = user.email || '—';
+          updateConnectedUserDisplay(email);
+
+          document.getElementById('profileCreatedDisplay').textContent = user.createdAt || '—';
+          document.getElementById('profileEmail').value = user.email || '';
+          document.getElementById('profileBio').value = user.bio || '';
+        })
+        .catch(err => {
+          console.error('Erreur chargement profil:', err);
+          alertDiv.textContent = 'Erreur de chargement du profil. Veuillez vous reconnecter.';
+          alertDiv.className = 'alert alert-danger';
+          alertDiv.classList.remove('d-none');
         });
-      }
+    }
 
-      function loadProfile() {
-        fetchWithAuth(`${apiBase}/profile`)
-          .then(user => {
-            document.getElementById('sidebarUserName').textContent = user.email;
-            document.getElementById('navbarUserName').textContent = user.email;
-            document.getElementById('profileEmailDisplay').textContent = user.email;
-            document.getElementById('profileCreatedDisplay').textContent = user.createdAt || '—';
+    // Toggle password
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const passwordInput = document.getElementById('profilePassword');
+    const passwordIcon = document.getElementById('passwordToggleIcon');
 
-            document.getElementById('profileEmail').value = user.email;
-            document.getElementById('profileBio').value = user.bio || '';
-
-            // Le badge de vérification a été supprimé, donc rien à faire
-          })
-          .catch(err => {
-            console.error('Erreur chargement profil:', err);
-            alertDiv.textContent = 'Erreur de chargement du profil. Veuillez vous reconnecter.';
-            alertDiv.className = 'alert alert-danger';
-            alertDiv.classList.remove('d-none');
-          });
-      }
-
-      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-      const passwordInput = document.getElementById('profilePassword');
-      const passwordIcon = document.getElementById('passwordToggleIcon');
-
-      togglePasswordBtn.addEventListener('click', function() {
+    if (togglePasswordBtn) {
+      togglePasswordBtn.addEventListener('click', function () {
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
         passwordIcon.className = type === 'password' ? 'bi bi-eye-slash' : 'bi bi-eye';
       });
+    }
 
-      const form = document.getElementById('profileForm');
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        alertDiv.classList.add('d-none');
+    // Soumission du formulaire
+    const form = document.getElementById('profileForm');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      alertDiv.classList.add('d-none');
 
-        const payload = {
-          email: document.getElementById('profileEmail').value.trim(),
-          bio: document.getElementById('profileBio').value.trim(),
-          password: document.getElementById('profilePassword').value || undefined
-        };
+      const newEmail = document.getElementById('profileEmail').value.trim();
+      const payload = {
+        email: newEmail,
+        bio: document.getElementById('profileBio').value.trim(),
+        password: document.getElementById('profilePassword').value || undefined
+      };
 
-        fetchWithAuth(`${apiBase}/profile`, {
-          method: 'PUT',
-          body: JSON.stringify(payload)
-        })
+      fetchWithAuth(`${apiBase}/profile`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      })
         .then(data => {
           if (data.success !== false) {
             alertDiv.textContent = 'Profil mis à jour avec succès !';
             alertDiv.className = 'alert alert-success';
             alertDiv.classList.remove('d-none');
+
+            // Mettre à jour immédiatement l'affichage avec le nouvel email
+            updateConnectedUserDisplay(newEmail);
+
+            // Recharger les données depuis l'API
             loadProfile();
+
+            // Vider le champ mot de passe
+            document.getElementById('profilePassword').value = '';
           } else {
             alertDiv.textContent = data.message || 'Erreur lors de la mise à jour.';
             alertDiv.className = 'alert alert-danger';
@@ -276,49 +312,50 @@
           }
         })
         .catch(err => {
-          alertDiv.textContent = 'Erreur réseau. Veuillez réessayer.';
+          alertDiv.textContent = err.message || 'Erreur réseau. Veuillez réessayer.';
           alertDiv.className = 'alert alert-danger';
           alertDiv.classList.remove('d-none');
           console.error(err);
         });
-      });
-
-      loadProfile();
     });
+
+    loadProfile();
+  });
+  </script>
+
+  <script>
+  /* Active le lien du menu latéral selon la page courante */
+  (function () {
+    function activateSidebarNav() {
+      const path = (window.location.pathname || '').replace(/\\/g, '/');
+      const file = path.split('/').pop() || 'index.html';
+      const current = file.toLowerCase() || 'index.html';
+
+      document.querySelectorAll('.admin-sidebar .sidebar-nav a.nav-link').forEach(function (link) {
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
+
+        const href = (link.getAttribute('href') || '').split('?')[0].split('#')[0];
+        const linkFile = href.split('/').pop().toLowerCase() || '';
+
+        const isMatch =
+          linkFile === current ||
+          (current === '' && (linkFile === 'index.html' || linkFile === '')) ||
+          (current === 'index.html' && (linkFile === 'index.html' || linkFile === ''));
+
+        if (isMatch) {
+          link.classList.add('active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', activateSidebarNav);
+    } else {
+      activateSidebarNav();
+    }
+  })();
   </script>
 </body>
-<script>
-/* Active le lien du menu latéral selon la page courante */
-(function () {
-  function activateSidebarNav() {
-    const path = (window.location.pathname || '').replace(/\\/g, '/');
-    const file = path.split('/').pop() || 'index.html';
-    const current = file.toLowerCase() || 'index.html';
-
-    document.querySelectorAll('.admin-sidebar .sidebar-nav a.nav-link').forEach(function (link) {
-      link.classList.remove('active');
-      link.removeAttribute('aria-current');
-
-      const href = (link.getAttribute('href') || '').split('?')[0].split('#')[0];
-      const linkFile = href.split('/').pop().toLowerCase() || '';
-
-      const isMatch =
-        linkFile === current ||
-        (current === '' && (linkFile === 'index.html' || linkFile === '')) ||
-        (current === 'index.html' && (linkFile === 'index.html' || linkFile === ''));
-
-      if (isMatch) {
-        link.classList.add('active');
-        link.setAttribute('aria-current', 'page');
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', activateSidebarNav);
-  } else {
-    activateSidebarNav();
-  }
-})();
-</script>
 </html>

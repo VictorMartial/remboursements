@@ -237,17 +237,8 @@
                         <div>
                             <p class="eyebrow mb-1" data-i18n="page.eyebrow">Demande</p>
                             <h1 class="h3 mb-1"><i class="bi bi-clipboard-plus"></i> <span data-i18n="page.title">Nouvelle demande de remboursement</span></h1>
-                            <p class="text-muted mb-0" data-i18n="page.subtitle">Déposez votre demande. L'email de demande de RIB sera envoyé immédiatement au client (sans attente de confirmation).</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="info-box success">
-                    <span class="status-badge auto-refund"><i class="bi bi-envelope-x"></i> <span data-i18n="type.aev.title">AEV non reçu</span></span>
-                    → <span data-i18n="type.aev.description">Remboursement total du montant payé.</span>
-                    &nbsp; | &nbsp;
-                    <span class="status-badge auto-refund"><i class="bi bi-arrow-repeat"></i> <span data-i18n="type.multiple.title">Paiement multiple</span></span>
-                    → <span data-i18n="type.multiple.description">Remboursement du surplus.</span>
                 </div>
 
                 <div class="steps-indicator mb-4 d-flex justify-content-center gap-3">
@@ -306,7 +297,7 @@
                                 <div class="input-group mb-2" id="accountInputGroup">
                                     <div class="account-id-wrapper flex-grow-1">
                                         <i class="bi bi-credit-card"></i>
-                                        <input type="text" id="accountInput" class="form-control" placeholder="Ex : 4251251234560515" inputmode="numeric" autocomplete="off" minlength="16" maxlength="16" pattern="[0-9]{16}">
+                                        <input type="text" id="accountInput" class="form-control" placeholder="" inputmode="numeric" autocomplete="off" minlength="16" maxlength="16" pattern="[0-9]{16}">
                                     </div>
                                     <button class="btn btn-outline-primary" type="button" id="addAccountBtn"><i class="bi bi-plus-circle"></i> Ajouter</button>
                                 </div>
@@ -321,7 +312,7 @@
                                     <i class="bi bi-coin"></i> <span data-i18n="field.total_paid">Montant total payé</span> *
                                 </label>
                                 <div class="input-group">
-                                    <input type="number" name="montant_commande" class="form-control" step="0.01" min="0.01" placeholder="Ex : 105.00" required>
+                                    <input type="number" name="montant_commande" class="form-control" step="0.01" min="0.01"  required>
                                     <select name="devise" class="form-select" style="max-width: 120px;" required>
                                         <option value="EUR">EUR €</option>
                                         <option value="USD">USD $</option>
@@ -347,12 +338,9 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label">
-                                    <i class="bi bi-envelope-at"></i> Email du client (saisie manuelle) <span class="text-danger">*</span>
+                                    <i class="bi bi-envelope-at"></i> Email du client<span class="text-danger">*</span>
                                 </label>
                                 <input type="email" name="client_email" id="clientEmailInput" class="form-control" placeholder="ex. client@exemple.com" required autocomplete="off" inputmode="email">
-                                <div class="help-text">
-                                    Saisissez manuellement l’adresse email du client. Un email professionnel de <strong>demande de RIB</strong> sera envoyé immédiatement à cette adresse (sans attente de confirmation).
-                                </div>
                                 <div class="error-feedback" id="clientEmailError">Veuillez saisir un email client valide.</div>
                             </div>
                             <div class="col-12">
