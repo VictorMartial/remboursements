@@ -7,20 +7,38 @@
     <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/vendors/bootstrap-icons/bootstrap-icons.css">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             --glass-bg: rgba(226,232,240,0.78);
             --glass-border: rgba(71,85,105,0.35);
             --glass-shadow: 0 8px 32px rgba(31,41,55,0.14);
             --radius-md: 12px;
             --radius-pill: 999px;
+            --accent: #6366f1;
+            --accent-soft: rgba(99,102,241,0.12);
         }
         [data-bs-theme="dark"] {
             --glass-bg: rgba(32,36,46,0.55);
             --glass-border: rgba(255,255,255,0.08);
             --glass-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            --accent-soft: rgba(99,102,241,0.22);
         }
 
+        body { font-family: var(--font-sans); }
+
+        /* ===== Titres en serif ===== */
+        h1, h2, h3, h4, .brand-title, .modal-title-serif {
+            font-family: var(--font-serif);
+            letter-spacing: 0.2px;
+        }
+        h2 i, h3 i { color: var(--accent); }
+
+        /* ===== Table ===== */
         .table-wrap, .table-responsive {
             display: block; width: 100%; max-width: 100%;
             overflow-x: hidden !important;
@@ -30,27 +48,15 @@
             border: 1px solid rgba(71,85,105,0.2);
             box-shadow: 0 2px 12px rgba(15,23,42,0.08);
         }
-        /* laisse le ruban visible dans le coin de chaque ligne */
         #ticketsTable { border-collapse: separate; border-spacing: 0; }
         #ticketsTable {
-            width: 100% !important;
-            min-width: 0 !important;
-            table-layout: fixed !important;
-            margin-bottom: 0;
+            width: 100% !important; min-width: 0 !important;
+            table-layout: fixed !important; margin-bottom: 0;
         }
         #ticketsTable th, #ticketsTable td {
-            white-space: nowrap;
-            vertical-align: middle;
-            padding: 8px 10px;
-            font-size: 0.84rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        #ticketsTable td:nth-child(3),
-        #ticketsTable td:nth-child(4),
-        #ticketsTable td:nth-child(5) {
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: nowrap; vertical-align: middle;
+            padding: 8px 10px; font-size: 0.84rem;
+            overflow: hidden; text-overflow: ellipsis;
         }
         #ticketsTable th:nth-child(1), #ticketsTable td:nth-child(1) { width: 36px; }
         #ticketsTable th:nth-child(2), #ticketsTable td:nth-child(2) { width: 52px; }
@@ -64,6 +70,7 @@
             background: transparent; color: #334155 !important; font-weight: 700;
             font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
             border-color: rgba(71,85,105,0.22);
+            font-family: var(--font-sans);
         }
         [data-bs-theme="dark"] #ticketsTable thead.table-dark th { color: #94a3b8 !important; }
         #ticketsTable tbody tr { transition: background-color 0.15s ease; }
@@ -72,118 +79,54 @@
         #ticketsTable tbody td { color: #1e293b; }
         [data-bs-theme="dark"] #ticketsTable tbody td { color: #e6e8ec; }
 
+        /* Statut : texte + pastille, sans fond ni bordure */
         #ticketsTable .badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 3px 9px 3px 6px; border-radius: var(--radius-pill);
-            font-size: 0.7rem; font-weight: 600; border: 1px solid transparent;
-            max-width: 100%;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0 !important; border: none !important; border-radius: 0;
+            background: transparent !important; box-shadow: none;
+            font-size: 0.84rem; font-weight: 600; line-height: 1.3; letter-spacing: 0;
+            color: var(--st, #475569) !important; max-width: 100%;
         }
-        #ticketsTable .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-        /* Palette harmonique des statuts */
-        #ticketsTable .badge.status-attente-rib,
-        #ticketsTable .badge.bg-primary {
-            background: #fef3c7 !important; color: #92400e; border-color: #fcd34d;
+        #ticketsTable .badge::before {
+            content: ""; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+            background: var(--st-dot, #94a3b8); box-shadow: 0 0 0 3px var(--st-halo, rgba(148,163,184,.2));
         }
-        #ticketsTable .badge.status-attente-rib::before,
-        #ticketsTable .badge.bg-primary::before { background: #f59e0b; }
-        #ticketsTable .badge.status-rib-recu,
-        #ticketsTable .badge.bg-info {
-            background: #cffafe !important; color: #155e75; border-color: #67e8f9;
-        }
-        #ticketsTable .badge.status-rib-recu::before,
-        #ticketsTable .badge.bg-info::before { background: #06b6d4; }
-        #ticketsTable .badge.status-attente-banque,
-        #ticketsTable .badge.bg-secondary {
-            background: #ede9fe !important; color: #5b21b6; border-color: #c4b5fd;
-        }
-        #ticketsTable .badge.status-attente-banque::before,
-        #ticketsTable .badge.bg-secondary::before { background: #8b5cf6; }
-        #ticketsTable .badge.status-valide,
-        #ticketsTable .badge.bg-success {
-            background: #d1fae5 !important; color: #065f46; border-color: #6ee7b7;
-        }
-        #ticketsTable .badge.status-valide::before,
-        #ticketsTable .badge.bg-success::before { background: #10b981; }
-        #ticketsTable .badge.status-refuse,
-        #ticketsTable .badge.bg-danger {
-            background: #ffe4e6 !important; color: #9f1239; border-color: #fda4af;
-        }
-        #ticketsTable .badge.status-refuse::before,
-        #ticketsTable .badge.bg-danger::before { background: #f43f5e; }
-        #ticketsTable .badge.bg-warning {
-            background: #fef3c7 !important; color: #92400e; border-color: #fcd34d;
-        }
-        #ticketsTable .badge.bg-warning::before { background: #f59e0b; }
-        [data-bs-theme="dark"] #ticketsTable .badge.status-attente-rib,
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-primary {
-            background: rgba(245,158,11,0.18) !important; color: #fcd34d; border-color: rgba(245,158,11,0.35);
-        }
-        [data-bs-theme="dark"] #ticketsTable .badge.status-rib-recu,
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-info {
-            background: rgba(6,182,212,0.18) !important; color: #67e8f9; border-color: rgba(6,182,212,0.35);
-        }
-        [data-bs-theme="dark"] #ticketsTable .badge.status-attente-banque,
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-secondary {
-            background: rgba(139,92,246,0.18) !important; color: #c4b5fd; border-color: rgba(139,92,246,0.35);
-        }
-        [data-bs-theme="dark"] #ticketsTable .badge.status-valide,
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-success {
-            background: rgba(16,185,129,0.18) !important; color: #6ee7b7; border-color: rgba(16,185,129,0.35);
-        }
-        [data-bs-theme="dark"] #ticketsTable .badge.status-refuse,
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-danger {
-            background: rgba(244,63,94,0.18) !important; color: #fda4af; border-color: rgba(244,63,94,0.35);
-        }
-        [data-bs-theme="dark"] #ticketsTable .badge.bg-warning {
-            background: rgba(245,158,11,0.18) !important; color: #fcd34d; border-color: rgba(245,158,11,0.35);
-        }
+        #ticketsTable .badge.status-attente-rib, #ticketsTable .badge.bg-primary, #ticketsTable .badge.bg-warning { --st: #b45309; --st-dot: #f59e0b; --st-halo: rgba(245,158,11,.2); }
+        #ticketsTable .badge.status-rib-recu, #ticketsTable .badge.bg-info { --st: #0e7490; --st-dot: #06b6d4; --st-halo: rgba(6,182,212,.2); }
+        #ticketsTable .badge.status-attente-banque, #ticketsTable .badge.bg-secondary { --st: #6d28d9; --st-dot: #8b5cf6; --st-halo: rgba(139,92,246,.2); }
+        #ticketsTable .badge.status-valide, #ticketsTable .badge.bg-success { --st: #047857; --st-dot: #10b981; --st-halo: rgba(16,185,129,.2); }
+        #ticketsTable .badge.status-refuse, #ticketsTable .badge.bg-danger { --st: #be123c; --st-dot: #f43f5e; --st-halo: rgba(244,63,94,.2); }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-attente-rib, [data-bs-theme="dark"] #ticketsTable .badge.bg-primary, [data-bs-theme="dark"] #ticketsTable .badge.bg-warning { --st: #fcd34d; }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-rib-recu, [data-bs-theme="dark"] #ticketsTable .badge.bg-info { --st: #67e8f9; }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-attente-banque, [data-bs-theme="dark"] #ticketsTable .badge.bg-secondary { --st: #c4b5fd; }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-valide, [data-bs-theme="dark"] #ticketsTable .badge.bg-success { --st: #6ee7b7; }
+        [data-bs-theme="dark"] #ticketsTable .badge.status-refuse, [data-bs-theme="dark"] #ticketsTable .badge.bg-danger { --st: #fda4af; }
 
-
-        /* ===== Étiquette coin haut-droite — "Sans retour" lisible ===== */
+        /* ===== Ribbon ===== */
         #ticketsTable tbody tr { position: relative; }
         #ticketsTable tbody td.actions-col,
         #ticketsTable tbody td:last-child {
-            position: relative !important;
-            overflow: visible !important;
+            position: relative !important; overflow: visible !important;
             padding: 12px 58px 12px 6px !important;
-            text-align: left !important;
-            vertical-align: middle !important;
+            text-align: left !important; vertical-align: middle !important;
         }
         #ticketsTable tbody td.actions-col .actions-cell,
         #ticketsTable tbody td:last-child .actions-cell {
-            position: relative;
-            z-index: 3;
-            justify-content: flex-start;
-            gap: 5px;
-            flex-wrap: nowrap;
+            position: relative; z-index: 3; justify-content: flex-start;
+            gap: 5px; flex-wrap: nowrap;
         }
         .corner-ribbon {
-            position: absolute;
-            top: -1px;
-            right: -1px;
-            width: 78px;
-            height: 78px;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 4;
+            position: absolute; top: -1px; right: -1px;
+            width: 78px; height: 78px; overflow: hidden;
+            pointer-events: none; z-index: 4;
         }
         .corner-ribbon span {
-            position: absolute;
-            top: 14px;
-            right: -30px;
-            display: block;
-            width: 120px;
-            padding: 4px 0;
-            text-align: center;
-            font-size: 0.6rem;
-            font-weight: 800;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            color: #fff;
-            transform: rotate(45deg);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-            line-height: 1.2;
-            white-space: nowrap;
+            position: absolute; top: 14px; right: -30px;
+            display: block; width: 120px; padding: 4px 0;
+            text-align: center; font-size: 0.6rem; font-weight: 800;
+            letter-spacing: 0.02em; text-transform: uppercase; color: #fff;
+            transform: rotate(45deg); box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            line-height: 1.2; white-space: nowrap;
         }
         .corner-ribbon.rib-ok span { background: #16a34a; }
         .corner-ribbon.rib-ko span { background: #e11d48; }
@@ -191,29 +134,316 @@
         .corner-ribbon.rib-attente span { background: #d97706; }
         .corner-ribbon.rib-none span { background: #64748b; }
 
-        /* Modal suivi */
-        .suivi-modal-box { max-width: 460px; }
-        .suivi-grid { display: grid; gap: 12px; margin: 14px 0; }
-        .suivi-row {
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-            padding: 10px 12px; border-radius: 10px;
-            border: 1px solid rgba(71,85,105,0.18); background: rgba(148,163,184,0.06);
+        /* ===== MODAL MODERNE ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15,18,25,.55);
+            backdrop-filter: blur(8px) saturate(140%);
+            -webkit-backdrop-filter: blur(8px) saturate(140%);
+            align-items: center; justify-content: center;
+            z-index: 2000;
+            animation: fadeOverlay .2s ease;
         }
-        [data-bs-theme="dark"] .suivi-row { border-color: rgba(148,163,184,0.15); background: rgba(0,0,0,0.2); }
-        .suivi-row label { font-weight: 600; margin: 0; min-width: 90px; }
-        .suivi-row select {
-            flex: 1; max-width: 180px; border-radius: 8px; padding: 6px 10px;
-            border: 1px solid rgba(71,85,105,0.3); background: #fff; color: #0f172a;
+        #confirmModal.modal-overlay { z-index: 2100; }
+        .modal-overlay.open { display: flex; }
+        @keyframes fadeOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        [data-bs-theme="dark"] .suivi-row select { background: #12151c; color: #e6e8ec; border-color: #262b36; }
-        .suivi-hint { font-size: 0.82rem; color: #64748b; margin: 0 0 8px; }
-        .suivi-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 12px; }
 
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px 26px 22px;
+            box-shadow: 0 24px 60px rgba(15,18,25,.28), 0 2px 8px rgba(15,18,25,.08);
+            width: 92%; max-width: 480px;
+            animation: slideUp .28s cubic-bezier(.2,.9,.3,1.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-box::before {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(140deg, rgba(99,102,241,0.06) 0%, transparent 40%);
+            pointer-events: none;
+        }
+        [data-bs-theme="dark"] .modal-box {
+            background: #161a22;
+            color: #e6e8ec;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        [data-bs-theme="dark"] .modal-box::before {
+            background: linear-gradient(140deg, rgba(99,102,241,0.12) 0%, transparent 40%);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-box h3 {
+            font-family: var(--font-serif);
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin: 0 0 18px 0;
+            display: flex; align-items: center; gap: 10px;
+            letter-spacing: 0.2px;
+            position: relative; z-index: 1;
+        }
+        .modal-box h3 i {
+            color: var(--accent);
+            font-size: 1.3rem;
+            padding: 8px;
+            background: var(--accent-soft);
+            border-radius: 10px;
+        }
+        [data-bs-theme="dark"] .modal-box h3 i {
+            background: var(--accent-soft);
+            color: #a5b4fc;
+        }
+
+        .modal-actions {
+            display: flex; justify-content: flex-end;
+            gap: 10px; margin-top: 20px;
+            position: relative; z-index: 1;
+        }
+
+        /* ===== SUIVI MODAL ===== */
+        .suivi-modal-box { max-width: 500px; }
+        .suivi-grid { display: grid; gap: 14px; margin: 16px 0 4px; position: relative; z-index: 1; }
+        .suivi-row {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 14px; padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(71,85,105,0.14);
+            background: linear-gradient(135deg, rgba(248,250,252,0.9), rgba(241,245,249,0.7));
+            transition: border-color .15s ease, background .15s ease;
+        }
+        .suivi-row:hover { border-color: rgba(99,102,241,0.25); }
+        [data-bs-theme="dark"] .suivi-row {
+            border-color: rgba(148,163,184,0.12);
+            background: linear-gradient(135deg, rgba(30,41,59,0.7), rgba(15,23,42,0.5));
+        }
+        [data-bs-theme="dark"] .suivi-row:hover { border-color: rgba(99,102,241,0.3); }
+
+        .suivi-row label {
+            font-family: var(--font-serif);
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 0;
+            min-width: 90px;
+            display: flex; align-items: center; gap: 8px;
+            color: #334155;
+            letter-spacing: 0.2px;
+        }
+        [data-bs-theme="dark"] .suivi-row label { color: #cbd5e1; }
+        .suivi-row label::before {
+            content: ""; width: 3px; height: 18px;
+            background: var(--accent);
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        /* ===== CUSTOM ANIMATED SELECT DROPDOWN ===== */
+        .custom-select {
+            position: relative;
+            flex: 1;
+            max-width: 220px;
+            min-width: 150px;
+            user-select: none;
+            z-index: 5;
+        }
+        .custom-select-trigger {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px;
+            padding: 9px 14px;
+            border-radius: 11px;
+            border: 1.5px solid rgba(71,85,105,0.22);
+            background: #fff;
+            color: #0f172a;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all .18s ease;
+            box-shadow: 0 1px 2px rgba(15,23,42,.04);
+        }
+        .custom-select-trigger:hover {
+            border-color: rgba(99,102,241,0.45);
+            box-shadow: 0 2px 8px rgba(99,102,241,0.12);
+        }
+        .custom-select.open .custom-select-trigger {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--accent-soft);
+        }
+        [data-bs-theme="dark"] .custom-select-trigger {
+            background: #12151c;
+            color: #e6e8ec;
+            border-color: #262b36;
+        }
+        [data-bs-theme="dark"] .custom-select-trigger:hover {
+            border-color: rgba(99,102,241,0.5);
+        }
+        .custom-select-trigger .cs-value {
+            display: inline-flex; align-items: center; gap: 8px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .custom-select-trigger .cs-value i { font-size: 1.05rem; }
+        .custom-select-trigger .cs-arrow {
+            font-size: 0.85rem;
+            opacity: 0.55;
+            transition: transform .22s ease, opacity .15s ease;
+            flex-shrink: 0;
+        }
+        .custom-select.open .custom-select-trigger .cs-arrow {
+            transform: rotate(180deg);
+            opacity: 1;
+        }
+
+        .custom-select-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0; right: 0;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid rgba(71,85,105,0.14);
+            box-shadow: 0 12px 32px rgba(15,23,42,.16), 0 2px 6px rgba(15,23,42,.06);
+            padding: 6px;
+            margin: 0; list-style: none;
+            opacity: 0;
+            transform: translateY(-6px) scale(.98);
+            pointer-events: none;
+            transition: opacity .18s ease, transform .18s ease;
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+        [data-bs-theme="dark"] .custom-select-menu {
+            background: #161a22;
+            border-color: rgba(255,255,255,0.08);
+            box-shadow: 0 12px 32px rgba(0,0,0,.5);
+        }
+        .custom-select.open .custom-select-menu {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .custom-select-option {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: background .12s ease, color .12s ease;
+            font-family: var(--font-sans);
+        }
+        [data-bs-theme="dark"] .custom-select-option { color: #cbd5e1; }
+        .custom-select-option i { font-size: 1.05rem; opacity: .8; }
+        .custom-select-option:hover {
+            background: rgba(99,102,241,0.09);
+            color: var(--accent);
+        }
+        [data-bs-theme="dark"] .custom-select-option:hover {
+            background: rgba(99,102,241,0.18);
+            color: #a5b4fc;
+        }
+        .custom-select-option.selected {
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        [data-bs-theme="dark"] .custom-select-option.selected {
+            background: var(--accent-soft);
+            color: #c7d2fe;
+        }
+        .custom-select-option.selected i { opacity: 1; }
+        .custom-select-option.selected::after {
+            content: "\F26E"; /* bi-check-lg */
+            font-family: "bootstrap-icons";
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+
+        /* Couleurs par option (Banque / Client / Mada) */
+        .custom-select-option[data-tone="ok"] i { color: #16a34a; }
+        .custom-select-option[data-tone="ko"] i { color: #e11d48; }
+        .custom-select-option[data-tone="attente"] i { color: #d97706; }
+        .custom-select-option[data-tone="sans"] i { color: #9f1239; }
+
+        /* ===== SUIVI : tous les selects alignés à droite, style épuré ===== */
+        #suiviModal .suivi-modal-box {
+            max-width: 440px; padding: 22px 22px 18px; border-radius: 18px;
+            background: #fff; overflow: visible;
+            box-shadow: 0 24px 60px rgba(15,18,25,.22), 0 0 0 1px rgba(15,23,42,.05);
+        }
+        #suiviModal .suivi-modal-box::before { display: none; }
+        [data-bs-theme="dark"] #suiviModal .suivi-modal-box {
+            background: #161a23; box-shadow: 0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06);
+        }
+        #suiviModal .suivi-modal-box h3 {
+            font-family: var(--font-sans); font-size: 1.05rem; font-weight: 600;
+            margin: 0 0 8px; letter-spacing: 0;
+        }
+        #suiviModal .suivi-modal-box h3 > i { display: none; }
+        #suiviModal .suivi-modal-box h3 span#suiviModalTicketId {
+            color: #94a3b8 !important; font-family: var(--font-sans); font-weight: 500; font-size: inherit;
+        }
+
+        #suiviModal .suivi-grid { gap: 0; margin: 0; }
+        #suiviModal .suivi-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            padding: 14px 0; border: none; border-radius: 0; background: none;
+            border-bottom: 1px solid rgba(71,85,105,.1);
+        }
+        #suiviModal .suivi-row:last-child { border-bottom: none; }
+        [data-bs-theme="dark"] #suiviModal .suivi-row { border-bottom-color: rgba(255,255,255,.07); background: none; }
+        #suiviModal .suivi-row label {
+            font-family: var(--font-sans); font-size: .92rem; font-weight: 600;
+            min-width: 0; letter-spacing: 0;
+        }
+        #suiviModal .suivi-row label::before { display: none; }
+
+        /* select : toujours collé à droite, même largeur pour les 3 */
+        #suiviModal .custom-select {
+            flex: 0 0 auto; width: min(220px, 58%); min-width: 0; max-width: none; margin-left: auto;
+        }
+        #suiviModal .custom-select.open { z-index: 30; }
+        #suiviModal .custom-select-trigger { border-radius: 10px; box-shadow: none; padding: 9px 12px; }
+        #suiviModal .custom-select-trigger:hover { box-shadow: none; }
+        #suiviModal .custom-select-menu { left: auto; right: 0; min-width: 100%; width: max-content; max-width: 260px; }
+
+        /* --- empilement : les listes passent toujours au-dessus des boutons --- */
+        #suiviModal .suivi-grid { position: relative; z-index: 5; transition: padding-bottom .18s ease; }
+        #suiviModal .modal-actions { position: relative; z-index: 1; }
+        /* Client : on réserve la place sous la liste pour qu'elle ne touche pas les boutons */
+        #suiviModal .suivi-grid:has(#suiviClientSelect.open) { padding-bottom: 64px; }
+        /* Mada Ozi (dernière ligne) : la liste s'ouvre vers le haut */
+        #suiviModal #suiviMadaSelect .custom-select-menu {
+            top: auto; bottom: calc(100% + 6px); transform: translateY(6px) scale(.98);
+        }
+        #suiviModal #suiviMadaSelect.open .custom-select-menu { transform: translateY(0) scale(1); }
+        #suiviModal .custom-select-menu { background: #fff; }
+        [data-bs-theme="dark"] #suiviModal .custom-select-menu { background: #1c2230; }
+
+        #suiviModal .modal-actions { gap: 8px; margin-top: 16px; }
+        #suiviModal .modal-actions .btn { border-radius: 10px !important; box-shadow: none; padding: 9px 18px; font-weight: 600; }
+        #suiviModal .modal-actions .btn-primary { background: var(--accent); }
+        #suiviModal .modal-actions .btn-primary:hover { transform: none; filter: brightness(1.08); box-shadow: none; }
+
+        @media (max-width: 575px) {
+            #suiviModal.modal-overlay { align-items: flex-end; }
+            #suiviModal .suivi-modal-box { width: 100%; max-width: none; border-radius: 18px 18px 0 0; padding: 20px 16px 16px; }
+            #suiviModal .modal-actions .btn { flex: 1; justify-content: center; }
+        }
+
+        /* ===== Boutons action table ===== */
         .btn-action {
             width: 30px; height: 30px; padding: 0; border-radius: 8px;
             display: inline-flex; align-items: center; justify-content: center;
             border: 1px solid #e2e8f0; background: #fff; color: #64748b;
-            transition: all 0.15s ease; text-decoration: none; cursor: pointer;
+            transition: all .15s ease; text-decoration: none; cursor: pointer;
         }
         .btn-action:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,23,42,0.08); }
         .btn-action.btn-view:hover { background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; }
@@ -221,54 +451,50 @@
         .btn-action.btn-rib:hover { background: #d1fae5; color: #047857; border-color: #3ca87d; }
         .btn-action.btn-rib i { animation: wiz-blink 1.4s ease-in-out infinite; }
         @keyframes wiz-blink { 0%,100%{opacity:1} 50%{opacity:.35} }
-        .btn-action.btn-follow { background: #fffbeb; color: #d97706; border-color: #fde68a; }
-        .btn-action.btn-follow:hover { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
-        .btn-action.btn-follow i { animation: wiz-hourglass-spin 2.4s linear infinite; }
-        @keyframes wiz-hourglass-spin { to { transform: rotate(360deg); } }
         .btn-action.btn-delete:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
         [data-bs-theme="dark"] .btn-action { background: rgba(30,41,59,0.8); border-color: rgba(148,163,184,0.2); color: #94a3b8; }
         [data-bs-theme="dark"] .btn-action.btn-view:hover { background: rgba(99,102,241,0.2); color: #c7d2fe; }
         [data-bs-theme="dark"] .btn-action.btn-rib { background: rgba(16,185,129,0.16); color: #6ee7b7; border-color: rgba(16,185,129,0.3); }
-        [data-bs-theme="dark"] .btn-action.btn-follow { background: rgba(245,158,11,0.16); color: #fcd34d; border-color: rgba(245,158,11,0.3); }
         [data-bs-theme="dark"] .btn-action.btn-delete:hover { background: rgba(239,68,68,0.2); color: #fca5a5; }
 
         .actions-cell { display: inline-flex; flex-wrap: nowrap; gap: 6px; align-items: center; }
         .date-pill {
             display: inline-flex; align-items: center; gap: 4px;
-            padding: 0.2rem 0.45rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
-            color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; white-space: nowrap;
+            padding: 0.2rem 0.45rem; border-radius: 6px;
+            font-size: 0.75rem; font-weight: 500;
+            color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0;
+            white-space: nowrap;
         }
         .date-pill i { font-size: 0.85rem; opacity: 0.7; }
         [data-bs-theme="dark"] .date-pill { background: rgba(148,163,184,0.12); color: #cbd5e1; border-color: rgba(148,163,184,0.2); }
         .amount-cell { font-weight: 600; font-variant-numeric: tabular-nums; }
+
         .btn-primary {
             display: inline-flex; align-items: center; gap: 6px;
             border-radius: var(--radius-pill) !important;
-            background: linear-gradient(135deg, rgba(79,70,229,0.88), rgba(67,56,202,0.88));
-            border-color: rgba(67,56,202,0.5); font-weight: 500;
+            background: linear-gradient(135deg, rgba(79,70,229,0.92), rgba(67,56,202,0.92));
+            border-color: rgba(67,56,202,0.5); font-weight: 600;
+            font-family: var(--font-sans);
+            padding: 8px 18px;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 6px;
+            border-radius: var(--radius-pill) !important;
+            font-family: var(--font-sans); font-weight: 500;
+            padding: 8px 18px;
+            transition: all .15s ease;
         }
         .btn-danger { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill) !important; }
 
-        /* Modale + Toast */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(15,18,25,.45); backdrop-filter: blur(4px);
-            align-items: center; justify-content: center; z-index: 2000;
-        }
-        #confirmModal.modal-overlay { z-index: 2100; }
-        .modal-overlay.open { display: flex; }
-        .modal-box {
-            background: #fff; border-radius: 16px; padding: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,.15); width: 90%; max-width: 420px;
-        }
-        [data-bs-theme="dark"] .modal-box { background: #1b2029; color: #e6e8ec; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
-
+        /* ===== Toast ===== */
         .toast-item {
             padding: 14px 18px; border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,.14);
             display: flex; align-items: flex-start; gap: 10px;
             animation: toastIn .3s ease; font-size: .9rem; font-weight: 500;
+            font-family: var(--font-sans);
         }
         .toast-item.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
         .toast-item.danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
@@ -285,11 +511,24 @@
         [data-bs-theme="dark"] .toast-item.success { background: rgba(16,185,129,.18); color: #6ee7b7; border-color: rgba(16,185,129,.3); }
         [data-bs-theme="dark"] .toast-item.danger  { background: rgba(239,68,68,.18); color: #fca5a5; border-color: rgba(239,68,68,.3); }
 
+        /* ===== Statut lisible + espace entre Statut et Date ===== */
+        #ticketsTable th, #ticketsTable td { padding: 12px 14px; }
+        #ticketsTable th:nth-child(1), #ticketsTable td:nth-child(1) { width: 44px; padding-right: 4px; }
+        #ticketsTable th:nth-child(2), #ticketsTable td:nth-child(2) { width: 64px; }
+        #ticketsTable th:nth-child(3), #ticketsTable td:nth-child(3) { width: 15%; }
+        #ticketsTable th:nth-child(4), #ticketsTable td:nth-child(4) { width: 13%; }
+        #ticketsTable th:nth-child(5), #ticketsTable td:nth-child(5) { width: 26%; padding-right: 24px; }
+        #ticketsTable th:nth-child(6), #ticketsTable td:nth-child(6) { width: 14%; padding-left: 24px; }
+        #ticketsTable th:nth-child(7), #ticketsTable td:nth-child(7) { width: 150px; }
+        #ticketsTable td:nth-child(5) { overflow: visible; text-overflow: clip; white-space: normal; }
+        #ticketsTable td:nth-child(5) .badge { white-space: normal; text-align: left; align-items: flex-start; }
+        #ticketsTable td:nth-child(5) .badge::before { margin-top: 5px; }
+
         @media (min-width: 1400px) {
             .container-fluid { max-width: 1600px; margin-inline: auto; }
             .table-wrap, .table-responsive { max-height: 640px; }
             #ticketsTable { width: 100% !important; }
-            #ticketsTable th, #ticketsTable td { padding: 10px 12px; font-size: 0.88rem; }
+            #ticketsTable th, #ticketsTable td { padding: 14px 16px; font-size: 0.88rem; }
             .btn-action { width: 34px; height: 34px; }
         }
     </style>
@@ -428,39 +667,81 @@
 <!-- Modale suivi Banque / Client / Mada Ozi -->
 <div class="modal-overlay" id="suiviModal">
     <div class="modal-box suivi-modal-box">
-        <h3><i class="bi bi-bookmark-star"></i> Suivi ticket <span id="suiviModalTicketId">#</span></h3>
-        <p class="suivi-hint" id="suiviModalHint">
-            Client <strong>OK</strong> → clôture · <strong>Sans retour</strong> → marquer · <strong>Non OK</strong> → renvoyer à la banque.
-        </p>
+        <h3><i class="bi bi-bookmark-star"></i> Suivi ticket <span id="suiviModalTicketId" style="color: var(--accent);">#</span></h3>
         <div class="suivi-grid">
+
+            <!-- Banque (select custom animé) -->
             <div class="suivi-row">
-                <label>Banque</label>
-                <select id="suiviBanqueSel">
-                    <option value="attente">En attente</option>
-                    <option value="ok">OK</option>
-                    <option value="ko">Non OK</option>
-                </select>
+                <label><i class="bi bi-bank2" style="color:#3b82f6;"></i> Banque</label>
+                <div class="custom-select" id="suiviBanqueSelect" data-select-id="suiviBanque">
+                    <div class="custom-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="cs-value"><i class="bi bi-hourglass-split"></i> En attente</span>
+                        <i class="bi bi-chevron-down cs-arrow"></i>
+                    </div>
+                    <ul class="custom-select-menu" role="listbox">
+                        <li class="custom-select-option selected" data-value="attente" data-tone="attente" role="option">
+                            <i class="bi bi-hourglass-split"></i> En attente
+                        </li>
+                        <li class="custom-select-option" data-value="ok" data-tone="ok" role="option">
+                            <i class="bi bi-check-circle-fill"></i> OK
+                        </li>
+                        <li class="custom-select-option" data-value="ko" data-tone="ko" role="option">
+                            <i class="bi bi-x-circle-fill"></i> Non OK
+                        </li>
+                    </ul>
+                </div>
             </div>
+
+            <!-- Client (select custom animé) -->
             <div class="suivi-row">
-                <label>Client</label>
-                <select id="suiviClientSel">
-                    <option value="ok">OK → Clôturer</option>
-                    <option value="sans_retour">Sans retour</option>
-                    <option value="ko">Non OK → Renvoi banque</option>
-                </select>
+                <label><i class="bi bi-person-circle" style="color:#8b5cf6;"></i> Client</label>
+                <div class="custom-select" id="suiviClientSelect" data-select-id="suiviClient">
+                    <div class="custom-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="cs-value"><i class="bi bi-dash-circle-fill"></i> Sans retour</span>
+                        <i class="bi bi-chevron-down cs-arrow"></i>
+                    </div>
+                    <ul class="custom-select-menu" role="listbox">
+                        <li class="custom-select-option selected" data-value="sans_retour" data-tone="sans" role="option">
+                            <i class="bi bi-dash-circle-fill"></i> Sans retour
+                        </li>
+                        <li class="custom-select-option" data-value="ok" data-tone="ok" role="option">
+                            <i class="bi bi-check-circle-fill"></i> Clôturer
+                        </li>
+                        <li class="custom-select-option" data-value="ko" data-tone="ko" role="option">
+                            <i class="bi bi-arrow-counterclockwise"></i> Renvoyer à la banque
+                        </li>
+                    </ul>
+                </div>
             </div>
+
+            <!-- Mada Ozi (select custom animé) -->
             <div class="suivi-row">
-                <label>Mada Ozi</label>
-                <select id="suiviMadaSel">
-                    <option value="attente">En attente</option>
-                    <option value="ok">OK</option>
-                    <option value="ko">Non OK</option>
-                </select>
+                <label><i class="bi bi-shop" style="color:#f59e0b;"></i> Mada Ozi</label>
+                <div class="custom-select" id="suiviMadaSelect" data-select-id="suiviMada">
+                    <div class="custom-select-trigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="cs-value"><i class="bi bi-hourglass-split"></i> En attente</span>
+                        <i class="bi bi-chevron-down cs-arrow"></i>
+                    </div>
+                    <ul class="custom-select-menu" role="listbox">
+                        <li class="custom-select-option selected" data-value="attente" data-tone="attente" role="option">
+                            <i class="bi bi-hourglass-split"></i> En attente
+                        </li>
+                        <li class="custom-select-option" data-value="ok" data-tone="ok" role="option">
+                            <i class="bi bi-check-circle-fill"></i> OK
+                        </li>
+                        <li class="custom-select-option" data-value="ko" data-tone="ko" role="option">
+                            <i class="bi bi-x-circle-fill"></i> Non OK
+                        </li>
+                    </ul>
+                </div>
             </div>
+
         </div>
-        <div class="suivi-actions" id="suiviModalActions">
-            <button type="button" class="btn btn-secondary btn-sm" id="suiviModalClose">Fermer</button>
-            <button type="button" class="btn btn-primary btn-sm" id="suiviSaveBtn" style="display:none;">Enregistrer</button>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="suiviModalClose">Fermer</button>
+            <button type="button" class="btn btn-primary" id="suiviSaveBtn" style="display:none;">
+                <i class="bi bi-check2"></i> Enregistrer
+            </button>
         </div>
     </div>
 </div>
@@ -492,7 +773,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(close, 4500);
     }
 
-    /* ===== Confirmation popup ===== */
+    /* ===== Confirmation ===== */
     function showConfirm(message, title = 'Confirmation') {
         return new Promise((resolve) => {
             const modal = document.getElementById('confirmModal');
@@ -500,11 +781,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const msgEl = document.getElementById('confirmMessage');
             const okBtn = document.getElementById('confirmOkBtn');
             const cancelBtn = document.getElementById('confirmCancelBtn');
-
             titleEl.innerHTML = `<i class="bi bi-exclamation-triangle text-danger"></i> ${title}`;
             msgEl.textContent = message;
             modal.classList.add('open');
-
             function cleanup(result) {
                 modal.classList.remove('open');
                 okBtn.removeEventListener('click', onOk);
@@ -515,22 +794,13 @@ document.addEventListener('DOMContentLoaded', function() {
             function onOk() { cleanup(true); }
             function onCancel() { cleanup(false); }
             function onOutside(e) { if (e.target === modal) cleanup(false); }
-
             okBtn.addEventListener('click', onOk);
             cancelBtn.addEventListener('click', onCancel);
             modal.addEventListener('click', onOutside);
         });
     }
 
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('jwt_token');
-            window.location.href = '/auth/login.html';
-        });
-    }
-
+    /* ===== JWT ===== */
     function parseJwt(t) {
         try {
             const base64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
@@ -540,7 +810,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return JSON.parse(json);
         } catch (e) { return null; }
     }
-
     const jwtPayload = parseJwt(token);
     const currentUserEmail = jwtPayload?.email || jwtPayload?.username || jwtPayload?.sub || 'Interlocuteur';
     const roles = jwtPayload?.roles || jwtPayload?.role || [];
@@ -548,13 +817,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const isInterlocuteur = roleList.some(r => String(r).toUpperCase().includes('INTERLOCUTEUR') || String(r).toUpperCase().includes('ADMIN'));
     document.getElementById('sidebarUserName').textContent = currentUserEmail;
     document.getElementById('navbarUserName').textContent = currentUserEmail;
-    // Espace interlocuteur (compte client → interlocuteur)
+    window.__isInterlocuteur = isInterlocuteur;
+
     const brandTitle = document.getElementById('brandTitle');
     const brandSubtitle = document.getElementById('brandSubtitle');
     const sidebarRole = document.getElementById('sidebarRoleLabel');
     if (brandTitle) brandTitle.textContent = isInterlocuteur ? 'Interlocuteur' : 'Utilisateur';
     if (brandSubtitle) brandSubtitle.textContent = isInterlocuteur ? 'Espace de travail' : 'Espace personnel';
     if (sidebarRole) sidebarRole.textContent = isInterlocuteur ? 'Espace de travail' : 'Espace personnel';
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('jwt_token');
+            window.location.href = '/auth/login.html';
+        });
+    }
 
     function fetchWithAuth(url, options = {}) {
         return fetch(url, {
@@ -607,63 +886,130 @@ document.addEventListener('DOMContentLoaded', function() {
         return statut;
     }
 
-    function ribbonClass(val) {
-        if (val === 'ok') return 'rib-ok';
-        if (val === 'ko') return 'rib-ko';
-        if (val === 'sans_retour') return 'rib-sans';
-        if (val === 'attente') return 'rib-attente';
-        return 'rib-none';
-    }
-    /** Statuts d'avant validation banque : aucune étiquette n'est affichée */
     const STATUTS_SANS_ETIQUETTE = ['En attente RIB', 'RIB reçu', 'En attente réponse banque', 'En attente confirmation'];
-
-    /** Étiquette unique, affichée uniquement à partir de la validation banque (Validé, Client OK/Non OK, Sans retour, Clôturé, Refusé) */
     function cornerRibbonHtml(ticket) {
-        let label = null;
-        let cls = 'rib-none';
+        let label = null; let cls = 'rib-none';
         const st = ticket.statut || '';
         if (STATUTS_SANS_ETIQUETTE.includes(st)) return '';
-        if (st === 'Clôturé') {
-            label = 'Clôturé'; cls = 'rib-ok';
-        } else if (st === 'Sans retour') {
-            label = 'Sans retour'; cls = 'rib-sans';
-        } else if (st === 'Validé') {
+        if (st === 'Clôturé') { label = 'Clôturé'; cls = 'rib-ok'; }
+        else if (st === 'Sans retour') { label = 'Sans retour'; cls = 'rib-sans'; }
+        else if (st === 'Validé') {
             const client = ticket.suivi_client || 'sans_retour';
             if (client === 'ok') { label = 'Client OK'; cls = 'rib-ok'; }
             else if (client === 'ko') { label = 'Non OK'; cls = 'rib-ko'; }
             else { label = 'Sans retour'; cls = 'rib-sans'; }
-        } else if (st === 'Refusé') {
-            label = 'Refusé'; cls = 'rib-ko';
-        } else if (st) {
-            label = translateStatus(st);
-            cls = 'rib-none';
-        }
+        } else if (st === 'Refusé') { label = 'Refusé'; cls = 'rib-ko'; }
+        else if (st) { label = translateStatus(st); cls = 'rib-none'; }
         if (!label) return '';
         return `<div class="corner-ribbon ${cls}"><span>${label}</span></div>`;
     }
 
+    /* ============================================================
+       CUSTOM ANIMATED SELECT
+       ============================================================ */
+    function initCustomSelect(wrapperId) {
+        const wrap = document.getElementById(wrapperId);
+        if (!wrap) return null;
+        const trigger = wrap.querySelector('.custom-select-trigger');
+        const menu = wrap.querySelector('.custom-select-menu');
+        const valueEl = trigger.querySelector('.cs-value');
+
+        const state = { value: null, text: '' };
+
+        function close() {
+            wrap.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+        function open() {
+            // Fermer les autres
+            document.querySelectorAll('.custom-select.open').forEach(w => {
+                if (w !== wrap) w.classList.remove('open');
+            });
+            wrap.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+        }
+        function selectOption(li) {
+            const val = li.dataset.value;
+            const html = li.innerHTML.trim();
+            state.value = val;
+            state.text = html;
+            menu.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
+            li.classList.add('selected');
+            valueEl.innerHTML = html;
+            close();
+            wrap.dataset.value = val;
+        }
+
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (wrap.classList.contains('open')) close();
+            else open();
+        });
+        trigger.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (wrap.classList.contains('open')) close();
+                else open();
+            }
+            if (e.key === 'Escape') close();
+        });
+        menu.querySelectorAll('.custom-select-option').forEach(li => {
+            li.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (wrap.classList.contains('disabled') || trigger.hasAttribute('disabled')) return;
+                selectOption(li);
+            });
+        });
+        document.addEventListener('click', function(e) {
+            if (!wrap.contains(e.target)) close();
+        });
+
+        return {
+            setValue: function(val) {
+                const li = menu.querySelector(`.custom-select-option[data-value="${val}"]`);
+                if (li) selectOption(li);
+            },
+            getValue: function() { return state.value; },
+            setDisabled: function(disabled) {
+                if (disabled) {
+                    wrap.classList.add('disabled');
+                    trigger.style.opacity = '0.5';
+                    trigger.style.pointerEvents = 'none';
+                } else {
+                    wrap.classList.remove('disabled');
+                    trigger.style.opacity = '';
+                    trigger.style.pointerEvents = '';
+                }
+            }
+        };
+    }
+
+    const banqueSelect = initCustomSelect('suiviBanqueSelect');
+    const madaSelect = initCustomSelect('suiviMadaSelect');
+    const clientSelect = initCustomSelect('suiviClientSelect');
+
+    /* ============================================================
+       SUIVI MODAL
+       ============================================================ */
     window.__ticketsById = {};
-    window.__isInterlocuteur = isInterlocuteur;
 
     window.ouvrirSuiviModal = function(id) {
         const ticket = window.__ticketsById[id];
         if (!ticket) return;
         document.getElementById('suiviModalTicketId').textContent = '#' + id;
-        // Banque validée → coché OK auto ; client = sans retour par défaut
+
         const banqueVal = ticket.suivi_banque || (ticket.statut === 'Validé' ? 'ok' : 'attente');
         const clientVal = ticket.suivi_client || (ticket.statut === 'Validé' ? 'sans_retour' : 'attente');
-        document.getElementById('suiviBanqueSel').value = banqueVal;
-        document.getElementById('suiviClientSel').value = clientVal;
-        document.getElementById('suiviMadaSel').value = ticket.suivi_madaozi || 'attente';
-
         const canEdit = window.__isInterlocuteur && ['Validé','Sans retour'].includes(ticket.statut);
-        document.getElementById('suiviBanqueSel').disabled = true; // banque déjà OK après validation
-        document.getElementById('suiviClientSel').disabled = !canEdit;
-        document.getElementById('suiviMadaSel').disabled = !canEdit;
+
+        banqueSelect.setValue(banqueVal);
+        madaSelect.setValue(ticket.suivi_madaozi || 'attente');
+        clientSelect.setValue(clientVal === 'attente' ? 'sans_retour' : clientVal);
+        banqueSelect.setDisabled(true);
+        clientSelect.setDisabled(!canEdit);
+        madaSelect.setDisabled(!canEdit);
+
         document.getElementById('suiviSaveBtn').style.display = canEdit ? '' : 'none';
-        document.getElementById('suiviModalHint').textContent = canEdit
-            ? 'Client OK → clôture · Sans retour → marquer · Non OK → statut non validé + renvoi email banque.'
-            : 'Consultation des retours.';
 
         document.getElementById('suiviModal').dataset.ticketId = id;
         document.getElementById('suiviModal').classList.add('open');
@@ -671,93 +1017,72 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function fermerSuiviModal() {
         document.getElementById('suiviModal').classList.remove('open');
+        document.querySelectorAll('.custom-select.open').forEach(w => w.classList.remove('open'));
     }
     document.getElementById('suiviModalClose').addEventListener('click', fermerSuiviModal);
     document.getElementById('suiviModal').addEventListener('click', function(e) {
         if (e.target === this) fermerSuiviModal();
     });
 
-    async function postSuivi(action) {
+    async function postSuivi() {
         const id = document.getElementById('suiviModal').dataset.ticketId;
         if (!id) return;
-
-        const client = document.getElementById('suiviClientSel').value;
-        let confirmMsg = 'Confirmer l\'enregistrement du suivi ?';
-        let confirmTitle = 'Confirmation';
-        if (client === 'ok') {
-            confirmMsg = 'Client OK — clôturer définitivement ce ticket ?';
-            confirmTitle = 'Clôture';
-        } else if (client === 'ko') {
-            confirmMsg = 'Client non OK — retirer la validation, enlever « Sans retour » et renvoyer l\'email à la banque ?';
-            confirmTitle = 'Renvoi banque';
-        } else if (client === 'sans_retour') {
-            confirmMsg = 'Marquer ce ticket « Sans retour » ?';
-            confirmTitle = 'Sans retour';
+        const client = clientSelect.getValue();
+        if (!client) {
+            showToast('Choisissez une action client', 'info');
+            return;
         }
 
-        // 1) Confirmation d'abord (le modal suivi reste ouvert)
+        let confirmMsg = 'Confirmer l\'enregistrement du suivi ?';
+        let confirmTitle = 'Confirmation';
+        if (client === 'ok') { confirmMsg = 'Client OK — clôturer définitivement ce ticket ?'; confirmTitle = 'Clôture'; }
+        else if (client === 'ko') { confirmMsg = 'Client non OK — renvoyer l\'email à la banque ?'; confirmTitle = 'Renvoi banque'; }
+        else if (client === 'sans_retour') { confirmMsg = 'Marquer ce ticket « Sans retour » ?'; confirmTitle = 'Sans retour'; }
+
         const ok = await showConfirm(confirmMsg, confirmTitle);
-        if (!ok) return; // annulation → on reste dans le modal suivi
+        if (!ok) return;
 
         const payload = {
-            suivi_banque: document.getElementById('suiviBanqueSel').value || 'ok',
+            suivi_banque: banqueSelect.getValue() || 'ok',
             suivi_client: client,
-            suivi_madaozi: document.getElementById('suiviMadaSel').value,
+            suivi_madaozi: madaSelect.getValue(),
             action: 'enregistrer'
         };
 
         const saveBtn = document.getElementById('suiviSaveBtn');
-        if (saveBtn) {
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Enregistrement…';
-        }
+        if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Enregistrement…'; }
 
         try {
-            // 2) Enregistrement API
             const data = await fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/suivi`, {
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
             if (data.success) {
                 showToast(data.message || 'Suivi enregistré', 'success');
-                // 3) Fermer seulement après succès
                 fermerSuiviModal();
                 loadTickets();
             } else {
-                showToast(data.message || 'Erreur lors de l\'enregistrement', 'danger');
+                showToast(data.message || 'Erreur', 'danger');
             }
         } catch (e) {
             showToast(e.message || 'Erreur réseau', 'danger');
         } finally {
-            if (saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Enregistrer';
-            }
+            if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="bi bi-check2"></i> Enregistrer'; }
         }
     }
-    document.getElementById('suiviSaveBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        postSuivi('enregistrer');
-    });
+    document.getElementById('suiviSaveBtn').addEventListener('click', postSuivi);
 
-    // Client select change → propose action
-    document.getElementById('suiviClientSel').addEventListener('change', function() {
-        const v = this.value;
-        if (v === 'ok') showToast('Client OK → cliquez Clôturer.', 'info');
-        else if (v === 'sans_retour') showToast('Sans retour (défaut après validation banque).', 'info');
-        else if (v === 'ko') showToast('Client non OK → Renvoyer à la banque.', 'info');
-    });
-
+    /* ============================================================
+       CHARGEMENT TICKETS
+       ============================================================ */
     function loadTickets() {
         return fetchWithAuth(`${API_BASE}/api/user/tickets`)
             .then(tickets => {
                 const tbody = document.getElementById('ticketsBody');
                 if (!tickets.length) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="text-center">${typeof t === 'function' ? t('tickets.empty') : 'Aucun ticket'}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center">Aucun ticket</td></tr>`;
                     return;
                 }
-
                 window.__ticketsById = {};
                 tickets.forEach(tk => { window.__ticketsById[tk.id] = tk; });
 
@@ -769,10 +1094,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     else if (ticket.statut === 'RIB reçu') badgeClass = 'status-rib-recu';
                     else if (ticket.statut === 'En attente réponse banque') badgeClass = 'status-attente-banque';
 
-                    // Validé (banque OK) → modal pour client OK = clôture, sinon renvoi banque
                     const canSuivi = ['Validé','Sans retour'].includes(ticket.statut);
                     let actions = canSuivi
-                        ? `<button type="button" class="btn-action btn-view" onclick="ouvrirSuiviModal(${ticket.id})" title="Retour client — clôturer ou renvoyer banque"><i class="bi bi-bookmark-check"></i></button>`
+                        ? `<button type="button" class="btn-action btn-view" onclick="ouvrirSuiviModal(${ticket.id})" title="Suivi"><i class="bi bi-bookmark-check"></i></button>`
                         : `<a class="btn-action btn-view" href="/ticket/ticket-show.html?id=${ticket.id}" title="Voir"><i class="bi bi-eye"></i></a>`;
                     if (ticket.statut === 'En attente RIB') {
                         actions += `<a class="btn-action btn-rib" href="/ticket/ticket-step3.html?id=${ticket.id}" title="Envoyer RIB"><i class="bi bi-paperclip"></i></a>`;
@@ -802,28 +1126,23 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(err => {
                 console.error(err);
-                document.getElementById('ticketsBody').innerHTML =
-                    `<tr><td colspan="7" class="text-danger">${typeof t === 'function' ? t('tickets.load_error') : 'Erreur de chargement'}</td></tr>`;
+                document.getElementById('ticketsBody').innerHTML = `<tr><td colspan="7" class="text-danger">Erreur de chargement</td></tr>`;
             });
     }
 
     window.deleteTicket = async function(id) {
-        const ok = await showConfirm(typeof t === 'function' ? t('confirm.delete_one') : 'Confirmer la suppression de ce ticket ?', typeof t === 'function' ? t('confirm.delete_title') : 'Suppression');
+        const ok = await showConfirm('Confirmer la suppression de ce ticket ?', 'Suppression');
         if (!ok) return;
-
         fetchWithAuth(`${API_BASE}/api/user/ticket/${id}/delete`, { method: 'POST' })
             .then(data => {
                 if (data.success) {
-                    showToast(typeof t === 'function' ? t('toast.ticket_deleted') : 'Ticket supprimé avec succès', 'success');
+                    showToast('Ticket supprimé avec succès', 'success');
                     loadTickets();
                 } else {
-                    showToast(typeof t === 'function' ? t('toast.delete_error') : 'Erreur de suppression', 'danger');
+                    showToast('Erreur de suppression', 'danger');
                 }
             })
-            .catch(err => {
-                console.error(err);
-                showToast(typeof t === 'function' ? t('toast.delete_error') : 'Erreur de suppression', 'danger');
-            });
+            .catch(err => { console.error(err); showToast('Erreur de suppression', 'danger'); });
     };
 
     function updateDeleteButtonVisibility() {
@@ -834,120 +1153,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function deleteSelected() {
         const ids = Array.from(document.querySelectorAll('.ticket-checkbox:checked')).map(cb => cb.dataset.id);
-        if (!ids.length) {
-            showToast(typeof t === 'function' ? t('toast.none_selected') : 'Aucun ticket sélectionné', 'info');
-            return;
-        }
-
-        const ok = await showConfirm((typeof t === 'function' ? t('confirm.delete_many') : 'Supprimer {n} ticket(s) ?').replace('{n}', ids.length), typeof t === 'function' ? t('confirm.delete_many_title') : 'Suppression multiple');
+        if (!ids.length) { showToast('Aucun ticket sélectionné', 'info'); return; }
+        const ok = await showConfirm(`Supprimer ${ids.length} ticket(s) ?`, 'Suppression multiple');
         if (!ok) return;
-
         const btn = document.getElementById('deleteSelectedBtn');
         if (btn) btn.disabled = true;
-
         try {
-            const results = await Promise.allSettled(
-                ids.map(id => fetchWithAuth(`${API_BASE}/api/user/ticket/${id}/delete`, { method: 'POST' }))
-            );
-            const failed = results.filter(r =>
-                r.status === 'rejected' || (r.status === 'fulfilled' && !(r.value && r.value.success))
-            );
-            if (failed.length === 0) {
-                showToast(typeof t === 'function' ? t('toast.delete_success') : 'Suppression réussie', 'success');
-            } else {
-                showToast(`${failed.length} échec(s) lors de la suppression`, 'danger');
-            }
+            const results = await Promise.allSettled(ids.map(id => fetchWithAuth(`${API_BASE}/api/user/ticket/${id}/delete`, { method: 'POST' })));
+            const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !(r.value && r.value.success)));
+            if (failed.length === 0) showToast('Suppression réussie', 'success');
+            else showToast(`${failed.length} échec(s)`, 'danger');
             loadTickets();
         } catch (e) {
             console.error(e);
-            showToast(typeof t === 'function' ? t('toast.delete_error') : 'Erreur de suppression', 'danger');
+            showToast('Erreur de suppression', 'danger');
         } finally {
             if (btn) btn.disabled = false;
             updateDeleteButtonVisibility();
         }
     }
-
     document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
     loadTickets();
 
-    /* ===== WebSocket temps réel + fallback polling ===== */
+    /* ===== WebSocket ===== */
     const WS_URL = window.WS_URL || ((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.hostname + ':8081/ws');
-    let ticketsWs = null;
-    let ticketsWsTimer = null;
-    let ticketsWsOk = false;
-    let ticketsPollTimer = null;
-    const TICKETS_POLL_MS = 35000;
-
+    let ticketsWs = null, ticketsWsTimer = null, ticketsWsOk = false, ticketsPollTimer = null;
     function ticketsWsConnect() {
         if (ticketsWs && (ticketsWs.readyState === WebSocket.OPEN || ticketsWs.readyState === WebSocket.CONNECTING)) return;
-        try {
-            ticketsWs = new WebSocket(WS_URL);
-        } catch (e) {
-            console.warn('[ws] connect failed', e);
-            scheduleTicketsWs();
-            return;
-        }
-        ticketsWs.addEventListener('open', function () {
-            console.log('[ws] connected', WS_URL);
-            ticketsWsOk = true;
-            stopTicketsPolling();
-            loadTickets();
-        });
+        try { ticketsWs = new WebSocket(WS_URL); } catch (e) { scheduleTicketsWs(); return; }
+        ticketsWs.addEventListener('open', function () { ticketsWsOk = true; stopTicketsPolling(); loadTickets(); });
         ticketsWs.addEventListener('message', function (ev) {
-            let msg;
-            try { msg = JSON.parse(ev.data); } catch (_) { return; }
+            let msg; try { msg = JSON.parse(ev.data); } catch (_) { return; }
             if (!msg) return;
-
-            // Le hub peut envoyer soit {event, ticketId, ...}, soit {type: 'ping'|'connected'}
             const eventName = msg.event || msg.type || '';
             if (eventName === 'pong' || eventName === 'connected') return;
-
-            // On ne réagit qu'aux événements ticket.*
-            if (eventName.indexOf('ticket.') === 0) {
-                console.log('[ws] event', eventName);
-                loadTickets();
-            }
+            if (eventName.indexOf('ticket.') === 0) loadTickets();
         });
-        ticketsWs.addEventListener('close', function () {
-            console.warn('[ws] closed — fallback polling');
-            ticketsWsOk = false;
-            scheduleTicketsWs();
-            if (!document.hidden) startTicketsPolling();
-        });
-        ticketsWs.addEventListener('error', function () {
-            try { ticketsWs.close(); } catch (_) {}
-        });
+        ticketsWs.addEventListener('close', function () { ticketsWsOk = false; scheduleTicketsWs(); startTicketsPolling(); });
+        ticketsWs.addEventListener('error', function () { try { ticketsWs.close(); } catch (_) {} });
     }
     function scheduleTicketsWs() {
         if (ticketsWsTimer) return;
-        ticketsWsTimer = setTimeout(function () {
-            ticketsWsTimer = null;
-            ticketsWsConnect();
-        }, 4000);
+        ticketsWsTimer = setTimeout(function () { ticketsWsTimer = null; ticketsWsConnect(); }, 4000);
     }
     function startTicketsPolling() {
         stopTicketsPolling();
         if (document.hidden || ticketsWsOk) return;
-        ticketsPollTimer = setInterval(function () {
-            if (!document.hidden && !ticketsWsOk) loadTickets();
-        }, TICKETS_POLL_MS);
+        ticketsPollTimer = setInterval(function () { if (!document.hidden && !ticketsWsOk) loadTickets(); }, 35000);
     }
     function stopTicketsPolling() {
         if (ticketsPollTimer) { clearInterval(ticketsPollTimer); ticketsPollTimer = null; }
     }
     document.addEventListener('visibilitychange', function () {
         if (document.hidden) stopTicketsPolling();
-        else {
-            loadTickets();
-            if (!ticketsWsOk) { startTicketsPolling(); ticketsWsConnect(); }
-        }
+        else { loadTickets(); if (!ticketsWsOk) { startTicketsPolling(); ticketsWsConnect(); } }
     });
     ticketsWsConnect();
     startTicketsPolling();
 
-    document.addEventListener('languageChanged', function() {
-        loadTickets();
-    });
+    document.addEventListener('languageChanged', function() { loadTickets(); });
 });
 </script>
 </body>
