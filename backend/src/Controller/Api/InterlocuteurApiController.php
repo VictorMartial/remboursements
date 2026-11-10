@@ -582,6 +582,30 @@ class InterlocuteurApiController extends AbstractController
         }
     }
 
+        // ==== 10. Supprimer un ticket (interlocuteur) ====
+    #[Route('/ticket/{id}/delete', name: 'api_interlocuteur_ticket_delete', methods: ['POST', 'DELETE'])]
+    public function deleteTicket(Ticket $ticket): JsonResponse
+    {
+        try {
+            $this->realtimeNotifier->ticketUpdated('ticket.deleted', $ticket);
+            $this->em->remove($ticket);
+            $this->em->flush();
+
+            $this->activityLogger->log(
+                'SUPPRESSION',
+                sprintf('Ticket #%d supprime par un interlocuteur.', $ticket->getId()),
+                'Ticket',
+                $ticket->getId()
+            );
+
+            return $this->json(['success' => true, 'message' => 'Ticket supprime']);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
     // ==================== MÉTHODES PRIVÉES ====================
 
     private function notifyUserRib(Ticket $ticket): void

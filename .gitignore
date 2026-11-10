@@ -18,3 +18,5 @@
 Thumbs.db
 Desktop.ini
 /backend/public/uploads/
+# Backups de migration
+backup-migration-*/

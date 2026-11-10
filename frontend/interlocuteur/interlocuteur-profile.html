@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -88,7 +88,7 @@
     <div class="sidebar-backdrop" data-sidebar-close></div>
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
-            <a class="brand-mark" href="/user/dashboard-user.html">
+            <a class="brand-mark" href="/interlocuteur/interlocuteur-accueil.html">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
                 <span class="brand-copy">
                     <span class="brand-title" id="brandTitle">Interlocuteur</span>
@@ -97,11 +97,11 @@
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link" href="/user/dashboard-user.html">
+            <a class="nav-link" href="/interlocuteur/interlocuteur-accueil.html">
                 <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                 <span class="nav-text">Dashboard</span>
             </a>
-            <a class="nav-link" href="/user/tickets-list.html">
+            <a class="nav-link" href="/interlocuteur/interlocuteur-tickets-list.html">
                 <span class="nav-icon"><i class="bi bi-list-ul"></i></span>
                 <span class="nav-text">Mes tickets</span>
             </a>
@@ -113,7 +113,7 @@
                 <span class="nav-icon"><i class="bi bi-inbox"></i></span>
                 <span class="nav-text">Suivi RIB / Banque</span>
             </a>
-            <a class="nav-link active" href="/user/profile.html" aria-current="page">
+            <a class="nav-link active" href="/interlocuteur/interlocuteur-profile.html" aria-current="page">
                 <span class="nav-icon"><i class="bi bi-person"></i></span>
                 <span class="nav-text">Profil</span>
             </a>
@@ -124,7 +124,7 @@
         </div>
         <div class="sidebar-footer">
             <span class="status-dot"></span>
-            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">ConnectÃ©</span>
         </div>
     </aside>
 
@@ -136,10 +136,10 @@
                 </button>
                 <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
                     <div class="dropdown me-2">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageButton">🇫🇷</button>
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageButton">ðŸ‡«ðŸ‡·</button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
-                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">ðŸ‡«ðŸ‡· FranÃ§ais</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">ðŸ‡¬ðŸ‡§ English</a></li>
                         </ul>
                     </div>
                     <button class="icon-button theme-toggle" type="button" data-theme-toggle>
@@ -150,9 +150,9 @@
                             <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><a class="dropdown-item" href="/interlocuteur/interlocuteur-profile.html" data-i18n="profile">Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">Déconnexion</a></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">DÃ©connexion</a></li>
                         </ul>
                     </div>
                 </div>
@@ -177,7 +177,7 @@
                         <div class="panel h-100">
                             <div class="profile-hero">
                                 <div class="user-avatar-xl" id="profileAvatar">?</div>
-                                <h2 class="h5 mb-1" id="profileEmailTitle">—</h2>
+                                <h2 class="h5 mb-1" id="profileEmailTitle">â€”</h2>
                                 <div class="mt-2" id="profileRoleBadges"></div>
                                 <div class="mt-2" id="profileVerifiedBadge"></div>
                             </div>
@@ -189,26 +189,26 @@
                                 <div>
                                     <h2 class="h5 mb-1 section-title">
                                         <i class="bi bi-info-circle"></i>
-                                        <span>Détails du compte</span>
+                                        <span>DÃ©tails du compte</span>
                                     </h2>
                                 </div>
                             </div>
                             <div class="info-list px-1">
                                 <div>
                                     <span data-i18n="label.email">Email</span>
-                                    <strong id="profileEmail">—</strong>
+                                    <strong id="profileEmail">â€”</strong>
                                 </div>
                                 <div>
-                                    <span>Rôle</span>
-                                    <strong id="profileRoles">—</strong>
+                                    <span>RÃ´le</span>
+                                    <strong id="profileRoles">â€”</strong>
                                 </div>
                                 <div>
-                                    <span>Compte vérifié</span>
-                                    <strong id="profileVerified">—</strong>
+                                    <span>Compte vÃ©rifiÃ©</span>
+                                    <strong id="profileVerified">â€”</strong>
                                 </div>
                                 <div>
                                     <span data-i18n="label.registered">Inscrit le</span>
-                                    <strong><span class="date-pill" id="profileCreatedAt"><i class="bi bi-calendar3"></i> —</span></strong>
+                                    <strong><span class="date-pill" id="profileCreatedAt"><i class="bi bi-calendar3"></i> â€”</span></strong>
                                 </div>
                             </div>
                         </div>
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function formatDate(raw) {
-        if (!raw) return '—';
+        if (!raw) return 'â€”';
         var s = String(raw).trim();
         if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) {
             return s.split(' ')[0];
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function roleLabel(role) {
         var map = { 'ROLE_USER': 'User', 'ROLE_INTERLOCUTEUR': 'Interlocuteur', 'ROLE_ADMIN': 'Admin' };
-        return map[role] || role || '—';
+        return map[role] || role || 'â€”';
     }
     function roleClass(role) {
         var r = (role || '').toUpperCase();
@@ -276,17 +276,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.status === 401) {
                 localStorage.removeItem('jwt_token');
                 window.location.href = '/auth/login.html';
-                return Promise.reject('Non authentifié');
+                return Promise.reject('Non authentifiÃ©');
             }
             if (!res.ok) throw new Error('HTTP ' + res.status);
             return res.json();
         });
     }
 
-    fetchWithAuth(API_BASE + '/api/user/profile')
+    fetchWithAuth(API_BASE + '/api/interlocuteur/profile')
         .then(function(data) {
             var user = (data && data.user) ? data.user : (data || {});
-            var email = user.email || user.username || '—';
+            var email = user.email || user.username || 'â€”';
             var created = user.createdAt || user.created_at || user.dateCreation || null;
 
             function setText(id, val) {
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setText('navbarUserName', email);
 
             var avatar = document.getElementById('profileAvatar');
-            if (avatar) avatar.textContent = (email && email !== '—') ? email.charAt(0).toUpperCase() : '?';
+            if (avatar) avatar.textContent = (email && email !== 'â€”') ? email.charAt(0).toUpperCase() : '?';
 
             var elDate = document.getElementById('profileCreatedAt');
             if (elDate) {
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var roles = [];
             if (Array.isArray(user.roles)) roles = user.roles;
             else if (user.role) roles = [user.role];
-            setText('profileRoles', roles.length ? roles.map(roleLabel).join(', ') : '—');
+            setText('profileRoles', roles.length ? roles.map(roleLabel).join(', ') : 'â€”');
 
             var badgesEl = document.getElementById('profileRoleBadges');
             if (badgesEl) {
@@ -329,8 +329,8 @@ document.addEventListener('DOMContentLoaded', function() {
             var elVerifiedBadge = document.getElementById('profileVerifiedBadge');
             if (elVerifiedBadge) {
                 elVerifiedBadge.innerHTML = verified
-                    ? '<span class="status-badge">Compte vérifié</span>'
-                    : '<span class="status-badge off">Non vérifié</span>';
+                    ? '<span class="status-badge">Compte vÃ©rifiÃ©</span>'
+                    : '<span class="status-badge off">Non vÃ©rifiÃ©</span>';
             }
         })
         .catch(function(err) { console.error(err); });

@@ -17,28 +17,43 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class AdminStatsApiController extends AbstractController
 {
-    #[Route('/stats', name: 'api_admin_stats', methods: ['GET'])]
-    public function stats(TicketRepository $repo): JsonResponse
+        #[Route('/stats', name: 'api_admin_stats', methods: ['GET'])]
+    public function stats(TicketRepository $repo, Request $request): JsonResponse
     {
-        $monthlyStats = $repo->getMonthlyStats(6);
+        try {
+            $dateFrom = $request->query->get('date_from');
+            $dateTo   = $request->query->get('date_to');
+            $type     = $request->query->get('type');
+            $statut   = $request->query->get('statut');
 
-        // Utilisation des constantes de l'entité pour fiabilité
-        $enAttenteRib = $repo->count(['statut' => Ticket::STATUT_ATTENTE_RIB]);
-        $crees = $repo->count([]); // total
-        $ticketsARembourser = $repo->count(['statut' => Ticket::STATUT_ATTENTE_CONFIRMATION]);
-        $ticketsARenvoyer = $repo->count(['statut' => Ticket::STATUT_RIB_RECU]);
-        $aevNonRecu = $repo->count(['typeRemboursement' => Ticket::TYPE_AEV]);
-        $paiementMultiple = $repo->count(['typeRemboursement' => Ticket::TYPE_MULTIPLE]);
+            // ✅ Stats filtrées (une seule requête, tout est agrégé côté repo)
+            $filtered = $repo->getStatsFiltered($dateFrom, $dateTo, $type, $statut, 6);
 
-        return $this->json([
-            'en_attente_rib' => $enAttenteRib,
-            'crees' => $crees,
-            'tickets_a_rembourser' => $ticketsARembourser,
-            'tickets_a_renvoyer' => $ticketsARenvoyer,
-            'aev_non_recu' => $aevNonRecu,
-            'paiement_multiple' => $paiementMultiple,
-            'monthlyStats' => $monthlyStats,
-        ]);
+            // Compatibilité : on garde les champs "historiques" attendus par le frontend
+            $parStatut = $filtered['par_statut'];
+            $enAttenteRib = $parStatut[Ticket::STATUT_ATTENTE_RIB] ?? 0;
+            $crees        = $filtered['total'];
+            $aRembourser  = $parStatut[Ticket::STATUT_ATTENTE_CONFIRMATION] ?? 0;
+            $aRenvoyer    = $parStatut[Ticket::STATUT_RIB_RECU] ?? 0;
+            $aevNonRecu   = $filtered['par_type'][Ticket::TYPE_AEV] ?? 0;
+            $paiementMultiple = $filtered['par_type'][Ticket::TYPE_MULTIPLE] ?? 0;
+
+            return $this->json([
+                'en_attente_rib'       => $enAttenteRib,
+                'crees'                => $crees,
+                'tickets_a_rembourser' => $aRembourser,
+                'tickets_a_renvoyer'   => $aRenvoyer,
+                'aev_non_recu'         => $aevNonRecu,
+                'paiement_multiple'    => $paiementMultiple,
+                'monthlyStats'         => $filtered['monthly'],
+                'par_statut'           => $parStatut,
+                'total'                => $filtered['total'],
+                'filters'              => $filtered['filters'],
+            ]);
+        } catch (\Exception $e) {
+            error_log('Erreur /api/admin/stats : ' . $e->getMessage());
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     #[Route('/activities', name: 'api_admin_activities', methods: ['GET'])]
@@ -71,21 +86,7 @@ class AdminStatsApiController extends AbstractController
         ]);
     }
 
-    #[Route('/users', name: 'api_admin_users', methods: ['GET'])]
-    public function users(UserRepository $userRepo): JsonResponse
-    {
-        $users = $userRepo->findRecent(5);
-        $data = [];
-        foreach ($users as $user) {
-            $data[] = [
-                'id' => $user->getId(),
-                'email' => $user->getEmail(),
-                'role' => $user->getRole(),
-                'createdAt' => $user->getCreatedAt() ? $user->getCreatedAt()->format('Y-m-d') : null,
-            ];
-        }
-        return $this->json($data);
-    }
+    
 
     // ------------------------------------------------------------------
     // Paramètres système : Email Banque (saisie manuelle + stockage DB)

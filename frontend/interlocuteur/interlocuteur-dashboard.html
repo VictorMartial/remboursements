@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -81,7 +81,7 @@
     .card-header-flex .card-header-text h1 { font-size: clamp(1.05rem, 2.5vw, 1.35rem); margin: 0; }
     .card { border-radius: var(--radius-lg); overflow: hidden; }
 
-    /* —— Tableaux adaptatifs (sans superposition) —— */
+    /* ===== Tableaux adaptatifs (sans superposition) ===== */
     .table-wrap {
         overflow-x: hidden;
         overflow-y: auto;
@@ -110,7 +110,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        max-width: 0; /* force ellipsis with table-layout:fixed */
+        max-width: 0;
     }
     .table-wrap th {
         background: #e2e8f0;
@@ -352,11 +352,11 @@
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link active" href="/user/dashboard-user.html" aria-current="page">
+            <a class="nav-link active" href="/interlocuteur/interlocuteur-accueil.html" aria-current="page">
                 <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
                 <span class="nav-text">Dashboard</span>
             </a>
-            <a class="nav-link" href="/user/tickets-list.html">
+            <a class="nav-link" href="/interlocuteur/interlocuteur-tickets-list.html">
                 <span class="nav-icon"><i class="bi bi-list-ul" aria-hidden="true"></i></span>
                 <span class="nav-text">Mes tickets</span>
             </a>
@@ -401,7 +401,7 @@
                             <span class="profile-name d-none d-sm-inline" id="navbarUserName">Interlocuteur</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/user/profile.html">Profil</a></li>
+                            <li><a class="dropdown-item" href="/interlocuteur/interlocuteur-profile.html">Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" id="logoutBtn">Déconnexion</a></li>
                         </ul>
@@ -413,12 +413,11 @@
         <main class="dashboard-content">
             <div class="container-fluid px-3 px-lg-4 py-4">
 
-                <!-- Section 1 : RIB reçus (plus de section « en attente de confirmation ») -->
+                <!-- Section 1 : RIB reçus -->
                 <div class="card">
                     <div class="card-header card-header-flex">
                         <div class="card-header-text">
                             <h1 class="h4">RIB reçus</h1>
-                            
                         </div>
                         <div>
                             <button class="btn btn-success btn-sm" id="envoyerTousBanqueBtn" onclick="envoyerTousBanque(this)">
@@ -962,7 +961,6 @@ function wsConnect() {
         try { msg = JSON.parse(ev.data); } catch (_) { return; }
         if (!msg) return;
 
-        // Hub : { type, data, at } — ancien : { event, ... }
         const eventName = msg.type || msg.event || '';
         if (eventName === 'pong' || eventName === 'connected') return;
         if (eventName.indexOf('ticket.') !== 0) return;
@@ -1003,28 +1001,10 @@ function stopWsPing() {
     if (wsPingTimer) { clearInterval(wsPingTimer); wsPingTimer = null; }
 }
 
-function onRealtimeEvent(msg) {
-    const type = msg.type || msg.event || '';
-    if (type.indexOf('ticket.') !== 0) return;
-    console.log('[ws] event', type);
-    rafraichirApresAction();
-    if (type === 'ticket.created' || type === 'ticket.rib_uploaded') {
-        showFlash('Nouvelle mise à jour ticket (temps réel).', 'info');
-    }
-}
-
 /* ===== Refresh (manuel + fallback polling si WS down) ===== */
 let refreshEnCours = false;
 let pollTimer = null;
 const POLL_INTERVAL_MS = 30000;
-
-
-
-
-
-
-
-
 
 function chargerToutesLesDonnees(options = {}) {
     const silencieux = options.silencieux === true;
@@ -1099,18 +1079,6 @@ if (document.readyState === 'loading') {
 window.addEventListener('beforeunload', function () {
     arreterPolling();
     stopWsPing();
-    try { if (ws) ws.close(); } catch (_) {}
-}); 
-
-document.addEventListener('DOMContentLoaded', function() {
-    chargerToutesLesDonnees({ silencieux: false }).then(function () {
-        wsConnect();
-        demarrerPolling();
-    });
-});
-
-window.addEventListener('beforeunload', function () {
-    arreterPolling();
     try { if (ws) ws.close(); } catch (_) {}
 });
 </script>

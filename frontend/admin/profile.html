@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -186,7 +186,7 @@
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const API_BASE = 'http://localhost:8000';
-    const apiBase = `${API_BASE}/api/user`;
+    const apiBase = `${API_BASE}/api/admin/profile`;
     const alertDiv = document.getElementById('profileAlert');
     const token = localStorage.getItem('jwt_token');
 
@@ -244,7 +244,7 @@
     }
 
     function loadProfile() {
-      fetchWithAuth(`${apiBase}/profile`)
+      fetchWithAuth(`${apiBase}`)
         .then(user => {
           const email = user.email || '—';
           updateConnectedUserDisplay(email);
@@ -287,7 +287,7 @@
         password: document.getElementById('profilePassword').value || undefined
       };
 
-      fetchWithAuth(`${apiBase}/profile`, {
+      fetchWithAuth(`${apiBase}`, {
         method: 'PUT',
         body: JSON.stringify(payload)
       })

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -31,7 +31,6 @@
 
         body { font-family: var(--font-sans); }
 
-        /* ===== Titres en serif ===== */
         h1, h2, h3, h4, .brand-title, .modal-title-serif {
             font-family: var(--font-serif);
             letter-spacing: 0.2px;
@@ -39,45 +38,152 @@
         h2 i, h3 i { color: var(--accent); }
 
         /* ===== Table ===== */
+                /* ===== TABLE — Attributs fixés ===== */
         .table-wrap, .table-responsive {
-            display: block; width: 100%; max-width: 100%;
-            overflow-x: hidden !important;
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
             border-radius: var(--radius-md);
             border: 1px solid rgba(71,85,105,0.2);
             box-shadow: 0 2px 12px rgba(15,23,42,0.08);
+            max-height: min(65vh, 600px);
         }
-        #ticketsTable { border-collapse: separate; border-spacing: 0; }
+
         #ticketsTable {
-            width: 100% !important; min-width: 0 !important;
-            table-layout: fixed !important; margin-bottom: 0;
+            width: 100% !important;
+            min-width: 820px;              /* ← force une largeur minimale cohérente */
+            table-layout: fixed !important;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 0;
         }
+
+        /* Largeurs FIXES par colonne — ne bougent plus au tri */
+        #ticketsTable col.col-check    { width: 44px; }
+        #ticketsTable col.col-id       { width: 64px; }
+        #ticketsTable col.col-reference{ width: 180px; }
+        #ticketsTable col.col-montant  { width: 110px; }
+        #ticketsTable col.col-statut   { width: 160px; }
+        #ticketsTable col.col-date     { width: 120px; }
+        #ticketsTable col.col-actions  { width: 170px; }
+
         #ticketsTable th, #ticketsTable td {
-            white-space: nowrap; vertical-align: middle;
-            padding: 8px 10px; font-size: 0.84rem;
-            overflow: hidden; text-overflow: ellipsis;
+            vertical-align: middle;
+            padding: 10px 12px;
+            font-size: 0.84rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-color: rgba(71,85,105,0.16);
         }
-        #ticketsTable th:nth-child(1), #ticketsTable td:nth-child(1) { width: 36px; }
-        #ticketsTable th:nth-child(2), #ticketsTable td:nth-child(2) { width: 52px; }
-        #ticketsTable th:nth-child(3), #ticketsTable td:nth-child(3) { width: 16%; }
-        #ticketsTable th:nth-child(4), #ticketsTable td:nth-child(4) { width: 13%; }
-        #ticketsTable th:nth-child(5), #ticketsTable td:nth-child(5) { width: 16%; }
-        #ticketsTable th:nth-child(6), #ticketsTable td:nth-child(6) { width: 11%; }
-        #ticketsTable th:nth-child(7), #ticketsTable td:nth-child(7) { width: 150px; }
-        #ticketsTable thead.table-dark { background: rgba(71,85,105,0.14) !important; }
-        #ticketsTable thead.table-dark th {
-            background: transparent; color: #334155 !important; font-weight: 700;
-            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
-            border-color: rgba(71,85,105,0.22);
+
+        /* ===== EN-TÊTES STICKY ===== */
+        #ticketsTable thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        #ticketsTable thead th {
+            position: sticky;
+            top: 0;
+            background: #e2e8f0 !important;
+            color: #1e293b !important;
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid rgba(71,85,105,0.28) !important;
+            box-shadow: 0 2px 4px rgba(15,23,42,0.06);
+            z-index: 10;
             font-family: var(--font-sans);
         }
-        [data-bs-theme="dark"] #ticketsTable thead.table-dark th { color: #94a3b8 !important; }
-        #ticketsTable tbody tr { transition: background-color 0.15s ease; }
-        #ticketsTable tbody tr:hover { background: rgba(99,102,241,0.08) !important; }
-        #ticketsTable td, #ticketsTable th { border-color: rgba(71,85,105,0.16); }
+        [data-bs-theme="dark"] #ticketsTable thead th {
+            background: #2a3140 !important;
+            color: #e2e8f0 !important;
+            border-bottom-color: rgba(148,163,184,0.28) !important;
+        }
+
+        /* Largeur fixe pour chaque th selon son data-sort */
+        #ticketsTable th[data-sort="id"]        { width: 64px;  }
+        #ticketsTable th[data-sort="reference"] { width: 180px; }
+        #ticketsTable th[data-sort="montant"]   { width: 110px; }
+        #ticketsTable th[data-sort="statut"]    { width: 160px; }
+        #ticketsTable th[data-sort="date"]      { width: 120px; }
+        #ticketsTable th:first-child            { width: 44px;  }
+        #ticketsTable th:last-child             { width: 170px; }
+
+        /* Corps */
+        #ticketsTable tbody tr {
+            transition: background-color 0.15s ease;
+        }
+        #ticketsTable tbody tr:hover {
+            background: rgba(99,102,241,0.08) !important;
+        }
         #ticketsTable tbody td { color: #1e293b; }
         [data-bs-theme="dark"] #ticketsTable tbody td { color: #e6e8ec; }
+
+        /* Cellules spécifiques */
+        #ticketsTable td.amount-cell {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        #ticketsTable td.statut-cell {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            line-height: 1.35;
+        }
+
+        /* Checkbox */
+        #ticketsTable th:first-child,
+        #ticketsTable td:first-child {
+            padding-right: 4px;
+            text-align: center;
+        }
+
+        /* Actions */
+        #ticketsTable th:last-child,
+        #ticketsTable td:last-child {
+            text-align: right;
+        }
+
+        /* ===== TRI ===== */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 22px !important;
+            transition: background-color 0.15s ease;
+        }
+        .sortable:hover {
+            background: rgba(99,102,241,0.08);
+        }
+        .sortable::after {
+            content: "⇅";
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            opacity: 0.35;
+            font-weight: 400;
+            transition: opacity 0.15s ease;
+        }
+        .sortable:hover::after { opacity: 0.7; }
+        .sortable.sort-asc::after {
+            content: "▲";
+            opacity: 1;
+            color: var(--accent);
+        }
+        .sortable.sort-desc::after {
+            content: "▼";
+            opacity: 1;
+            color: var(--accent);
+        }
 
         /* Statut : texte + pastille, sans fond ni bordure */
         #ticketsTable .badge {
@@ -128,13 +234,15 @@
             transform: rotate(45deg); box-shadow: 0 2px 8px rgba(0,0,0,0.25);
             line-height: 1.2; white-space: nowrap;
         }
-        .corner-ribbon.rib-ok span { background: #16a34a; }
-        .corner-ribbon.rib-ko span { background: #e11d48; }
-        .corner-ribbon.rib-sans span { background: #9f1239; }
-        .corner-ribbon.rib-attente span { background: #d97706; }
-        .corner-ribbon.rib-none span { background: #64748b; }
+        /* ===== RUBANS ===== */
+        .corner-ribbon.rib-ok span { background: linear-gradient(135deg, #10b981, #059669); }
+        .corner-ribbon.rib-ko span { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+        .corner-ribbon.rib-sans span { background: linear-gradient(135deg, #9f1239, #881337); }
+        .corner-ribbon.rib-cloture span { background: linear-gradient(135deg, #059669, #047857); }
+        .corner-ribbon.rib-attente span { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .corner-ribbon.rib-none span { background: linear-gradient(135deg, #64748b, #475569); }
 
-        /* ===== MODAL MODERNE ===== */
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(15,18,25,.55);
@@ -146,10 +254,7 @@
         }
         #confirmModal.modal-overlay { z-index: 2100; }
         .modal-overlay.open { display: flex; }
-        @keyframes fadeOverlay {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
 
         .modal-box {
             background: #fff;
@@ -242,7 +347,7 @@
             opacity: 0.7;
         }
 
-        /* ===== CUSTOM ANIMATED SELECT DROPDOWN ===== */
+        /* ===== CUSTOM SELECT ===== */
         .custom-select {
             position: relative;
             flex: 1;
@@ -359,20 +464,19 @@
         }
         .custom-select-option.selected i { opacity: 1; }
         .custom-select-option.selected::after {
-            content: "\F26E"; /* bi-check-lg */
+            content: "\F26E";
             font-family: "bootstrap-icons";
             margin-left: auto;
             font-size: 0.9rem;
             color: var(--accent);
         }
 
-        /* Couleurs par option (Banque / Client / Mada) */
         .custom-select-option[data-tone="ok"] i { color: #16a34a; }
         .custom-select-option[data-tone="ko"] i { color: #e11d48; }
         .custom-select-option[data-tone="attente"] i { color: #d97706; }
         .custom-select-option[data-tone="sans"] i { color: #9f1239; }
 
-        /* ===== SUIVI : tous les selects alignés à droite, style épuré ===== */
+        /* ===== SUIVI MODAL ===== */
         #suiviModal .suivi-modal-box {
             max-width: 440px; padding: 22px 22px 18px; border-radius: 18px;
             background: #fff; overflow: visible;
@@ -405,7 +509,6 @@
         }
         #suiviModal .suivi-row label::before { display: none; }
 
-        /* select : toujours collé à droite, même largeur pour les 3 */
         #suiviModal .custom-select {
             flex: 0 0 auto; width: min(220px, 58%); min-width: 0; max-width: none; margin-left: auto;
         }
@@ -414,12 +517,9 @@
         #suiviModal .custom-select-trigger:hover { box-shadow: none; }
         #suiviModal .custom-select-menu { left: auto; right: 0; min-width: 100%; width: max-content; max-width: 260px; }
 
-        /* --- empilement : les listes passent toujours au-dessus des boutons --- */
         #suiviModal .suivi-grid { position: relative; z-index: 5; transition: padding-bottom .18s ease; }
         #suiviModal .modal-actions { position: relative; z-index: 1; }
-        /* Client : on réserve la place sous la liste pour qu'elle ne touche pas les boutons */
         #suiviModal .suivi-grid:has(#suiviClientSelect.open) { padding-bottom: 64px; }
-        /* Mada Ozi (dernière ligne) : la liste s'ouvre vers le haut */
         #suiviModal #suiviMadaSelect .custom-select-menu {
             top: auto; bottom: calc(100% + 6px); transform: translateY(6px) scale(.98);
         }
@@ -438,7 +538,7 @@
             #suiviModal .modal-actions .btn { flex: 1; justify-content: center; }
         }
 
-        /* ===== Boutons action table ===== */
+        /* ===== Boutons action ===== */
         .btn-action {
             width: 30px; height: 30px; padding: 0; border-radius: 8px;
             display: inline-flex; align-items: center; justify-content: center;
@@ -511,7 +611,7 @@
         [data-bs-theme="dark"] .toast-item.success { background: rgba(16,185,129,.18); color: #6ee7b7; border-color: rgba(16,185,129,.3); }
         [data-bs-theme="dark"] .toast-item.danger  { background: rgba(239,68,68,.18); color: #fca5a5; border-color: rgba(239,68,68,.3); }
 
-        /* ===== Statut lisible + espace entre Statut et Date ===== */
+        /* ===== Statut lisible ===== */
         #ticketsTable th, #ticketsTable td { padding: 12px 14px; }
         #ticketsTable th:nth-child(1), #ticketsTable td:nth-child(1) { width: 44px; padding-right: 4px; }
         #ticketsTable th:nth-child(2), #ticketsTable td:nth-child(2) { width: 64px; }
@@ -550,7 +650,7 @@
     <div class="sidebar-backdrop" data-sidebar-close></div>
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
-            <a class="brand-mark" href="/user/dashboard-user.html">
+            <a class="brand-mark" href="/interlocuteur/interlocuteur-accueil.html">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
                 <span class="brand-copy">
                     <span class="brand-title" id="brandTitle">Interlocuteur</span>
@@ -559,8 +659,8 @@
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
-            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span>Mes tickets</span></a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-accueil.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+            <a class="nav-link active" href="/interlocuteur/interlocuteur-tickets-list.html"><i class="bi bi-list-ul"></i> <span>Mes tickets</span></a>
             <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
             <a class="nav-link" id="navInterlocuteurDash" href="/interlocuteur/interlocuteur-dashboard.html"><i class="bi bi-inbox"></i> <span>Suivi RIB / Banque</span></a>
         </nav>
@@ -599,7 +699,7 @@
                             <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><a class="dropdown-item" href="/interlocuteur/interlocuteur-profile.html" data-i18n="profile">Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">Déconnexion</a></li>
                         </ul>
@@ -629,11 +729,11 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th style="width:40px"><input type="checkbox" id="selectAllTickets" aria-label="Tout sélectionner"></th>
-                                    <th data-i18n="table.id">ID</th>
-                                    <th data-i18n="table.reference">Référence</th>
-                                    <th data-i18n="table.amount">Montant</th>
-                                    <th data-i18n="table.status">Statut</th>
-                                    <th data-i18n="table.date">Date</th>
+                                    <th class="sortable" data-sort="id" data-i18n="table.id">ID</th>
+                                    <th class="sortable" data-sort="reference" data-i18n="table.reference">Référence</th>
+                                    <th class="sortable" data-sort="montant" data-i18n="table.amount">Montant</th>
+                                    <th class="sortable" data-sort="statut" data-i18n="table.status">Statut</th>
+                                    <th class="sortable" data-sort="date" data-i18n="table.date">Date</th>
                                     <th data-i18n="table.actions" class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -664,13 +764,12 @@
     </div>
 </div>
 
-<!-- Modale suivi Banque / Client / Mada Ozi -->
+<!-- Modale suivi -->
 <div class="modal-overlay" id="suiviModal">
     <div class="modal-box suivi-modal-box">
         <h3><i class="bi bi-bookmark-star"></i> Suivi ticket <span id="suiviModalTicketId" style="color: var(--accent);">#</span></h3>
         <div class="suivi-grid">
 
-            <!-- Banque (select custom animé) -->
             <div class="suivi-row">
                 <label><i class="bi bi-bank2" style="color:#3b82f6;"></i> Banque</label>
                 <div class="custom-select" id="suiviBanqueSelect" data-select-id="suiviBanque">
@@ -692,7 +791,6 @@
                 </div>
             </div>
 
-            <!-- Client (select custom animé) -->
             <div class="suivi-row">
                 <label><i class="bi bi-person-circle" style="color:#8b5cf6;"></i> Client</label>
                 <div class="custom-select" id="suiviClientSelect" data-select-id="suiviClient">
@@ -714,7 +812,6 @@
                 </div>
             </div>
 
-            <!-- Mada Ozi (select custom animé) -->
             <div class="suivi-row">
                 <label><i class="bi bi-shop" style="color:#f59e0b;"></i> Mada Ozi</label>
                 <div class="custom-select" id="suiviMadaSelect" data-select-id="suiviMada">
@@ -868,45 +965,262 @@ document.addEventListener('DOMContentLoaded', function() {
                String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
     }
 
-    const STATUS_I18N_KEYS = {
-        'Validé': 'ticket.status.validated',
-        'Clôturé': 'ticket.status.closed',
-        'Sans retour': 'ticket.status.no_return',
-        'Refusé': 'ticket.status.refused',
-        'En attente RIB': 'ticket.status.pending_rib',
-        'RIB reçu': 'ticket.status.rib_received',
-        'En attente réponse banque': 'ticket.status.pending_bank'
-    };
-    function translateStatus(statut) {
-        if (!statut) return '-';
-        const key = STATUS_I18N_KEYS[statut];
-        if (!key) return statut;
-        const translated = (typeof t === 'function') ? t(key) : null;
-        if (translated && translated !== key) return translated;
-        return statut;
+    /* ============================================================
+       RUBAN — Validé (Client OK/KO/Sans retour) + Clôturé
+       ============================================================ */
+    function cornerRibbonHtml(ticket) {
+        const statut = ticket.statut;
+
+        // ✅ Clôturé
+        if (statut === 'Clôturé') {
+            return '<div class="corner-ribbon rib-cloture"><span>Clôturé</span></div>';
+        }
+
+        // ✅ Validé (selon suivi_client)
+        if (statut === 'Validé') {
+            const client = ticket.suivi_client || 'sans_retour';
+            if (client === 'ok')            return '<div class="corner-ribbon rib-ok"><span>Client OK</span></div>';
+            if (client === 'ko')            return '<div class="corner-ribbon rib-ko"><span>Non OK</span></div>';
+            return '<div class="corner-ribbon rib-sans"><span>Sans retour</span></div>';
+        }
+
+        // ❌ Tous les autres statuts : pas de ruban
+        return '';
     }
 
-    const STATUTS_SANS_ETIQUETTE = ['En attente RIB', 'RIB reçu', 'En attente réponse banque', 'En attente confirmation'];
-    function cornerRibbonHtml(ticket) {
-        let label = null; let cls = 'rib-none';
-        const st = ticket.statut || '';
-        if (STATUTS_SANS_ETIQUETTE.includes(st)) return '';
-        if (st === 'Clôturé') { label = 'Clôturé'; cls = 'rib-ok'; }
-        else if (st === 'Sans retour') { label = 'Sans retour'; cls = 'rib-sans'; }
-        else if (st === 'Validé') {
-            const client = ticket.suivi_client || 'sans_retour';
-            if (client === 'ok') { label = 'Client OK'; cls = 'rib-ok'; }
-            else if (client === 'ko') { label = 'Non OK'; cls = 'rib-ko'; }
-            else { label = 'Sans retour'; cls = 'rib-sans'; }
-        } else if (st === 'Refusé') { label = 'Refusé'; cls = 'rib-ko'; }
-        else if (st) { label = translateStatus(st); cls = 'rib-none'; }
-        if (!label) return '';
-        return `<div class="corner-ribbon ${cls}"><span>${label}</span></div>`;
+       /* ============================================================
+       TRI DES COLONNES (ID, Référence, Montant, Statut, Date)
+       ============================================================ */
+    let sortState = { key: null, dir: 'asc' };
+    let allTickets = [];  // cache
+
+    // Priorité d'affichage des statuts (pour tri cohérent)
+    const STATUT_ORDER = {
+        'En attente confirmation': 1,
+        'En attente RIB': 2,
+        'RIB reçu': 3,
+        'En attente réponse banque': 4,
+        'Validé': 5,
+        'Clôturé': 6,
+        'Sans retour': 7,
+        'Refusé': 8
+    };
+
+    function applySort(items) {
+        if (!sortState.key) return items;
+        const k = sortState.key;
+        const dir = sortState.dir === 'asc' ? 1 : -1;
+
+        return [...items].sort((a, b) => {
+            let va, vb;
+
+            switch (k) {
+                case 'id':
+                    va = parseInt(a.id, 10) || 0;
+                    vb = parseInt(b.id, 10) || 0;
+                    break;
+
+                case 'montant':
+                    va = parseFloat(a.montant) || 0;
+                    vb = parseFloat(b.montant) || 0;
+                    break;
+
+                case 'date':
+                    va = new Date(String(a.date || a.createdAt || '').replace(' ', 'T')).getTime() || 0;
+                    vb = new Date(String(b.date || b.createdAt || '').replace(' ', 'T')).getTime() || 0;
+                    break;
+
+                case 'statut':
+                    // Priorité logique d'abord, puis alphabétique en fallback
+                    va = STATUT_ORDER[a.statut] || 999;
+                    vb = STATUT_ORDER[b.statut] || 999;
+                    if (va === vb) {
+                        va = String(a.statut || '').toLowerCase();
+                        vb = String(b.statut || '').toLowerCase();
+                    }
+                    break;
+
+                case 'reference':
+                    va = String(a.reference || '').toLowerCase();
+                    vb = String(b.reference || '').toLowerCase();
+                    break;
+
+                default:
+                    va = ''; vb = '';
+            }
+
+            if (va < vb) return -1 * dir;
+            if (va > vb) return 1 * dir;
+            return 0;
+        });
+    }
+
+    function bindSort() {
+        document.querySelectorAll('#ticketsTable th.sortable').forEach(th => {
+            th.addEventListener('click', function () {
+                const key = this.dataset.sort;
+                if (!key) return;
+
+                if (sortState.key === key) {
+                    sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortState.key = key;
+                    sortState.dir = 'asc';
+                }
+
+                updateSortIndicators();
+                renderTickets();
+            });
+        });
+    }
+
+    function updateSortIndicators() {
+        document.querySelectorAll('#ticketsTable th.sortable').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+            if (th.dataset.sort === sortState.key) {
+                th.classList.add(sortState.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
+    }
+
+    function bindSort() {
+        document.querySelectorAll('#ticketsTable .sortable').forEach(th => {
+            th.addEventListener('click', function() {
+                const key = this.dataset.sort;
+                if (sortState.key === key) {
+                    sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortState.key = key;
+                    sortState.dir = 'asc';
+                }
+                updateSortIndicators();
+                renderTickets();
+            });
+        });
+    }
+
+    function updateSortIndicators() {
+        document.querySelectorAll('#ticketsTable .sortable').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+            if (th.dataset.sort === sortState.key) {
+                th.classList.add(sortState.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+        });
     }
 
     /* ============================================================
-       CUSTOM ANIMATED SELECT
+       CHARGEMENT TICKETS
        ============================================================ */
+    function loadTickets() {
+        return fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets`)
+            .then(tickets => {
+                allTickets = tickets || [];
+                window.__ticketsById = {};
+                allTickets.forEach(tk => { window.__ticketsById[tk.id] = tk; });
+                renderTickets();
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('ticketsBody').innerHTML = `<tr><td colspan="7" class="text-danger">Erreur de chargement</td></tr>`;
+            });
+    }
+
+    function renderTickets() {
+        const tbody = document.getElementById('ticketsBody');
+        const sorted = applySort(allTickets);
+
+        if (!sorted.length) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center">Aucun ticket</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = sorted.map(ticket => {
+            let badgeClass = 'status-attente-rib';
+            if (ticket.statut === 'Validé' || ticket.statut === 'Clôturé') badgeClass = 'status-valide';
+            else if (ticket.statut === 'Sans retour' || ticket.statut === 'Refusé') badgeClass = 'status-refuse';
+            else if (ticket.statut === 'En attente RIB') badgeClass = 'status-attente-rib';
+            else if (ticket.statut === 'RIB reçu') badgeClass = 'status-rib-recu';
+            else if (ticket.statut === 'En attente réponse banque') badgeClass = 'status-attente-banque';
+
+            const canSuivi = ['Validé','Sans retour'].includes(ticket.statut);
+            let actions = canSuivi
+                ? `<button type="button" class="btn-action btn-view" onclick="ouvrirSuiviModal(${ticket.id})" title="Suivi"><i class="bi bi-bookmark-check"></i></button>`
+                : `<a class="btn-action btn-view" href="/ticket/ticket-show.html?id=${ticket.id}" title="Voir"><i class="bi bi-eye"></i></a>`;
+            if (ticket.statut === 'En attente RIB') {
+                actions += `<a class="btn-action btn-rib" href="/ticket/ticket-step3.html?id=${ticket.id}" title="Envoyer RIB"><i class="bi bi-paperclip"></i></a>`;
+            }
+            actions += `<button type="button" class="btn-action btn-delete" onclick="deleteTicket(${ticket.id})" title="Supprimer"><i class="bi bi-trash"></i></button>`;
+
+            return `
+                <tr>
+                    <td><input type="checkbox" class="ticket-checkbox" data-id="${ticket.id}"></td>
+                    <td>#${ticket.id}</td>
+                    <td>${ticket.reference || '—'}</td>
+                    <td class="amount-cell">${formatCurrency(ticket.montant, ticket.devise)}</td>
+                    <td><span class="badge ${badgeClass}">${ticket.statut || '—'}</span></td>
+                    <td><span class="date-pill"><i class="bi bi-calendar3"></i>${formatDate(ticket.date || ticket.createdAt)}</span></td>
+                    <td class="actions-col">
+                        ${cornerRibbonHtml(ticket)}
+                        <div class="actions-cell">${actions}</div>
+                    </td>
+                </tr>`;
+        }).join('');
+
+        const selAll = document.getElementById('selectAllTickets');
+        if (selAll) {
+            selAll.onclick = function() {
+                document.querySelectorAll('.ticket-checkbox').forEach(cb => cb.checked = this.checked);
+                updateDeleteButtonVisibility();
+            };
+        }
+        document.querySelectorAll('.ticket-checkbox').forEach(cb => cb.onchange = updateDeleteButtonVisibility);
+    }
+
+    window.deleteTicket = async function(id) {
+        const ok = await showConfirm('Confirmer la suppression de ce ticket ?', 'Suppression');
+        if (!ok) return;
+        fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/delete`, { method: 'POST' })
+            .then(data => {
+                if (data.success) {
+                    showToast('Ticket supprimé avec succès', 'success');
+                    loadTickets();
+                } else {
+                    showToast('Erreur de suppression', 'danger');
+                }
+            })
+            .catch(err => { console.error(err); showToast('Erreur de suppression', 'danger'); });
+    };
+
+    function updateDeleteButtonVisibility() {
+        const any = document.querySelectorAll('.ticket-checkbox:checked').length > 0;
+        const btn = document.getElementById('deleteSelectedBtn');
+        if (btn) btn.classList.toggle('d-none', !any);
+    }
+
+    async function deleteSelected() {
+        const ids = Array.from(document.querySelectorAll('.ticket-checkbox:checked')).map(cb => cb.dataset.id);
+        if (!ids.length) { showToast('Aucun ticket sélectionné', 'info'); return; }
+        const ok = await showConfirm(`Supprimer ${ids.length} ticket(s) ?`, 'Suppression multiple');
+        if (!ok) return;
+        const btn = document.getElementById('deleteSelectedBtn');
+        if (btn) btn.disabled = true;
+        try {
+            const results = await Promise.allSettled(ids.map(id => fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${id}/delete`, { method: 'POST' })));
+            const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !(r.value && r.value.success)));
+            if (failed.length === 0) showToast('Suppression réussie', 'success');
+            else showToast(`${failed.length} échec(s)`, 'danger');
+            loadTickets();
+        } catch (e) {
+            console.error(e);
+            showToast('Erreur de suppression', 'danger');
+        } finally {
+            if (btn) btn.disabled = false;
+            updateDeleteButtonVisibility();
+        }
+    }
+    document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
+
+    /* ===== CUSTOM SELECT ===== */
     function initCustomSelect(wrapperId) {
         const wrap = document.getElementById(wrapperId);
         if (!wrap) return null;
@@ -921,7 +1235,6 @@ document.addEventListener('DOMContentLoaded', function() {
             trigger.setAttribute('aria-expanded', 'false');
         }
         function open() {
-            // Fermer les autres
             document.querySelectorAll('.custom-select.open').forEach(w => {
                 if (w !== wrap) w.classList.remove('open');
             });
@@ -988,9 +1301,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const madaSelect = initCustomSelect('suiviMadaSelect');
     const clientSelect = initCustomSelect('suiviClientSelect');
 
-    /* ============================================================
-       SUIVI MODAL
-       ============================================================ */
+    /* ===== SUIVI MODAL ===== */
     window.__ticketsById = {};
 
     window.ouvrirSuiviModal = function(id) {
@@ -1072,109 +1383,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.getElementById('suiviSaveBtn').addEventListener('click', postSuivi);
 
-    /* ============================================================
-       CHARGEMENT TICKETS
-       ============================================================ */
-    function loadTickets() {
-        return fetchWithAuth(`${API_BASE}/api/user/tickets`)
-            .then(tickets => {
-                const tbody = document.getElementById('ticketsBody');
-                if (!tickets.length) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="text-center">Aucun ticket</td></tr>`;
-                    return;
-                }
-                window.__ticketsById = {};
-                tickets.forEach(tk => { window.__ticketsById[tk.id] = tk; });
-
-                tbody.innerHTML = tickets.map(ticket => {
-                    let badgeClass = 'status-attente-rib';
-                    if (ticket.statut === 'Validé' || ticket.statut === 'Clôturé') badgeClass = 'status-valide';
-                    else if (ticket.statut === 'Sans retour' || ticket.statut === 'Refusé') badgeClass = 'status-refuse';
-                    else if (ticket.statut === 'En attente RIB') badgeClass = 'status-attente-rib';
-                    else if (ticket.statut === 'RIB reçu') badgeClass = 'status-rib-recu';
-                    else if (ticket.statut === 'En attente réponse banque') badgeClass = 'status-attente-banque';
-
-                    const canSuivi = ['Validé','Sans retour'].includes(ticket.statut);
-                    let actions = canSuivi
-                        ? `<button type="button" class="btn-action btn-view" onclick="ouvrirSuiviModal(${ticket.id})" title="Suivi"><i class="bi bi-bookmark-check"></i></button>`
-                        : `<a class="btn-action btn-view" href="/ticket/ticket-show.html?id=${ticket.id}" title="Voir"><i class="bi bi-eye"></i></a>`;
-                    if (ticket.statut === 'En attente RIB') {
-                        actions += `<a class="btn-action btn-rib" href="/ticket/ticket-step3.html?id=${ticket.id}" title="Envoyer RIB"><i class="bi bi-paperclip"></i></a>`;
-                    }
-                    actions += `<button type="button" class="btn-action btn-delete" onclick="deleteTicket(${ticket.id})" title="Supprimer"><i class="bi bi-trash"></i></button>`;
-
-                    return `
-                        <tr>
-                            <td><input type="checkbox" class="ticket-checkbox" data-id="${ticket.id}"></td>
-                            <td>#${ticket.id}</td>
-                            <td>${ticket.reference || '—'}</td>
-                            <td class="amount-cell">${formatCurrency(ticket.montant, ticket.devise)}</td>
-                            <td><span class="badge ${badgeClass}">${translateStatus(ticket.statut)}</span></td>
-                            <td><span class="date-pill"><i class="bi bi-calendar3"></i>${formatDate(ticket.date || ticket.createdAt)}</span></td>
-                            <td class="actions-col">
-                                ${cornerRibbonHtml(ticket)}
-                                <div class="actions-cell">${actions}</div>
-                            </td>
-                        </tr>`;
-                }).join('');
-
-                document.getElementById('selectAllTickets').onclick = function() {
-                    document.querySelectorAll('.ticket-checkbox').forEach(cb => cb.checked = this.checked);
-                    updateDeleteButtonVisibility();
-                };
-                document.querySelectorAll('.ticket-checkbox').forEach(cb => cb.onchange = updateDeleteButtonVisibility);
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('ticketsBody').innerHTML = `<tr><td colspan="7" class="text-danger">Erreur de chargement</td></tr>`;
-            });
-    }
-
-    window.deleteTicket = async function(id) {
-        const ok = await showConfirm('Confirmer la suppression de ce ticket ?', 'Suppression');
-        if (!ok) return;
-        fetchWithAuth(`${API_BASE}/api/user/ticket/${id}/delete`, { method: 'POST' })
-            .then(data => {
-                if (data.success) {
-                    showToast('Ticket supprimé avec succès', 'success');
-                    loadTickets();
-                } else {
-                    showToast('Erreur de suppression', 'danger');
-                }
-            })
-            .catch(err => { console.error(err); showToast('Erreur de suppression', 'danger'); });
-    };
-
-    function updateDeleteButtonVisibility() {
-        const any = document.querySelectorAll('.ticket-checkbox:checked').length > 0;
-        const btn = document.getElementById('deleteSelectedBtn');
-        if (btn) btn.classList.toggle('d-none', !any);
-    }
-
-    async function deleteSelected() {
-        const ids = Array.from(document.querySelectorAll('.ticket-checkbox:checked')).map(cb => cb.dataset.id);
-        if (!ids.length) { showToast('Aucun ticket sélectionné', 'info'); return; }
-        const ok = await showConfirm(`Supprimer ${ids.length} ticket(s) ?`, 'Suppression multiple');
-        if (!ok) return;
-        const btn = document.getElementById('deleteSelectedBtn');
-        if (btn) btn.disabled = true;
-        try {
-            const results = await Promise.allSettled(ids.map(id => fetchWithAuth(`${API_BASE}/api/user/ticket/${id}/delete`, { method: 'POST' })));
-            const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !(r.value && r.value.success)));
-            if (failed.length === 0) showToast('Suppression réussie', 'success');
-            else showToast(`${failed.length} échec(s)`, 'danger');
-            loadTickets();
-        } catch (e) {
-            console.error(e);
-            showToast('Erreur de suppression', 'danger');
-        } finally {
-            if (btn) btn.disabled = false;
-            updateDeleteButtonVisibility();
-        }
-    }
-    document.getElementById('deleteSelectedBtn').addEventListener('click', deleteSelected);
-    loadTickets();
-
     /* ===== WebSocket ===== */
     const WS_URL = window.WS_URL || ((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.hostname + ':8081/ws');
     let ticketsWs = null, ticketsWsTimer = null, ticketsWsOk = false, ticketsPollTimer = null;
@@ -1208,11 +1416,110 @@ document.addEventListener('DOMContentLoaded', function() {
         if (document.hidden) stopTicketsPolling();
         else { loadTickets(); if (!ticketsWsOk) { startTicketsPolling(); ticketsWsConnect(); } }
     });
+
+    /* ===== INIT ===== */
+    bindSort();
+    loadTickets();
     ticketsWsConnect();
     startTicketsPolling();
 
     document.addEventListener('languageChanged', function() { loadTickets(); });
 });
+
+    /* ============================================================
+       RECHERCHE — filtre en temps réel sur la table
+       ============================================================ */
+    function initTableSearch() {
+        const input = document.querySelector('[data-table-search="ticketsTable"]');
+        if (!input) {
+            console.warn('❌ Barre de recherche introuvable (data-table-search="ticketsTable")');
+            return;
+        }
+
+        let searchTimer = null;
+
+        input.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                applyTableFilter(this.value.trim());
+            }, 150); // debounce 150ms
+        });
+
+        // Support Entrée pour forcer
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                applyTableFilter('');
+            }
+        });
+    }
+
+    function normalize(str) {
+        return String(str || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, ''); // enlève les accents
+    }
+
+    function applyTableFilter(searchValue) {
+        const tbody = document.getElementById('ticketsBody');
+        if (!tbody) return;
+
+        const q = normalize(searchValue);
+        const rows = tbody.querySelectorAll('tr');
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            // Ignorer les lignes "message" (colspan)
+            if (cells.length === 1) return;
+
+            const rowText = normalize(row.textContent);
+            const match = q === '' || rowText.includes(q);
+
+            row.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+
+        // Afficher un message si aucun résultat
+        updateEmptyMessage(tbody, visibleCount, searchValue);
+    }
+
+    function updateEmptyMessage(tbody, visibleCount, searchValue) {
+        // Supprimer l'ancien message
+        const oldMsg = tbody.querySelector('.search-empty-message');
+        if (oldMsg) oldMsg.remove();
+
+        if (visibleCount === 0 && searchValue !== '') {
+            const tr = document.createElement('tr');
+            tr.className = 'search-empty-message';
+            tr.innerHTML = `<td colspan="7" class="text-center" style="padding:24px;color:#94a3b8;">
+                <i class="bi bi-search" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:0.5;"></i>
+                Aucun ticket ne correspond à « ${escapeHtmlSearch(searchValue)} »
+            </td>`;
+            tbody.appendChild(tr);
+        }
+    }
+
+    function escapeHtmlSearch(s) {
+        return String(s).replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[c]));
+    }
+
+    // Initialiser la recherche
+    initTableSearch();
+
+    // Ré-appliquer le filtre après un re-render (tri, WS, delete…)
+    const originalRenderTickets = renderTickets;
+    renderTickets = function () {
+        originalRenderTickets();
+        const input = document.querySelector('[data-table-search="ticketsTable"]');
+        if (input && input.value.trim() !== '') {
+            applyTableFilter(input.value.trim());
+        }
+    };
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -39,7 +39,7 @@
         <li>
           <a class="dropdown-item language-option d-flex align-items-center gap-2" href="#" data-lang="fr">
             <span class="lang-flag" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="14" viewBox="0 0 3 2" aria-hidden="true" style="display:block;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.12)"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg></span>
-            <span>Français</span>
+            <span>FranÃ§ais</span>
           </a>
         </li>
         <li>
@@ -58,15 +58,15 @@
     <section class="auth-card">
       <a class="auth-brand" href="/auth/login.html">
         <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
-        <span><strong data-i18n="auth.brand">Mada Ozi</strong><small data-i18n="auth.brand.subtitle">Espace sécurisé</small></span>
+        <span><strong data-i18n="auth.brand">Mada Ozi</strong><small data-i18n="auth.brand.subtitle">Espace sÃ©curisÃ©</small></span>
       </a>
 
       <div id="loginAlert" class="alert alert-danger d-none" role="alert"></div>
       <form id="loginForm" novalidate>
         <div class="mb-4">
-          <p class="eyebrow mb-1" data-i18n="auth.secure">Accès sécurisé</p>
+          <p class="eyebrow mb-1" data-i18n="auth.secure">AccÃ¨s sÃ©curisÃ©</p>
           <h1 class="h3 mb-1" data-i18n="auth.login.heading">Connexion</h1>
-          <p class="text-muted mb-0" data-i18n="auth.login.subtitle">Connectez-vous à votre espace.</p>
+          <p class="text-muted mb-0" data-i18n="auth.login.subtitle">Connectez-vous Ã  votre espace.</p>
         </div>
         <div class="mb-3">
           <label class="form-label" for="loginEmail" data-i18n="auth.login.email">Adresse email</label>
@@ -75,7 +75,7 @@
         <div class="mb-3">
           <div class="d-flex justify-content-between">
             <label class="form-label" for="loginPassword" data-i18n="auth.login.password">Mot de passe</label>
-            <a class="small fw-semibold" href="/auth/forgot-password.html" data-i18n="auth.login.forgot">Oublié ?</a>
+            <a class="small fw-semibold" href="/auth/forgot-password.html" data-i18n="auth.login.forgot">OubliÃ© ?</a>
           </div>
           <div class="password-field">
             <input class="form-control" id="loginPassword" type="password" minlength="6" required>
@@ -93,7 +93,7 @@
         </button>
       </form>
       <a class="auth-footer d-block mt-3" href="/auth/register.html">
-        <span data-i18n="auth.login.new">Nouveau ici ?</span> <strong data-i18n="auth.login.create">Créer un compte</strong>
+        <span data-i18n="auth.login.new">Nouveau ici ?</span> <strong data-i18n="auth.login.create">CrÃ©er un compte</strong>
       </a>
     </section>
   </main>
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const roles = payload.roles || [];
     if (roles.includes('ROLE_ADMIN')) return '/admin/index.html';
     if (roles.includes('ROLE_INTERLOCUTEUR')) return '/interlocuteur/interlocuteur-dashboard.html';
-    if (roles.includes('ROLE_USER')) return '/user/dashboard-user.html';
+    if (roles.includes('ROLE_USER')) return '/interlocuteur/interlocuteur-accueil.html';
     return null;
   }
   function checkExistingSession() {
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Le serveur a retourné une réponse non-JSON.');
+        throw new Error('Le serveur a retournÃ© une rÃ©ponse non-JSON.');
       }
       const data = await response.json();
       if (!response.ok || !data.success || !data.token) {
@@ -188,24 +188,24 @@ document.addEventListener('DOMContentLoaded', function () {
       localStorage.setItem(TOKEN_KEY, data.token);
       if (isTokenExpired(data.token)) {
         clearSession();
-        showAlert('Token expiré. Réessayez.');
+        showAlert('Token expirÃ©. RÃ©essayez.');
         return;
       }
       let redirect = data.redirect || getDashboardFromToken(data.token);
       if (!redirect) {
         clearSession();
-        showAlert('Votre rôle ne permet pas d’accéder à une interface.');
+        showAlert('Votre rÃ´le ne permet pas dâ€™accÃ©der Ã  une interface.');
         return;
       }
       window.location.replace(redirect);
     } catch (error) {
-      showAlert(error.message || 'Problème de connexion au serveur.');
+      showAlert(error.message || 'ProblÃ¨me de connexion au serveur.');
     }
   });
 
   checkExistingSession();
 
-  // Drapeaux gérés uniquement par i18n.js (ne pas écraser ici)
+  // Drapeaux gÃ©rÃ©s uniquement par i18n.js (ne pas Ã©craser ici)
 });
 </script>
 </body>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -96,7 +96,7 @@
     <div class="sidebar-backdrop" data-sidebar-close></div>
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Main navigation">
         <div class="sidebar-header">
-            <a class="brand-mark" href="/user/dashboard-user.html" aria-label="adminHMD dashboard">
+            <a class="brand-mark" href="/interlocuteur/interlocuteur-accueil.html" aria-label="adminHMD dashboard">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i></span>
                 <span class="brand-copy">
                     <span class="brand-title" id="brandTitle">Interlocuteur</span>
@@ -105,11 +105,11 @@
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link active" href="/user/dashboard-user.html" aria-current="page">
+            <a class="nav-link active" href="/interlocuteur/interlocuteur-accueil.html" aria-current="page">
                 <span class="nav-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
                 <span class="nav-text">Dashboard</span>
             </a>
-            <a class="nav-link" href="/user/tickets-list.html">
+            <a class="nav-link" href="/interlocuteur/interlocuteur-tickets-list.html">
                 <span class="nav-icon"><i class="bi bi-list-ul" aria-hidden="true"></i></span>
                 <span class="nav-text">Mes tickets</span>
             </a>
@@ -128,7 +128,7 @@
         </div>
         <div class="sidebar-footer">
             <span class="status-dot"></span>
-            <span class="sidebar-footer-text" data-i18n="sidebar.status">Connecté</span>
+            <span class="sidebar-footer-text" data-i18n="sidebar.status">ConnectÃ©</span>
         </div>
     </aside>
 
@@ -141,11 +141,11 @@
                 <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
                     <div class="dropdown me-2">
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="languageButton">
-                            🇫🇷
+                            ðŸ‡«ðŸ‡·
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">🇫🇷 Français</a></li>
-                            <li><a class="dropdown-item language-option" href="#" data-lang="en">🇬🇧 English</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="fr">ðŸ‡«ðŸ‡· FranÃ§ais</a></li>
+                            <li><a class="dropdown-item language-option" href="#" data-lang="en">ðŸ‡¬ðŸ‡§ English</a></li>
                         </ul>
                     </div>
                     <button class="icon-button theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">
@@ -156,9 +156,9 @@
                             <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><a class="dropdown-item" href="/interlocuteur/interlocuteur-profile.html" data-i18n="profile">Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">Déconnexion</a></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn" data-i18n="logout">DÃ©connexion</a></li>
                         </ul>
                     </div>
                 </div>
@@ -172,8 +172,8 @@
                         <div class="user-avatar" id="userAvatar">?</div>
                         <div>
                             <p class="eyebrow mb-1" id="pageEyebrow">Espace interlocuteur</p>
-                            <h1 class="h3 mb-1"><span>Bonjour,</span> <span id="userGreeting">—</span></h1>
-                            <p class="text-muted mb-0" id="pageSubtitle">Créez des demandes de remboursement et suivez les RIB / envois banque.</p>
+                            <h1 class="h3 mb-1"><span>Bonjour,</span> <span id="userGreeting">â€”</span></h1>
+                            <p class="text-muted mb-0" id="pageSubtitle">CrÃ©ez des demandes de remboursement et suivez les RIB / envois banque.</p>
                         </div>
                     </div>
                 </div>
@@ -185,11 +185,11 @@
                     </h2>
                     <div class="info-row">
                         <span data-i18n="label.email">Email</span>
-                        <strong id="profileEmail">—</strong>
+                        <strong id="profileEmail">â€”</strong>
                     </div>
                     <div class="info-row">
                         <span data-i18n="label.registered">Inscrit le</span>
-                        <strong><span class="date-pill" id="profileCreatedAt"><i class="bi bi-calendar3"></i>—</span></strong>
+                        <strong><span class="date-pill" id="profileCreatedAt"><i class="bi bi-calendar3"></i>â€”</span></strong>
                     </div>
                 </div>
 
@@ -197,8 +197,8 @@
                     <div class="col-12 col-md-4">
                         <div class="action-card p-4 d-flex flex-column">
                             <div class="action-icon blue mb-3"><i class="bi bi-plus-circle"></i></div>
-                            <h3 class="h5 mb-2">Créer un ticket</h3>
-                            <p class="text-muted flex-grow-1">Nouvelle demande de remboursement (email RIB envoyé au client).</p>
+                            <h3 class="h5 mb-2">CrÃ©er un ticket</h3>
+                            <p class="text-muted flex-grow-1">Nouvelle demande de remboursement (email RIB envoyÃ© au client).</p>
                             <a href="/ticket/ticket-create-step1.html" class="btn btn-primary btn-pill mt-2 w-100">
                                 <i class="bi bi-plus-lg"></i>
                                 <span>Nouvelle demande</span>
@@ -210,7 +210,7 @@
                             <div class="action-icon green mb-3"><i class="bi bi-list-ul"></i></div>
                             <h3 class="h5 mb-2">Mes tickets</h3>
                             <p class="text-muted flex-grow-1">Consultez vos demandes et leurs statuts.</p>
-                            <a href="/user/tickets-list.html" class="btn btn-outline-secondary btn-pill mt-2 w-100">
+                            <a href="/interlocuteur/interlocuteur-tickets-list.html" class="btn btn-outline-secondary btn-pill mt-2 w-100">
                                 <i class="bi bi-ticket-perforated"></i>
                                 <span>Mes tickets</span>
                             </a>
@@ -220,7 +220,7 @@
                         <div class="action-card p-4 d-flex flex-column">
                             <div class="action-icon amber mb-3"><i class="bi bi-inbox"></i></div>
                             <h3 class="h5 mb-2">Suivi RIB / Banque</h3>
-                            <p class="text-muted flex-grow-1">RIB reçus, envoi à la banque et validation des remboursements.</p>
+                            <p class="text-muted flex-grow-1">RIB reÃ§us, envoi Ã  la banque et validation des remboursements.</p>
                             <a href="/interlocuteur/interlocuteur-dashboard.html" class="btn btn-warning btn-pill mt-2 w-100" id="btnSuiviRib">
                                 <i class="bi bi-send-check"></i>
                                 <span>Ouvrir le suivi</span>
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Lien Suivi RIB : s'assurer que le token est présent avant navigation
+    // Lien Suivi RIB : s'assurer que le token est prÃ©sent avant navigation
     const btnSuivi = document.getElementById('btnSuiviRib');
     if (btnSuivi) {
         btnSuivi.addEventListener('click', function (e) {
@@ -270,9 +270,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
         function formatDate(raw) {
-        if (!raw) return '—';
+        if (!raw) return 'â€”';
         var s = String(raw).trim();
-        // Déjà au format jj/mm/aaaa (API Symfony)
+        // DÃ©jÃ  au format jj/mm/aaaa (API Symfony)
         if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) {
             return s.split(' ')[0];
         }
@@ -296,17 +296,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (res.status === 401) {
                 localStorage.removeItem('jwt_token');
                 window.location.href = '/auth/login.html';
-                return Promise.reject('Non authentifié');
+                return Promise.reject('Non authentifiÃ©');
             }
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return res.json();
         });
     }
 
-            fetchWithAuth(`${API_BASE}/api/user/profile`)
+            fetchWithAuth(`${API_BASE}/api/interlocuteur/profile`)
         .then(data => {
             const user = (data && data.user) ? data.user : (data || {});
-            const email = user.email || user.username || '—';
+            const email = user.email || user.username || 'â€”';
             const created = user.createdAt || user.created_at || user.dateCreation || null;
 
             const elGreeting = document.getElementById('userGreeting');
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (elDate) {
                 elDate.innerHTML = '<i class="bi bi-calendar3"></i> ' + formatDate(created);
             }
-            if (avatar) avatar.textContent = (email && email !== '—' ? email.charAt(0) : '?').toUpperCase();
+            if (avatar) avatar.textContent = (email && email !== 'â€”' ? email.charAt(0) : '?').toUpperCase();
         })
         .catch(err => {
             console.error('Erreur profil:', err);

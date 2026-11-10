@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="docTitle">Rapport statistiques — Mada Ozi</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', -apple-system, Arial, sans-serif;
+      color: #1e293b;
+      margin: 0;
+      padding: 24px;
+      background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
+      font-size: 12px;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ===== BARRE D'ACTIONS ===== */
+    .actions {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 9999;
+    }
+    .actions button {
+      padding: 12px 22px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .actions button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    .actions .btn-print { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; }
+    .actions .btn-close { background: #fff; color: #475569; border: 1px solid #e2e8f0; }
+
+    /* ===== CONTENEUR ===== */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      box-shadow: 0 8px 32px rgba(15,23,42,0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+      padding: 32px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: "";
+      position: absolute;
+      top: -50%; right: -10%;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15), transparent);
+      border-radius: 50%;
+    }
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: -30%; left: -5%;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
+      border-radius: 50%;
+    }
+    .header-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 16px; }
+    .brand-icon {
+      width: 56px; height: 56px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: #fff; font-weight: 800;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .brand-text h1 {
+      color: #fff;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+    .brand-text .sub {
+      color: rgba(255,255,255,0.85);
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .request-badge {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      width: fit-content;
+      max-width: 100%;
+    }
+    .request-badge .label {
+      font-size: 9px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .request-badge .value {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .filename-chip {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      text-align: right;
+    }
+    .filename-chip .label {
+      display: block;
+      font-size: 9px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .filename-chip strong {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* ===== BODY ===== */
+    .body-wrap { padding: 32px 36px; }
+
+    /* ===== TITRES ===== */
+    h2 {
+      font-size: 14px;
+      color: #0f172a;
+      font-weight: 800;
+      margin: 32px 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f1f5f9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    h2:first-child { margin-top: 0; }
+    h2::before {
+      content: "";
+      width: 5px; height: 18px;
+      background: linear-gradient(180deg, #6366f1, #4f46e5);
+      border-radius: 3px;
+    }
+    h2 .badge-count {
+      margin-left: auto;
+      background: #eef2ff;
+      color: #4f46e5;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    /* ===== FILTRES ===== */
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .filter-card {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .filter-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+    }
+    .filter-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #6366f1, #8b5cf6);
+      border-radius: 4px 0 0 4px;
+    }
+    .filter-card .label {
+      font-size: 9px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      margin-bottom: 6px;
+    }
+    .filter-card .value {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+    }
+
+    /* ===== KPI ===== */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .kpi {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px 18px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(15,23,42,0.08);
+    }
+    .kpi::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+    }
+    .kpi-total::before { background: linear-gradient(90deg, #6366f1, #4f46e5); }
+    .kpi-aev::before { background: linear-gradient(90deg, #0d6efd, #3b82f6); }
+    .kpi-multiple::before { background: linear-gradient(90deg, #dc3545, #ef4444); }
+    .kpi-valid::before { background: linear-gradient(90deg, #10b981, #059669); }
+
+    .kpi .icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .kpi-total .icon { background: rgba(99,102,241,0.12); color: #6366f1; }
+    .kpi-aev .icon { background: rgba(13,110,253,0.12); color: #0d6efd; }
+    .kpi-multiple .icon { background: rgba(220,53,69,0.12); color: #dc3545; }
+    .kpi-valid .icon { background: rgba(16,185,129,0.12); color: #10b981; }
+
+    .kpi .icon svg {
+      width: 22px; height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .kpi .value {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -1px;
+    }
+    .kpi-total .value { color: #4f46e5; }
+    .kpi-aev .value { color: #0d6efd; }
+    .kpi-multiple .value { color: #dc3545; }
+    .kpi-valid .value { color: #10b981; }
+
+    .kpi .label {
+      font-size: 10px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+    }
+
+    /* ===== TABLES ===== */
+    table.data {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 11px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    table.data th {
+      background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+      color: #3730a3;
+      font-weight: 800;
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      border-bottom: 2px solid #c7d2fe;
+    }
+    table.data td {
+      padding: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    table.data tbody tr:last-child td { border-bottom: none; }
+    table.data tbody tr:nth-child(even) td { background: #fafbfc; }
+    table.data tbody tr:hover td { background: #eef2ff; }
+    table.data tr.total td {
+      background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+      font-weight: 900;
+      color: #3730a3;
+      border-top: 2px solid #c7d2fe;
+      border-bottom: none;
+    }
+    table.data td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-block;
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+    .badge-valid { background: #d1fae5; color: #065f46; }
+    .badge-warn { background: #fef3c7; color: #92400e; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+    .badge-muted { background: #f1f5f9; color: #475569; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+
+    .type-badge {
+      display: inline-block;
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .type-aev { background: #dbeafe; color: #1e40af; }
+    .type-multiple { background: #fce7f3; color: #9d174d; }
+
+    /* ===== POURCENTAGE + CHIFFRE (remplace progress-bar) ===== */
+    .pct-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+    .pct-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 54px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .pct-badge.pct-valid { background: #d1fae5; color: #065f46; }
+    .pct-badge.pct-warn { background: #fef3c7; color: #92400e; }
+    .pct-badge.pct-info { background: #dbeafe; color: #1e40af; }
+    .pct-badge.pct-muted { background: #f1f5f9; color: #475569; }
+    .pct-badge.pct-danger { background: #fee2e2; color: #991b1b; }
+    .pct-badge.pct-primary { background: #eef2ff; color: #4f46e5; }
+    .pct-count {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* ===== ÉVOLUTION MENSUELLE ===== */
+    .monthly-table {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border-radius: 14px;
+      padding: 8px;
+      border: 1px solid #e2e8f0;
+      overflow-x: auto;
+    }
+    .monthly-table table { width: 100%; border-collapse: collapse; }
+    .monthly-table th {
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 10px;
+      color: #3730a3;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 800;
+      border-bottom: 2px solid #c7d2fe;
+    }
+    .monthly-table td {
+      padding: 14px 12px;
+      text-align: center;
+      font-weight: 800;
+      color: #4f46e5;
+      font-size: 16px;
+      font-variant-numeric: tabular-nums;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .monthly-table tr:last-child td { border-bottom: none; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: #94a3b8;
+      font-size: 10px;
+    }
+    .footer strong { color: #64748b; }
+    .footer .footer-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .footer .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #4f46e5;
+      font-size: 12px;
+    }
+    .footer .footer-brand-icon {
+      width: 24px; height: 24px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    /* ===== LOADING / ERROR ===== */
+    .loading {
+      text-align: center;
+      padding: 80px 20px;
+      color: #64748b;
+    }
+    .loading .spinner {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #dc2626;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    /* ===== IMPRESSION ===== */
+    @media print {
+      .actions { display: none !important; }
+      body { padding: 0; background: #fff; }
+      .container { box-shadow: none; border-radius: 0; max-width: none; }
+      .header { padding: 24px 28px; }
+      .body-wrap { padding: 24px 28px; }
+      h2 { page-break-after: avoid; }
+      table.data { page-break-inside: auto; }
+      tr { page-break-inside: avoid; }
+    }
+    @page { size: A4; margin: 12mm; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .filters, .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .actions { flex-direction: column; top: auto; bottom: 20px; right: 20px; }
+      .header-content { flex-direction: column; align-items: flex-start; }
+      .filename-chip { text-align: left; }
+      h2 .badge-count { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- BARRE D'ACTIONS -->
+<div class="actions">
+  <button class="btn-print" onclick="window.print()">🖨️ Enregistrer en PDF</button>
+  <button class="btn-close" onclick="window.close()">✕ Fermer</button>
+</div>
+
+<div class="container">
+  <div class="header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="brand-icon">M</div>
+        <div class="brand-text">
+          <h1>Rapport statistiques</h1>
+          <div class="sub" id="headerDate">Chargement…</div>
+        </div>
+      </div>
+      <div class="filename-chip" id="filenameChip">
+        <span class="label">Fichier généré</span>
+        <strong>—</strong>
+      </div>
+    </div>
+    <div class="request-badge" id="requestBadge">
+      <span class="label">Requête effectuée</span>
+      <span class="value" id="requestValue">—</span>
+    </div>
+  </div>
+
+  <div class="body-wrap">
+    <div id="content">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div>Chargement du rapport…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function () {
+  const API_BASE = window.location.protocol + '//' + window.location.hostname + ':8000';
+  const token = localStorage.getItem('jwt_token');
+
+  if (!token) {
+    window.location.href = '/auth/login.html';
+    return;
+  }
+
+  /* Force le titre au moment de l'impression */
+  window.addEventListener('beforeprint', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tp = urlParams.get('type') || '';
+    const st = urlParams.get('statut') || '';
+    const df = urlParams.get('date_from') || '';
+    const dt = urlParams.get('date_to') || '';
+
+    const parts = ['statistiques'];
+    if (tp === 'AEV_NON_RECU') parts.push('AEV');
+    else if (tp === 'PAIEMENT_MULTIPLE') parts.push('Multiple');
+    if (st) {
+      const slug = String(st).toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      parts.push(slug);
+    }
+    if (df) parts.push('du-' + df);
+    if (dt) parts.push('au-' + dt);
+    parts.push(new Date().toISOString().slice(0, 10));
+
+    document.title = parts.join('_') + '.pdf';
+  });
+
+  /* ============================================================
+     HELPERS
+     ============================================================ */
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function formatMontant(amount, devise) {
+    const n = parseFloat(amount) || 0;
+    const symbols = { EUR: '€', USD: '$', GBP: '£', MGA: 'Ar' };
+    return n.toFixed(2) + ' ' + (symbols[devise] || devise || '€');
+  }
+
+  function formatDateEU(raw) {
+    if (!raw) return '—';
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(String(raw))) {
+      return String(raw).split(' ')[0];
+    }
+    const d = new Date(String(raw).replace(' ', 'T'));
+    if (isNaN(d.getTime())) return String(raw);
+    const jj = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const aaaa = d.getFullYear();
+    return jj + '/' + mm + '/' + aaaa;
+  }
+
+  function formatDateTimeEU(raw) {
+    if (!raw) return '—';
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+    return String(d.getDate()).padStart(2, '0') + '/' +
+           String(d.getMonth() + 1).padStart(2, '0') + '/' +
+           d.getFullYear() + ' à ' +
+           String(d.getHours()).padStart(2, '0') + ':' +
+           String(d.getMinutes()).padStart(2, '0') + ':' +
+           String(d.getSeconds()).padStart(2, '0');
+  }
+
+  function typeLabel(t) {
+    if (!t) return '—';
+    const s = String(t).toUpperCase().trim();
+    if (s === 'AEV_NON_RECU' || s === 'AEV' || s.includes('AEV')) return 'AEV non reçu';
+    if (s === 'PAIEMENT_MULTIPLE' || s === 'MULTIPLE' || s.includes('MULTIPLE')) return 'Paiement multiple';
+    return String(t);
+  }
+
+  function getTicketType(t) {
+    return t.type || t.type_remboursement || t.typeRemboursement || t.type_remboursement_code || '';
+  }
+
+  function statutBadgeClass(statut) {
+    const s = statut || '';
+    if (s === 'Validé' || s === 'Clôturé') return 'badge-valid';
+    if (s === 'En attente RIB' || s === 'En attente réponse banque') return 'badge-warn';
+    if (s === 'RIB reçu') return 'badge-info';
+    if (s === 'Refusé') return 'badge-danger';
+    return 'badge-muted';
+  }
+
+  function statutPctClass(statut) {
+    const s = statut || '';
+    if (s === 'Validé' || s === 'Clôturé') return 'pct-valid';
+    if (s === 'En attente RIB' || s === 'En attente réponse banque') return 'pct-warn';
+    if (s === 'RIB reçu') return 'pct-info';
+    if (s === 'Refusé') return 'pct-danger';
+    return 'pct-muted';
+  }
+
+  function buildPdfFilename(filters) {
+    const parts = ['statistiques'];
+    if (filters.tp === 'AEV_NON_RECU') parts.push('AEV');
+    else if (filters.tp === 'PAIEMENT_MULTIPLE') parts.push('Multiple');
+    if (filters.st) {
+      const slug = String(filters.st)
+        .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      parts.push(slug);
+    }
+    if (filters.df) parts.push('du-' + filters.df);
+    if (filters.dt) parts.push('au-' + filters.dt);
+    parts.push(new Date().toISOString().slice(0, 10));
+    return parts.join('_') + '.pdf';
+  }
+
+  function buildRequestLabel(filters) {
+    const parts = [];
+    if (filters.tp) parts.push('Type: ' + typeLabel(filters.tp));
+    if (filters.st) parts.push('Statut: ' + filters.st);
+    if (filters.df || filters.dt) {
+      const datePart = [];
+      if (filters.df) datePart.push('du ' + formatDateEU(filters.df));
+      if (filters.dt) datePart.push('au ' + formatDateEU(filters.dt));
+      if (datePart.length) parts.push('Dates: ' + datePart.join(' '));
+    }
+    return parts.length ? parts.join(' • ') : 'Tous les tickets (sans filtre)';
+  }
+
+  function fetchWithAuth(url, options = {}) {
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    }).then(async res => {
+      if (res.status === 401) {
+        localStorage.removeItem('jwt_token');
+        window.location.href = '/auth/login.html';
+        return Promise.reject('Non authentifié');
+      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const ct = res.headers.get('content-type');
+      if (!ct || !ct.includes('application/json')) throw new Error('Réponse non-JSON');
+      return res.json();
+    });
+  }
+
+  /* ============================================================
+     FILTRES URL
+     ============================================================ */
+  const urlParams = new URLSearchParams(window.location.search);
+  const filters = {
+    df: urlParams.get('date_from') || '',
+    dt: urlParams.get('date_to') || '',
+    tp: urlParams.get('type') || '',
+    st: urlParams.get('statut') || ''
+  };
+
+  const submittedAt = new Date();
+
+  const pdfFilename = buildPdfFilename(filters);
+  document.getElementById('filenameChip').innerHTML =
+    '<span class="label">Fichier généré</span>' +
+    '<strong>' + escapeHtml(pdfFilename) + '</strong>';
+
+  document.getElementById('requestValue').textContent = buildRequestLabel(filters);
+
+  document.getElementById('headerDate').textContent =
+    'Mada Ozi — Généré le ' + formatDateTimeEU(submittedAt);
+
+  /* ============================================================
+     CHARGEMENT
+     ============================================================ */
+  try {
+    const params = new URLSearchParams();
+    if (filters.df) params.append('date_from', filters.df);
+    if (filters.dt) params.append('date_to', filters.dt);
+    if (filters.tp) params.append('type', filters.tp);
+    if (filters.st) params.append('statut', filters.st);
+
+    const urlStats = `${API_BASE}/api/admin/stats${params.toString() ? '?' + params.toString() : ''}`;
+    const urlTickets = `${API_BASE}/api/interlocuteur/tickets`;
+
+    const [stats, ticketsAll] = await Promise.all([
+      fetchWithAuth(urlStats),
+      fetch(urlTickets, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      }).then(r => r.ok ? r.json() : []).catch(() => [])
+    ]);
+
+    const tickets = (Array.isArray(ticketsAll) ? ticketsAll : []).filter(t => {
+      const tType = getTicketType(t);
+      if (filters.tp && tType !== filters.tp) return false;
+      if (filters.st && t.statut !== filters.st) return false;
+      if (filters.df || filters.dt) {
+        const raw = t.date_iso || t.date || t.createdAt;
+        if (!raw) return false;
+        const d = new Date(String(raw).replace(' ', 'T'));
+        if (isNaN(d.getTime())) return false;
+        if (filters.df && d < new Date(filters.df + 'T00:00:00')) return false;
+        if (filters.dt) {
+          const to = new Date(filters.dt + 'T23:59:59');
+          if (d > to) return false;
+        }
+      }
+      return true;
+    });
+
+    renderReport(stats, tickets, filters, submittedAt);
+
+  } catch (err) {
+    console.error('Erreur chargement rapport:', err);
+    document.getElementById('content').innerHTML =
+      '<div class="error-message">❌ Impossible de charger le rapport.<br><small>' +
+      escapeHtml(err.message) + '</small></div>';
+  }
+
+  /* ============================================================
+     RENDU DU RAPPORT
+     ============================================================ */
+  function renderReport(stats, tickets, filters, submittedAt) {
+    const typeFilterLabel = filters.tp === 'AEV_NON_RECU' ? 'AEV non reçu'
+                          : filters.tp === 'PAIEMENT_MULTIPLE' ? 'Paiement multiple'
+                          : 'Tous';
+    const statutLabel = filters.st || 'Tous';
+    const dateFromLabel = filters.df ? formatDateEU(filters.df) : 'Toutes';
+    const dateToLabel = filters.dt ? formatDateEU(filters.dt) : 'Toutes';
+
+    const parStatut = stats.par_statut || {};
+    const statutKeys = Object.keys(parStatut);
+    const total = stats.total || 0;
+
+    /* Rows statut avec % + chiffre */
+    const statutRows = statutKeys.length
+      ? statutKeys.map(k => {
+          const c = parStatut[k];
+          const pct = total > 0 ? Math.round((c / total) * 100) : 0;
+          const pctClass = statutPctClass(k);
+          return '<tr>' +
+            '<td style="font-weight:700;">' + escapeHtml(k) + '</td>' +
+            '<td class="num">' + c + '</td>' +
+            '<td style="width:30%;">' +
+              '<div class="pct-cell">' +
+                '<span class="pct-badge ' + pctClass + '">' + pct + '%</span>' +
+                '<span class="pct-count">' + c + ' ticket' + (c > 1 ? 's' : '') + '</span>' +
+              '</div>' +
+            '</td>' +
+          '</tr>';
+        }).join('')
+      : '<tr><td colspan="3" style="color:#94a3b8;font-style:italic;text-align:center;padding:24px;">Aucun ticket pour ces filtres</td></tr>';
+
+    const aevCount = (stats.par_type && stats.par_type['AEV_NON_RECU']) || stats.aev_non_recu || 0;
+    const multCount = (stats.par_type && stats.par_type['PAIEMENT_MULTIPLE']) || stats.paiement_multiple || 0;
+    const validCount = parStatut['Validé'] || 0;
+
+    const aevPct = total > 0 ? Math.round((aevCount / total) * 100) : 0;
+    const multPct = total > 0 ? Math.round((multCount / total) * 100) : 0;
+    const validPct = total > 0 ? Math.round((validCount / total) * 100) : 0;
+
+    const monthly = stats.monthly || stats.monthlyStats || {};
+    const monthlyKeys = Object.keys(monthly);
+    const monthlyHeaders = monthlyKeys.map(m => '<th>' + escapeHtml(m) + '</th>').join('');
+    const monthlyValues = monthlyKeys.map(m => '<td>' + monthly[m] + '</td>').join('');
+
+    const ticketsRows = (tickets.length > 0)
+      ? tickets.map(t => {
+          const tkType = getTicketType(t);
+          const typeCls = tkType === 'PAIEMENT_MULTIPLE' ? 'type-multiple' : 'type-aev';
+          const badgeCls = statutBadgeClass(t.statut);
+          return '<tr>' +
+            '<td style="font-weight:800;color:#4f46e5;">#' + (t.id || '—') + '</td>' +
+            '<td style="font-weight:600;">' + escapeHtml(t.reference || '—') + '</td>' +
+            '<td><span class="type-badge ' + typeCls + '">' + escapeHtml(typeLabel(tkType)) + '</span></td>' +
+            '<td class="num">' + formatMontant(t.montant, t.devise) + '</td>' +
+            '<td><span class="badge ' + badgeCls + '">' + escapeHtml(t.statut || '—') + '</span></td>' +
+            '<td style="color:#64748b;font-size:11px;font-weight:600;">' + escapeHtml(formatDateEU(t.date || t.createdAt)) + '</td>' +
+          '</tr>';
+        }).join('')
+      : '<tr><td colspan="6" style="color:#94a3b8;font-style:italic;text-align:center;padding:24px;">Aucun ticket pour ces filtres</td></tr>';
+
+    /* SVG icons modernes */
+    const svgTotal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>';
+    const svgAev = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+    const svgMultiple = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/><line x1="14" y1="15" x2="18" y2="15"/></svg>';
+    const svgValid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+
+    const html = `
+      <h2>Filtres appliqués <span class="badge-count">${filters.tp || filters.st || filters.df || filters.dt ? 'Filtré' : 'Tous'}</span></h2>
+      <div class="filters">
+        <div class="filter-card"><div class="label">Date (du)</div><div class="value">${escapeHtml(dateFromLabel)}</div></div>
+        <div class="filter-card"><div class="label">Date (au)</div><div class="value">${escapeHtml(dateToLabel)}</div></div>
+        <div class="filter-card"><div class="label">Type</div><div class="value">${escapeHtml(typeFilterLabel)}</div></div>
+        <div class="filter-card"><div class="label">Statut</div><div class="value">${escapeHtml(statutLabel)}</div></div>
+      </div>
+
+      <h2>Chiffres clés</h2>
+      <div class="kpi-grid">
+        <div class="kpi kpi-total">
+          <div class="icon">${svgTotal}</div>
+          <div class="value">${total}</div>
+          <div class="label">Total tickets</div>
+        </div>
+        <div class="kpi kpi-aev">
+          <div class="icon">${svgAev}</div>
+          <div class="value">${aevCount}</div>
+          <div class="label">AEV non reçu</div>
+        </div>
+        <div class="kpi kpi-multiple">
+          <div class="icon">${svgMultiple}</div>
+          <div class="value">${multCount}</div>
+          <div class="label">Paiement multiple</div>
+        </div>
+        <div class="kpi kpi-valid">
+          <div class="icon">${svgValid}</div>
+          <div class="value">${validCount}</div>
+          <div class="label">Validés</div>
+        </div>
+      </div>
+
+      <h2>Répartition par statut</h2>
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Statut</th>
+            <th style="text-align:right;width:100px;">Nombre</th>
+            <th style="width:30%;">Répartition</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${statutRows}
+          <tr class="total">
+            <td>Total</td>
+            <td class="num">${total}</td>
+            <td>
+              <div class="pct-cell">
+                <span class="pct-badge pct-primary">100%</span>
+                <span class="pct-count">${total} ticket${total > 1 ? 's' : ''}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Répartition par type</h2>
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th style="text-align:right;width:100px;">Nombre</th>
+            <th style="width:30%;">Répartition</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="type-badge type-aev">AEV non reçu</span></td>
+            <td class="num">${aevCount}</td>
+            <td>
+              <div class="pct-cell">
+                <span class="pct-badge pct-info">${aevPct}%</span>
+                <span class="pct-count">${aevCount} ticket${aevCount > 1 ? 's' : ''}</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="type-badge type-multiple">Paiement multiple</span></td>
+            <td class="num">${multCount}</td>
+            <td>
+              <div class="pct-cell">
+                <span class="pct-badge pct-danger">${multPct}%</span>
+                <span class="pct-count">${multCount} ticket${multCount > 1 ? 's' : ''}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      ${monthlyKeys.length > 0 ? `
+        <h2>Évolution mensuelle</h2>
+        <div class="monthly-table">
+          <table>
+            <thead><tr>${monthlyHeaders}</tr></thead>
+            <tbody><tr>${monthlyValues}</tr></tbody>
+          </table>
+        </div>
+      ` : ''}
+
+      <h2>Détail des tickets <span class="badge-count">${tickets.length} ticket${tickets.length > 1 ? 's' : ''}</span></h2>
+      <table class="data">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Référence</th>
+            <th>Type</th>
+            <th style="text-align:right;">Montant</th>
+            <th>Statut</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>${ticketsRows}</tbody>
+      </table>
+
+      <div class="footer">
+        <div class="footer-info">
+          <div class="footer-brand">
+            <span class="footer-brand-icon">M</span>
+            Mada Ozi
+          </div>
+          <div>Rapport généré le <strong>${formatDateTimeEU(submittedAt)}</strong></div>
+        </div>
+        <div class="footer-info" style="text-align:right;">
+          <div>Requête : <strong>${escapeHtml(buildRequestLabel(filters))}</strong></div>
+          <div>Fichier : <strong>${escapeHtml(pdfFilename)}</strong></div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('content').innerHTML = html;
+  }
+});
+</script>
+</body>
+</html>
