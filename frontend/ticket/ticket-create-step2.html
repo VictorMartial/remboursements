@@ -174,7 +174,7 @@
     <div class="sidebar-backdrop" data-sidebar-close></div>
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
-            <a class="brand-mark" href="/user/dashboard-user.html">
+            <a class="brand-mark" href="/interlocuteur/interlocuteur-accueil.html">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
                 <span class="brand-copy">
                     <span class="brand-title">Interlocuteur</span>
@@ -183,8 +183,8 @@
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
-            <a class="nav-link" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span>Mes tickets</span></a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-accueil.html"><i class="bi bi-speedometer2"></i> <span>Dashboard</span></a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-tickets-list.html"><i class="bi bi-list-ul"></i> <span>Mes tickets</span></a>
             <a class="nav-link active" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
             <a class="nav-link" href="/interlocuteur/interlocuteur-dashboard.html"><i class="bi bi-inbox"></i> <span>Suivi RIB / Banque</span></a>
         </nav>
@@ -217,10 +217,10 @@
                     </button>
                     <div class="dropdown">
                         <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">Interlocuteur</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><a class="dropdown-item" href="/interlocuteur/interlocuteur-profile.html" data-i18n="profile">Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/auth/login.html" data-i18n="logout">Déconnexion</a></li>
                         </ul>
@@ -816,7 +816,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function loadExistingOrderIds(forceReload) {
         if (!forceReload && existingOrderIds !== null) return existingOrderIds;
         try {
-            const tickets = await fetchWithAuth(`${API_BASE}/api/user/tickets`);
+            const tickets = await fetchWithAuth(`${API_BASE}/api/interlocuteur/tickets`);
             const list = Array.isArray(tickets) ? tickets : (tickets.tickets || tickets.data || []);
             existingOrderIds = new Set(
                 list
@@ -1117,10 +1117,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 isSubmitting = true;
                 step2Submit.disabled = true;
-                showToast('Ticket créé. Email de demande de RIB envoyé à ' + clientEmailVal, 'success');
+                if (data.email_sent === false) {
+                    showToast('Ticket créé, mais l\'email de demande de RIB n\'a pas pu être envoyé à ' + clientEmailVal + '.', 'warning');
+                } else {
+                    showToast('Ticket créé. Email de demande de RIB envoyé à ' + clientEmailVal, 'success');
+                }
                 setTimeout(() => {
-                    window.location.href = '/user/tickets-list.html';
-                }, 900);
+                    window.location.href = '/interlocuteur/interlocuteur-tickets-list.html';
+                }, data.email_sent === false ? 2500 : 900);
                 return;
             }
             showToast(data.message || data.error || 'Erreur serveur', 'danger');
@@ -1189,7 +1193,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (e) { return null; }
     }
     const payload = parseJwt(token);
-    const email = payload?.email || payload?.username || payload?.sub || 'Utilisateur';
+    const email = payload?.email || payload?.username || payload?.sub || 'Interlocuteur';
     const sidebarName = document.getElementById('sidebarUserName');
     const navbarName = document.getElementById('navbarUserName');
     if (sidebarName) sidebarName.textContent = email;

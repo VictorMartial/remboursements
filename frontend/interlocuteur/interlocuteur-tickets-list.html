@@ -1417,6 +1417,16 @@ document.addEventListener('DOMContentLoaded', function() {
         else { loadTickets(); if (!ticketsWsOk) { startTicketsPolling(); ticketsWsConnect(); } }
     });
 
+    /* Réapplique le filtre de recherche après chaque rendu */
+    const originalRenderTickets = renderTickets;
+    renderTickets = function () {
+        originalRenderTickets();
+        const input = document.querySelector('[data-table-search="ticketsTable"]');
+        if (input && input.value.trim() !== '') {
+            applyTableFilter(input.value.trim());
+        }
+    };
+
     /* ===== INIT ===== */
     bindSort();
     loadTickets();
@@ -1512,14 +1522,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initTableSearch();
 
     // Ré-appliquer le filtre après un re-render (tri, WS, delete…)
-    const originalRenderTickets = renderTickets;
-    renderTickets = function () {
-        originalRenderTickets();
-        const input = document.querySelector('[data-table-search="ticketsTable"]');
-        if (input && input.value.trim() !== '') {
-            applyTableFilter(input.value.trim());
-        }
-    };
 </script>
 </body>
 </html>

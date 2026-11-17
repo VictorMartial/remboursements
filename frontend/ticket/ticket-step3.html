@@ -145,22 +145,22 @@
     <div class="sidebar-backdrop" data-sidebar-close></div>
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
-            <a class="brand-mark" href="/user/dashboard-user.html">
+            <a class="brand-mark" href="/interlocuteur/interlocuteur-accueil.html">
                 <span class="brand-icon"><i class="bi bi-grid-1x2-fill"></i></span>
                 <span class="brand-copy">
-                    <span class="brand-title" data-i18n="brand.title">Utilisateur</span>
-                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace personnel</span>
+                    <span class="brand-title" data-i18n="brand.title">Interlocuteur</span>
+                    <span class="brand-subtitle" data-i18n="brand.subtitle">Espace de travail</span>
                 </span>
             </a>
         </div>
         <nav class="sidebar-nav">
-            <a class="nav-link" href="/user/dashboard-user.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
-            <a class="nav-link active" href="/user/tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
+            <a class="nav-link" href="/interlocuteur/interlocuteur-accueil.html"><i class="bi bi-speedometer2"></i> <span data-i18n="nav.dashboard">Dashboard</span></a>
+            <a class="nav-link active" href="/interlocuteur/interlocuteur-tickets-list.html"><i class="bi bi-list-ul"></i> <span data-i18n="nav.tickets">Mes tickets</span></a>
             <a class="nav-link" href="/ticket/ticket-create-step1.html"><i class="bi bi-plus-circle"></i> Nouveau ticket</a>
         </nav>
         <div class="sidebar-user">
-            <strong id="sidebarUserName">Utilisateur</strong>
-            <small data-i18n="brand.subtitle">Espace personnel</small>
+            <strong id="sidebarUserName">Interlocuteur</strong>
+            <small data-i18n="brand.subtitle">Espace de travail</small>
         </div>
         <div class="sidebar-footer">
             <span class="status-dot"></span>
@@ -190,10 +190,10 @@
                     </button>
                     <div class="dropdown">
                         <button class="profile-button dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">User</span>
+                            <span class="profile-name d-none d-sm-inline" id="navbarUserName">Interlocuteur</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/user/profile.html" data-i18n="profile">Profil</a></li>
+                            <li><a class="dropdown-item" href="/interlocuteur/interlocuteur-profile.html" data-i18n="profile">Profil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/auth/login.html" data-i18n="logout">Déconnexion</a></li>
                         </ul>
@@ -241,7 +241,7 @@
                             </div>
                             <div class="help-text" data-i18n="ticket.step3.file_help">Format accepté : PDF, JPG, PNG - Taille max : 5MB</div>
                             <div class="mt-3 d-flex gap-2">
-                                <a href="/user/tickets-list.html" class="btn btn-pill btn-cancel-pill">
+                                <a href="/interlocuteur/interlocuteur-tickets-list.html" class="btn btn-pill btn-cancel-pill">
                                     <i class="bi bi-x-lg"></i> <span data-i18n="ticket.step3.cancel">Annuler</span>
                                 </a>
                                 <button type="submit" class="btn btn-pill btn-send-pill" id="submitRib">
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.getElementById('ticketIdDisplay').textContent = `#${ticketId}`;
 
-    fetchWithAuth(`${API_BASE}/api/user/ticket/${ticketId}`)
+    fetchWithAuth(`${API_BASE}/api/interlocuteur/ticket/${ticketId}`)
         .then(ticket => {
             if (ticket.statut !== 'En attente RIB') {
                 document.getElementById('infoMessage').innerHTML =
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'success'
                 );
                 setTimeout(() => {
-                    window.location.href = '/user/tickets-list.html';
+                    window.location.href = '/interlocuteur/interlocuteur-tickets-list.html';
                 }, 1200);
             } else {
                 showToast(data.message || 'Erreur serveur', 'danger');
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) { return null; }
     }
     const payload = parseJwt(token);
-    const email = payload?.email || payload?.username || payload?.sub || 'Utilisateur';
+    const email = payload?.email || payload?.username || payload?.sub || 'Interlocuteur';
     const sidebarName = document.getElementById('sidebarUserName');
     const navbarName = document.getElementById('navbarUserName');
     if (sidebarName) sidebarName.textContent = email;

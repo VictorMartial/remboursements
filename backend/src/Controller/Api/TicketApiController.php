@@ -220,12 +220,17 @@ class TicketApiController extends AbstractController
         }
         $this->em->flush();
 
-        // Envoi immédiat de l'email professionnel demandant le RIB au client
-        $this->sendRibRequestEmail($ticket);
+        // Envoi immédiat de l'email professionnel demandant le RIB au client (adresse saisie à la main à l'étape 2)
+        $emailSent = $this->sendRibRequestEmail($ticket);
 
         $this->activityLogger->log(
             $type === 'AEV_NON_RECU' ? 'AEV NON RECU' : 'PAIEMENT MULTIPLE',
-            sprintf('Ticket #%d créé via API — email RIB envoyé à %s', $ticket->getId(), $clientEmail),
+            sprintf(
+                'Ticket #%d créé via API — email RIB %s à %s',
+                $ticket->getId(),
+                $emailSent ? 'envoyé' : 'NON envoyé (échec)',
+                $clientEmail
+            ),
             'Ticket',
             $ticket->getId()
         );
@@ -236,7 +241,11 @@ class TicketApiController extends AbstractController
         return $this->json([
             'success' => true,
             'id' => $ticket->getId(),
-            'message' => 'Ticket créé avec succès. Email de demande de RIB envoyé au client.'
+            'email_sent' => $emailSent,
+            'client_email' => $clientEmail,
+            'message' => $emailSent
+                ? 'Ticket créé avec succès. Email de demande de RIB envoyé au client.'
+                : 'Ticket créé, mais l\'email de demande de RIB n\'a pas pu être envoyé. Réessayez depuis la liste des tickets.'
         ], 201);
     }
 
@@ -244,11 +253,11 @@ class TicketApiController extends AbstractController
      * Envoie un email professionnel au client pour demander son RIB.
      * N'utilise plus le transport "client" : on utilise l'email professionnel (banque / interlocuteur).
      */
-    private function sendRibRequestEmail(Ticket $ticket): void
+    private function sendRibRequestEmail(Ticket $ticket): bool
     {
         $to = $ticket->getClientEmail();
         if (!$to) {
-            return;
+            return false;
         }
         try {
             // Email professionnel (plus de transport "client")
@@ -280,8 +289,10 @@ class TicketApiController extends AbstractController
             // Transport professionnel (banque) — plus de "client"
             $email->getHeaders()->addTextHeader('X-Transport', 'banque');
             $this->mailer->send($email);
-        } catch (\Exception $e) {
+            return true;
+        } catch (\Throwable $e) {
             $this->logger->error('Erreur envoi email demande RIB au client : ' . $e->getMessage());
+            return false;
         }
     }
 
