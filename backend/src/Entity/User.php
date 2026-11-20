@@ -42,6 +42,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 5, nullable: true)]
     private ?string $locale = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $passwordChangedAt = null;
+
+    public function getPasswordChangedAt(): ?\DateTimeImmutable
+    {
+    return $this->passwordChangedAt;
+    }
+
+    public function setPasswordChangedAt(?\DateTimeImmutable $passwordChangedAt): static
+    {
+    $this->passwordChangedAt = $passwordChangedAt;
+    return $this;
+    }
+
     public function getResetCode(): ?string
     {
         return $this->resetCode;

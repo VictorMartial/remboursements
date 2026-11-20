@@ -292,25 +292,25 @@
         body: JSON.stringify(payload)
       })
         .then(data => {
-          if (data.success !== false) {
-            alertDiv.textContent = 'Profil mis à jour avec succès !';
-            alertDiv.className = 'alert alert-success';
-            alertDiv.classList.remove('d-none');
+  if (data.success === false) {
+    alertDiv.textContent = data.message || 'Erreur lors de la mise à jour.';
+    alertDiv.className = 'alert alert-danger';
+    alertDiv.classList.remove('d-none');
+    return;
+  }
 
-            // Mettre à jour immédiatement l'affichage avec le nouvel email
-            updateConnectedUserDisplay(newEmail);
+  if (data.logout) {
+    logout();   // ta fonction existante : vide jwt_token puis redirige vers /auth/login.html
+    return;
+  }
 
-            // Recharger les données depuis l'API
-            loadProfile();
-
-            // Vider le champ mot de passe
-            document.getElementById('profilePassword').value = '';
-          } else {
-            alertDiv.textContent = data.message || 'Erreur lors de la mise à jour.';
-            alertDiv.className = 'alert alert-danger';
-            alertDiv.classList.remove('d-none');
-          }
-        })
+  alertDiv.textContent = 'Profil mis à jour avec succès !';
+  alertDiv.className = 'alert alert-success';
+  alertDiv.classList.remove('d-none');
+  updateConnectedUserDisplay(newEmail);
+  loadProfile();
+  document.getElementById('profilePassword').value = '';
+})
         .catch(err => {
           alertDiv.textContent = err.message || 'Erreur réseau. Veuillez réessayer.';
           alertDiv.className = 'alert alert-danger';

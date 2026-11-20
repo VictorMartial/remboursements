@@ -73,6 +73,23 @@
     }
   }
 
+  // ---------- Déconnexion globale (toutes les pages) ----------
+  // Phase de capture (true) : rien ne peut bloquer ce clic avant nous.
+  document.addEventListener("click", function (e) {
+    if (isPublicAuthPage) return; // pas sur login / register / forgot-password
+
+    var link = e.target.closest(
+      '#logoutBtn, [data-logout], .dropdown-menu a[href$="login.html"]'
+    );
+    if (!link) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    clearSession();
+    try { localStorage.removeItem("token"); } catch (err) {}
+    window.location.replace(LOGIN_URL);
+  }, true);
+
   // ---------- Thème global (mode sombre) ----------
   function getPreferredTheme() {
     try {

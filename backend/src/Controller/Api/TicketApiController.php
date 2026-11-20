@@ -401,28 +401,33 @@ class TicketApiController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'api_ticket_show', methods: ['GET'])]
-    public function show(Ticket $ticket): JsonResponse
-    {
-        if ($ticket->getUser() !== $this->getUser()) {
-            return $this->json(['error' => 'Accès refusé'], 403);
-        }
+    #[Route('/{id}', name: 'api_ticket_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+public function show(Ticket $ticket): JsonResponse
+{
+    $isStaff = $this->isGranted('ROLE_INTERLOCUTEUR') || $this->isGranted('ROLE_ADMIN');
 
-        return $this->json([
-            'id' => $ticket->getId(),
-            'reference' => $ticket->getReferenceCommande(),
-            'montant' => $ticket->getMontantARembourser(),
-            'statut' => $ticket->getStatut(),
-            'date' => $ticket->getDateCommande()?->format('d/m/Y'),
-            'description' => $ticket->getDescription(),
-            'type' => $ticket->getTypeRemboursement(),
-            'rib' => $ticket->getRib(),
-            'devise' => $ticket->getDevise(),
-            'suivi_banque' => method_exists($ticket, 'getSuiviBanque') ? $ticket->getSuiviBanque() : null,
-            'suivi_client' => method_exists($ticket, 'getSuiviClient') ? $ticket->getSuiviClient() : null,
-            'suivi_madaozi' => method_exists($ticket, 'getSuiviMadaozi') ? $ticket->getSuiviMadaozi() : null,
-        ]);
+    if (!$isStaff && $ticket->getUser() !== $this->getUser()) {
+        return $this->json(['error' => 'Accès refusé'], 403);
     }
+
+    return $this->json([
+        'id' => $ticket->getId(),
+        'reference' => $ticket->getReferenceCommande(),
+        'references' => $ticket->getReferences()
+            ? array_values(array_filter(explode("\n", $ticket->getReferences())))
+            : [],
+        'montant' => $ticket->getMontantARembourser(),
+        'statut' => $ticket->getStatut(),
+        'date' => $ticket->getDateCommande()?->format('d/m/Y'),
+        'description' => $ticket->getDescription(),
+        'type' => $ticket->getTypeRemboursement(),
+        'rib' => $ticket->getRib(),
+        'devise' => $ticket->getDevise(),
+        'suivi_banque' => method_exists($ticket, 'getSuiviBanque') ? $ticket->getSuiviBanque() : null,
+        'suivi_client' => method_exists($ticket, 'getSuiviClient') ? $ticket->getSuiviClient() : null,
+        'suivi_madaozi' => method_exists($ticket, 'getSuiviMadaozi') ? $ticket->getSuiviMadaozi() : null,
+    ]);
+}
 
     #[Route('/list', name: 'api_ticket_list', methods: ['GET'])]
     public function list(): JsonResponse

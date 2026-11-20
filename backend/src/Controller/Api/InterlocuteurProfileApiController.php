@@ -102,26 +102,33 @@ class InterlocuteurProfileApiController extends AbstractController
             $user->setBio(trim((string) $data['bio']));
         }
 
-        if (!empty($data['password'])) {
-            $password = (string) $data['password'];
-            if (strlen($password) < 6) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Le mot de passe doit contenir au moins 6 caracteres.',
-                ], 400);
-            }
-            $user->setPassword($this->passwordHasher->hashPassword($user, $password));
-        }
+        $passwordChanged = false;
 
-        $this->em->flush();
-
+if (!empty($data['password'])) {
+    $password = (string) $data['password'];
+    if (strlen($password) < 6) {
         return $this->json([
-            'success'   => true,
-            'message'   => 'Profil mis a jour avec succes.',
-            'email'     => $user->getEmail(),
-            'bio'       => method_exists($user, 'getBio') ? $user->getBio() : null,
-            'createdAt' => $user->getCreatedAt() ? $user->getCreatedAt()->format('d/m/Y H:i') : null,
-        ]);
+            'success' => false,
+            'message' => 'Le mot de passe doit contenir au moins 6 caractères.',
+        ], 400);
+    }
+    $user->setPassword($this->passwordHasher->hashPassword($user, $password));
+    $user->setPasswordChangedAt(new \DateTimeImmutable());
+    $passwordChanged = true;
+}
+
+$this->em->flush();
+
+return $this->json([
+    'success'   => true,
+    'message'   => $passwordChanged
+        ? 'Mot de passe modifié. Veuillez vous reconnecter.'
+        : 'Profil mis à jour avec succès.',
+    'logout'    => $passwordChanged,
+    'email'     => $user->getEmail(),
+    'bio'       => method_exists($user, 'getBio') ? $user->getBio() : null,
+    'createdAt' => $user->getCreatedAt()?->format('d/m/Y H:i'),
+]);
     }
 
     #[Route('/tickets', name: 'api_interlocuteur_tickets', methods: ['GET'])]
